@@ -111,8 +111,16 @@ describe('deriveCapabilities', () => {
   it('never leaks automation-mechanism terminology into any snippet', () => {
     const banned = /applescript|jxa|osascript|javascript for automation/i
     for (const cap of caps) {
-      expect(cap.cliSnippet).not.toMatch(banned)
+      expect(cap.cliSnippet ?? '').not.toMatch(banned)
     }
+  })
+
+  it('gives no CLI snippet to an operation the generated CLI has no command for', () => {
+    // The generated CLI registers no command for a resource delete, so
+    // discovery names none; the operation keeps its MCP tool.
+    const del = byName.get('notebook.notes.delete')
+    expect(del?.cliSnippet).toBeUndefined()
+    expect(del?.mcpToolName).toBe('macts__notebook__notes_delete')
   })
 
   it('derives the matching MCP tool name', () => {

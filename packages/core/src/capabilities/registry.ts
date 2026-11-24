@@ -13,7 +13,7 @@
  */
 import { normalizeManifestAddresses } from '../manifest/normalize-addresses.js'
 
-import type { AppManifest, Command, Resource, HierarchyChild } from '../manifest/index.js'
+import type { AppManifest, Command, Resource } from '../manifest/index.js'
 import {
   commandRouteSegment,
   normalizeResourceRouteSegment,
@@ -29,11 +29,10 @@ import {
   getResources,
   type JsonSchema,
 } from './operation-schema.js'
-import { usableHierarchyChildren } from '../manifest/unsupported.js'
 import { isOperationAvailable, omittedInputs } from '../generator/input-satisfiability.js'
 import { classifyCommandRisk } from './risk.js'
 import { commandMethodParameters } from '../generator/surface.js'
-import { commandCliSegments } from '../generator/cli/placement.js'
+import { cliCommandTree, type CliTreeCommand } from '../generator/cli/command-tree.js'
 import { itemIdentifierParameter, selectsOneItem } from '../manifest/item-selection.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
@@ -46,64 +45,41 @@ function toKebabCase(input: string): string {
 }
 
 /**
- * The CLI invocation path for a resource, as the CLI generator emits it: the
- * hierarchy path segments plus the parent-id flags needed to reach the resource.
+ * The CLI command of a resource capability, as the CLI generator emits it: the
+ * hierarchy path segments it sits under, its own name, and the parent-id flags
+ * needed to reach the resource.
  */
 interface ResourceCliPath {
   /** Hierarchy path segments (e.g. `['calendars', 'events']`). */
   readonly segments: readonly string[]
+  /** The command's own CLI name, kebab-cased (e.g. `list`, `do-script`). */
+  readonly operation: string
   /** Parent-id flag names in kebab-case (e.g. `['calendar-id']`). */
   readonly parentFlags: readonly string[]
 }
 
 /**
- * Walk the manifest hierarchy and record, for each resource, every CLI path
- * at which it appears, in depth-first, insertion order. Mirrors
- * `createCliGeneratorContext`'s `buildHierarchyPaths` so discovery snippets
- * match the generated CLI exactly. The entries of a resource marked
- * unsupported, and everything nested under them, are skipped, as the CLI
- * generator skips them.
+ * The CLI command a resource capability names, from the CLI's command tree
+ * (`../generator/cli/command-tree.ts`): the first command the tree generates
+ * for that manifest command on that resource. `undefined` when the CLI has no
+ * command for the operation, so the capability has no CLI snippet.
  */
-function buildResourceCliPaths(manifest: AppManifest): Map<string, ResourceCliPath[]> {
-  const paths = new Map<string, ResourceCliPath[]>()
-
-  const walk = (
-    children: Record<string, HierarchyChild>,
-    segments: readonly string[],
-    parentFlags: readonly string[]
-  ): void => {
-    for (const [key, child] of usableHierarchyChildren(manifest, children)) {
-      const nextSegments = [...segments, key]
-      const entries = paths.get(child.resource) ?? []
-      entries.push({ segments: nextSegments, parentFlags })
-      paths.set(child.resource, entries)
-      if (child.children) {
-        const nextParentFlags = [...parentFlags, `${toKebabCase(child.resource)}-id`]
-        walk(child.children, nextSegments, nextParentFlags)
-      }
-    }
-  }
-
-  walk(manifest.hierarchy.children, [], [])
-  return paths
-}
-
-/**
- * The CLI path a discovery snippet names for one resource command: the first
- * of the resource's hierarchy paths the command's address reaches, at the
- * segments the CLI generator places it under (`../generator/cli/placement.ts`).
- * A command no entry places keeps the resource's first path.
- */
-function commandCliPath(
-  manifest: AppManifest,
+function resourceCliPath(
+  tree: readonly CliTreeCommand[],
   command: Command,
-  entries: readonly ResourceCliPath[]
+  resourceName: string
 ): ResourceCliPath | undefined {
-  for (const entry of entries) {
-    const segments = commandCliSegments(manifest, command, entry.segments)
-    if (segments !== undefined) return { ...entry, segments }
+  const entry = tree.find(
+    (candidate) => candidate.command === command && candidate.resourceName === resourceName
+  )
+  if (entry?.at === undefined) return undefined
+  return {
+    segments: entry.at.path,
+    operation: entry.name,
+    parentFlags: entry.at.parentParams.map(
+      ({ resourceName: parent }) => `${toKebabCase(parent)}-id`
+    ),
   }
-  return entries[0]
 }
 
 /**
@@ -156,15 +132,13 @@ function buildRequiredFlags(inputSchema: JsonSchema): string[] {
  * `macts` surface — never any underlying automation mechanism.
  *
  * @param app - App name (lowercased)
- * @param cliPath - The resource's hierarchy path + parent flags
- * @param operation - Operation name (as authored in the manifest command)
+ * @param cliPath - The command's CLI path, name and parent flags
  * @param inputSchema - Capability input schema (for flag hints)
  * @returns A single-line CLI snippet
  */
 function buildResourceCliSnippet(
   app: string,
   cliPath: ResourceCliPath,
-  operation: string,
   inputSchema: JsonSchema,
   command: Command,
   version: AppManifest['version']
@@ -178,10 +152,9 @@ function buildResourceCliSnippet(
       .map(({ parameter: { name } }) =>
         name === item ? `<${name}>` : `--${toKebabCase(name)} <${name}>`
       )
-    return ['macts', app, ...cliPath.segments, toKebabCase(operation), ...inputs].join(' ')
+    return ['macts', app, ...cliPath.segments, cliPath.operation, ...inputs].join(' ')
   }
-  const opSegment = toKebabCase(operation)
-  const segments = ['macts', app, ...cliPath.segments, opSegment]
+  const segments = ['macts', app, ...cliPath.segments, cliPath.operation]
   const parentFlags = cliPath.parentFlags.map((flag) => `--${flag} <id>`)
   // The own-required flags already include any parent ids the schema declares;
   // de-duplicate against the parent-id flags by flag name.
@@ -263,16 +236,16 @@ function withoutInputs(schema: JsonSchema, omitted: ReadonlySet<string>): JsonSc
 }
 
 /**
- * Derive a single capability from a resource-scoped command. The ordinary CLI
- * get uses its verb; additional identity gets use their resolved route segment.
+ * Derive a single capability from a resource-scoped command. Its CLI snippet
+ * names the CLI command `cliPath`; it has none when the CLI has no command for
+ * the operation.
  */
 function deriveResourceCapability(
   app: string,
   bundleId: string,
   resource: Resource,
   command: Command,
-  primaryGet: Command | undefined,
-  cliPath: ResourceCliPath,
+  cliPath: ResourceCliPath | undefined,
   route: ManifestRoute,
   omitted: ReadonlySet<string>,
   version: AppManifest['version']
@@ -299,19 +272,10 @@ function deriveResourceCapability(
       operation,
       description: command.description,
     }),
-    cliSnippet: buildResourceCliSnippet(
-      app,
-      cliPath,
-      // Only an additional identity get is a CLI command named by its route;
-      // every other command, an item command with a traversal included, is
-      // named by its command name, as the generated CLI names it.
-      command !== primaryGet && command.name === 'get' && command.identityTraversal !== undefined
-        ? operation
-        : command.name,
-      inputSchema,
-      command,
-      version
-    ),
+    cliSnippet:
+      cliPath === undefined
+        ? undefined
+        : buildResourceCliSnippet(app, cliPath, inputSchema, command, version),
     mcpToolName: generateToolName(app, resourceName, operation),
   }
 }
@@ -324,7 +288,8 @@ function deriveAppCapability(
   bundleId: string,
   command: Command,
   route: ManifestRoute,
-  omitted: ReadonlySet<string>
+  omitted: ReadonlySet<string>,
+  hasCliCommand: boolean
 ): Capability {
   const inputSchema = withoutInputs(generateAppCommandSchema(command), omitted)
   const operation = commandRouteSegment(route.commandKey, command)
@@ -347,7 +312,7 @@ function deriveAppCapability(
       operation,
       description: command.description,
     }),
-    cliSnippet: buildAppCliSnippet(app, command.name, inputSchema),
+    cliSnippet: hasCliCommand ? buildAppCliSnippet(app, command.name, inputSchema) : undefined,
     mcpToolName: generateToolName(app, 'app', operation),
   }
 }
@@ -369,29 +334,21 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
   manifest = normalizeManifestAddresses(manifest)
   const app = manifest.app.name.replace(/\s+/g, '-').toLowerCase()
   const bundleId = manifest.app.bundleId
-  const cliPaths = buildResourceCliPaths(manifest)
+  const tree = cliCommandTree(manifest)
   const routeOf = indexRoutes(manifest)
   const capabilities: Capability[] = []
 
   for (const resource of getResources(manifest)) {
     const commands = getResourceCommands(manifest, resource.name)
-    const entries = cliPaths.get(resource.name) ?? []
     for (const command of commands) {
       if (!isOperationAvailable(manifest, command, resource.name)) continue
-      // Use the command's placed hierarchy CLI path when present; fall back to
-      // the resource segment for resources not in the hierarchy.
-      const cliPath = commandCliPath(manifest, command, entries) ?? {
-        segments: [normalizeResourceRouteSegment(resource.plural)],
-        parentFlags: [],
-      }
       capabilities.push(
         deriveResourceCapability(
           app,
           bundleId,
           resource,
           command,
-          commands.find((entry) => entry.name === 'get'),
-          cliPath,
+          resourceCliPath(tree, command, resource.name),
           routeOf(command, resource),
           omittedInputs(manifest, command, resource.name),
           manifest.version
@@ -408,7 +365,8 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
         bundleId,
         command,
         routeOf(command, undefined),
-        omittedInputs(manifest, command, undefined)
+        omittedInputs(manifest, command, undefined),
+        tree.some((entry) => entry.kind === 'app' && entry.command === command)
       )
     )
   }

@@ -79,7 +79,8 @@ export class CapabilitiesInspectCommand extends Command {
             risk: capability.risk,
             permission: capability.permission ?? null,
             inputSchema: capability.inputSchema,
-            call: capability.cliSnippet,
+            // null when the CLI has no command for this operation.
+            call: capability.cliSnippet ?? null,
             mcpTool: capability.mcpToolName,
           }) + '\n'
         )
@@ -92,7 +93,9 @@ export class CapabilitiesInspectCommand extends Command {
       this.context.stdout.write(`App:         ${capability.app} (${capability.appBundleId})\n`)
       this.context.stdout.write(`Risk:        ${capability.risk}\n`)
       this.context.stdout.write(`Permission:  ${capability.permission ?? '(none — ungoverned)'}\n`)
-      this.context.stdout.write(`Call:        ${capability.cliSnippet}\n`)
+      this.context.stdout.write(
+        `Call:        ${capability.cliSnippet ?? `(no CLI command; MCP tool ${capability.mcpToolName})`}\n`
+      )
       this.context.stdout.write('\nInput schema:\n')
       this.context.stdout.write(JSON.stringify(capability.inputSchema, null, 2) + '\n')
       return 0

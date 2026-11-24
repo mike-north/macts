@@ -231,4 +231,125 @@ describe('commandCliSegments', () => {
     if (listTabs === undefined) throw new Error('Fixture requires listTabs')
     expect(commandCliSegments(manifest, listTabs, ['windows', 'tabs'])).toEqual(['windows', 'tabs'])
   })
+
+  it('keeps the hierarchy path of a format 1.0 command whose parent names a native accessor', () => {
+    // The 1.0 `parent` of listTabs is the Window, whose native collection
+    // accessor is `windows`. The hierarchy key is `browserWindows`, so read as
+    // a hierarchy edge the parent would not reach the entry at all; format 1.0
+    // places the command at the hierarchy path regardless.
+    const manifest = renamedWindowsManifest()
+    const listTabs = manifest.commands['listTabs']
+    if (listTabs === undefined) throw new Error('Fixture requires listTabs')
+    expect(commandCliSegments(manifest, listTabs, ['browserWindows', 'tabs'])).toEqual([
+      'browserWindows',
+      'tabs',
+    ])
+    expect(generatedCommands(manifest).get('src/commands/browserWindows/tabs/list.ts')).toBe(
+      'panes browserWindows tabs list'
+    )
+  })
+})
+
+/**
+ * The format 1.0 Panes fixture with its `windows` hierarchy key renamed
+ * `browserWindows`, so the key differs from the Window's native collection
+ * accessor that a 1.0 `parent` names.
+ */
+function renamedWindowsManifest(): AppManifest {
+  const manifest = panesManifest()
+  const windows = manifest.hierarchy.children['windows']
+  if (windows === undefined) throw new Error('Fixture requires windows')
+  manifest.hierarchy.children = { browserWindows: windows }
+  return manifest
+}
+
+describe('CLI command path collisions', () => {
+  /**
+   * The Session fixture with a second resource, a Console, held directly by
+   * each Window under the key `sessions`, and a `write` command on it. The
+   * Window-addressed Session `write`, which searches every Tab, is placed at
+   * `windows sessions write` too. Each resource's operation names are unique
+   * on its own surface, so only their CLI placement makes them claim one path.
+   */
+  function collidingManifest(): AppManifest {
+    const manifest = sessionManifest()
+    manifest.resources['Console'] = {
+      name: 'Console',
+      plural: 'Consoles',
+      description: 'A console held directly by a window',
+      properties: {
+        id: {
+          access: 'r',
+          type: 'string',
+          description: 'Console identity',
+          code: 'ID  ',
+          optional: false,
+        },
+      },
+      identifiers: [{ property: 'id', primary: true }],
+    }
+    const windows = manifest.hierarchy.children['windows']
+    if (windows?.children === undefined) throw new Error('Fixture requires windows')
+    windows.children['sessions'] = { resource: 'Console', access: 'r' }
+    manifest.commands['getConsole'] = {
+      name: 'get',
+      description: 'Read a console of a window',
+      scope: 'resource',
+      resourceType: 'Console',
+      resolvesReferences: false,
+      parents: [
+        { resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' },
+      ],
+      item: { by: 'identity', parameter: 'consoleId' },
+      parameters: [
+        { name: 'windowId', type: 'integer', description: 'Window identity', required: true },
+        { name: 'consoleId', type: 'string', description: 'Console identity', required: true },
+      ],
+    }
+    manifest.commands['writeConsoleText'] = {
+      name: 'write',
+      description: 'Write text into a console',
+      scope: 'resource',
+      resourceType: 'Console',
+      risk: 'write',
+      parents: [
+        { resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' },
+      ],
+      item: { by: 'identity', parameter: 'consoleId' },
+      parameters: [
+        { name: 'windowId', type: 'integer', description: 'Window identity', required: true },
+        { name: 'consoleId', type: 'string', description: 'Console identity', required: true },
+        { name: 'text', type: 'string', description: 'Text to write', required: true },
+      ],
+    }
+    return manifest
+  }
+
+  it('rejects two commands placed at the same CLI path, naming the path and both commands', () => {
+    const result = generateCliPlugin(collidingManifest(), {
+      packageName: '@macts/panes',
+      sdkPackageName: '@macts/panes',
+    })
+    expect(result.files).toEqual([])
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toContain('panes windows sessions write')
+    expect(result.errors[0]).toContain('writeSessionText')
+    expect(result.errors[0]).toContain('writeConsoleText')
+  })
+
+  it('accepts the same command name at distinct CLI paths', () => {
+    // Renamed, the Console command sits beside the Window-scoped Session
+    // `write` at `windows sessions`, at a distinct path.
+    const manifest = collidingManifest()
+    const consoleWrite = manifest.commands['writeConsoleText']
+    if (consoleWrite === undefined) throw new Error('Fixture requires writeConsoleText')
+    consoleWrite.name = 'type'
+    const commands = generatedCommands(manifest)
+    expect(commands.get('src/commands/windows/sessions/write.ts')).toBe(
+      'panes windows sessions write'
+    )
+    expect(commands.get('src/commands/windows/sessions/type.ts')).toBe(
+      'panes windows sessions type'
+    )
+  })
 })
