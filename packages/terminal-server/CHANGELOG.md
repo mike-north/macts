@@ -1,5 +1,11 @@
 # @macts/terminal-server
 
+## 0.5.0
+
+### Patch Changes
+
+- @macts/terminal@0.5.0
+
 ## 0.4.0
 
 ### Patch Changes

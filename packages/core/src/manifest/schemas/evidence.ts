@@ -458,6 +458,46 @@ export const DictionaryAbsenceEvidenceSchema = z
 export type DictionaryAbsenceEvidence = z.infer<typeof DictionaryAbsenceEvidenceSchema>
 
 /**
+ * Evidence that a command an app's scripting dictionary declares is a handler
+ * the app sends, not a command the app carries out: the dictionary documents
+ * that the app itself invokes it in a user's script (when a rule fires, a menu
+ * item runs a script, or a plug-in is consulted), and the script supplies the
+ * behavior. Sending such a command to the app performs nothing a caller can
+ * rely on, so a command with this evidence is never callable.
+ *
+ * It is read from the dictionary alone, never from running the app: what was
+ * read (the command's term), the finding, the dictionary's own words that
+ * establish it, and which app build on which macOS version they hold for. A
+ * later release whose dictionary no longer documents the command as a handler
+ * shows the evidence is stale.
+ */
+export const DictionaryHandlerEvidenceSchema = z
+  .object({
+    source: z.literal('dictionary'),
+    /** The bundle identifier of the app whose dictionary was read. */
+    bundleId: z.string().min(1),
+    /** The version of the app whose dictionary was read. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app was installed on, e.g. `27.3`. */
+    osVersion: z.string().min(1),
+    /**
+     * The command's name exactly as the dictionary writes it, e.g.
+     * `perform mail action with messages`.
+     */
+    term: z.string().min(1),
+    /** The finding: the command is a handler the app sends, not one it carries out. */
+    finding: z.literal('handler'),
+    /**
+     * The dictionary's own text that documents the command as a handler,
+     * quoted verbatim: the command's description, or that of the suite
+     * declaring it when the suite says what its commands are for.
+     */
+    statement: z.string().min(1),
+  })
+  .strict()
+export type DictionaryHandlerEvidence = z.infer<typeof DictionaryHandlerEvidenceSchema>
+
+/**
  * Evidence that something a manifest declares is absent from the running app:
  * a live, read-only observation in which addressing it failed, for one app
  * build on one macOS version.

@@ -192,4 +192,30 @@ describe('macts capabilities (UAT)', () => {
     expect(inspect.stdout).not.toMatch(BANNED)
     expect(inspect.stderr).not.toMatch(BANNED)
   })
+
+  // Mail's "perform mail action with messages" is a handler Mail sends to a
+  // user's script when a rule or menu item runs it, as its dictionary says; the
+  // shipped manifest marks it unsupported, so discovery never offers it. Mail's
+  // `checkForNewMail`, an operation Mail carries out, stays discoverable.
+  it('never offers a handler the app sends to scripts', async () => {
+    const handler = 'mail.app.performMailActionWithMessages'
+    const search = await runCli([
+      'capabilities',
+      'search',
+      'perform mail action with messages',
+      '--limit',
+      '50',
+      '--json',
+    ])
+    expect(search.code).toBe(0)
+    const parsed = JSON.parse(search.stdout) as { data: { results: { name: string }[] } }
+    expect(parsed.data.results.map((result) => result.name)).not.toContain(handler)
+
+    const inspect = await runCli(['capabilities', 'inspect', handler])
+    expect(inspect.code).toBe(1)
+    expect(inspect.stderr).toMatch(/unknown capability/i)
+
+    const usable = await runCli(['capabilities', 'inspect', 'mail.app.checkForNewMail', '--json'])
+    expect(usable.code).toBe(0)
+  })
 })

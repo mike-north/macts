@@ -1,5 +1,11 @@
 # @macts/finder-server
 
+## 0.5.0
+
+### Patch Changes
+
+- @macts/finder@0.5.0
+
 ## 0.4.0
 
 ### Patch Changes

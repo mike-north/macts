@@ -402,7 +402,7 @@
     "mail": {
       "sources": {
         "client/src/types.ts": "18cecd611b7f62a10a76c29bd8db142eabf41cec208ac27023f6fa60edfdfe72",
-        "client/src/client.ts": "4160d234eb2ad1d21eb2c97a7fe4070bbd704b1be40b8b24e497a881c0034b4d",
+        "client/src/client.ts": "e43575a75776fe9c31037111da1f1802a30fd96c70b3215979fdfcd86116dce1",
         "client/src/resources/outgoingmessage.ts": "caa1f652adccaabe9fd2b0061c9527f1c5892e330614af52d0bd7fe7e42a0f6d",
         "client/src/resources/message.ts": "930019d1c14898a31d880f876f40237608b473da60acd214937715baa5161b20",
         "client/src/index.ts": "df60f12ea9dde85ff92c690392dc78b348eaf970b8016f8650f1d1d39b93377b",
@@ -424,13 +424,12 @@
         "client/src/cli/commands/get-url.ts": "cc62c702355218966de695592ddd1bc235eff94dd6fe90e451ed66881c26ffbe",
         "client/src/cli/commands/import-mail-mailbox.ts": "8c2e5b769e7b2ab1ac40cac6fa56a5a5dc291d666ac05d192c9d81d221204335",
         "client/src/cli/commands/mailto.ts": "b6b9aa20f1f2eea3dc4ddc94d5c518fb0910787df56277d57bc854756f3d92cd",
-        "client/src/cli/commands/perform-mail-action-with-messages.ts": "de161162dbb9cc72fcda6213fa1a079a2ce7c1decd76347d924d62217377c482",
-        "client/src/cli/plugin.ts": "afd41d637bbd5d3f8b3bd2a67eb6cd3e92d3f622f3413e2d473155beedd4d491",
+        "client/src/cli/plugin.ts": "8fcd5a3f6ddb785aa1916dac4cfaa9473c6e1c10ebbe05190453457f46a88d8e",
         "client/src/cli/index.ts": "e4b100a2ae405e5f1a7918f45205d408d274b8d904f6a4685285a5fe27625e5f",
         "client/src/cli/sdk.ts": "88d9362c66fc83efe235636d05f2e14fd22d9e6f7a5120fe27a7c2c0cc48d58e",
         "client/src/cli/output/index.ts": "5a749ca35ef31085847940f756e06444594993718eb8c0962da00ca5ea4448da",
-        "client/src/contract/index.ts": "d0ea9e1c1f02ad85cd2e1f6c435ae2b22ba391005dd135eed151c0f8c19bcde8",
-        "client/src/contract/manifest.ts": "1a867f1bdf5035f3db33c321bbff3377193cd3d114fe45ae1cd09c50759fd1d6",
+        "client/src/contract/index.ts": "06c15f43acce8d3de3583a817475d6db840623c6ba7d278e0763beb6a85ccb5b",
+        "client/src/contract/manifest.ts": "7b7e219225fefe427ed16f808144023f8012f3565012b2327a83d5199e2b99df",
         "server/src/index.ts": "b55a7bba5657c931ba4eb74b6bdc56911b8b5656829f63adaf5f21ac629120b5"
       },
       "methods": {

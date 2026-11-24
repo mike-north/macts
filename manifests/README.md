@@ -965,7 +965,7 @@ commands:
 | `code`              | string          | No       | AppleScript four-character code                                      |
 | `permission`        | string          | No       | Fine-grained permission required (format: `app:resource:operation`)  |
 | `permissionHistory` | array           | No       | History of permission changes for upgrade messages                   |
-| `unsupported`       | object          | No       | Marks a command the running app cannot carry out, with live evidence |
+| `unsupported`       | object          | No       | Marks a command no caller can have the app carry out, with evidence  |
 
 #### Command parents
 
@@ -1010,9 +1010,12 @@ decision, tracked in [#173](https://github.com/mike-north/macts/issues/173).
 
 #### Unsupported commands
 
-A manifest never drops a command it declares. When a live, read-only
-observation shows the running app cannot carry it out, the command is marked
-`unsupported`, with live evidence in the form shown in
+A manifest never drops a command it declares. When a command is one no caller
+can have the app carry out, it is marked `unsupported`, with one of two kinds
+of evidence.
+
+**Live evidence.** A live, read-only observation shows the running app cannot
+carry the command out. The evidence takes the form shown in
 [Unsupported resources](#unsupported-resources):
 
 ```yaml
@@ -1032,11 +1035,45 @@ getSetting:
       errorNumber: -1728
 ```
 
-A marked command has no route, so no operation, tool, capability or derived
-permission, and the SDKs and the CLI omit it. The manifest keeps it, so the
-omission stays auditable.
+**Dictionary handler evidence.** The app's dictionary documents the command as
+a handler the app sends, not a command it carries out: the app itself invokes
+it in a user's script, when a rule fires, a menu item runs a script, or a
+plug-in is consulted, and the script supplies the behavior. Sending such a
+command to the app performs nothing a caller can rely on. The evidence is read
+from the dictionary alone and records which app build and macOS version it
+holds for, the command's `term` exactly as the dictionary writes it,
+`finding: handler`, and the `statement`: the dictionary's own text that
+documents the command as a handler, quoted verbatim from the command's
+description, or from its suite's when the suite says what its commands are
+for:
 
-**Schemas:** [`CommandUnsupportedSchema`](../packages/core/src/manifest/schemas/command.ts), [`LiveAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
+```yaml
+performMailActionWithMessages:
+  name: performMailActionWithMessages
+  scope: application
+  unsupported:
+    evidence:
+      source: dictionary
+      bundleId: com.apple.mail
+      appVersion: '16.0'
+      osVersion: '27.3'
+      term: perform mail action with messages
+      finding: handler
+      statement: Script handler invoked by rules and menus that execute ... # quoted in full
+```
+
+Mark a command this way only when the dictionary's text clearly says the app
+sends it. A command the app carries out by passing something on to a script or
+an extension (System Events' `do folder action`, Safari's
+`dispatch message to extension`) is an operation of the app, not a handler.
+
+Either way, a marked command has no route, so no operation, tool, capability
+or derived permission, and the SDKs and the CLI omit it. The manifest keeps
+it, so the omission stays auditable. The marker is accepted under both format
+versions: a runtime that does not know a kind of evidence rejects the manifest
+rather than offering the command.
+
+**Schemas:** [`CommandUnsupportedSchema`](../packages/core/src/manifest/schemas/command.ts), [`LiveAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts), [`DictionaryHandlerEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
 
 #### Command Scope
 
