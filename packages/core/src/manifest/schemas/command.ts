@@ -31,7 +31,7 @@ export const RiskClassSchema = z.enum([
 export type RiskClassValue = z.infer<typeof RiskClassSchema>
 
 /**
- * Command parameter schema.
+ * Command parameter schema. Strict, like {@link CommandSchema}.
  *
  * @remarks
  * A parameter accepts `null` only when it claims `nullable: true`, with
@@ -63,6 +63,7 @@ export const CommandParameterSchema = z
       })
       .optional(),
   })
+  .strict()
   .superRefine((parameter, ctx) => {
     checkNullabilityClaim(parameter, ctx)
     // Absent reads are failed reads of a property; a parameter is never read.
@@ -83,16 +84,18 @@ export type CommandParameter = z.infer<typeof CommandParameterSchema>
  * Permission history entry - tracks when a command's permission changed.
  * Used to provide helpful error messages when keys become invalid.
  */
-export const PermissionHistoryEntrySchema = z.object({
-  /** Version when the permission changed */
-  version: z.string(),
-  /** Previous permission string */
-  permission: z.string(),
-  /** ISO date when the change occurred */
-  changed: z.string(),
-  /** Human-readable reason for the change */
-  reason: z.string().optional(),
-})
+export const PermissionHistoryEntrySchema = z
+  .object({
+    /** Version when the permission changed */
+    version: z.string(),
+    /** Previous permission string */
+    permission: z.string(),
+    /** ISO date when the change occurred */
+    changed: z.string(),
+    /** Human-readable reason for the change */
+    reason: z.string().optional(),
+  })
+  .strict()
 export type PermissionHistoryEntry = z.infer<typeof PermissionHistoryEntrySchema>
 
 /**
@@ -184,94 +187,102 @@ export type AddressParent = z.infer<typeof AddressParentSchema>
 
 /**
  * Schema for a command definition.
+ *
+ * Strict by design: a key the schema does not know is a parse error, never
+ * silently dropped. A command may gain a field that withholds or restricts it
+ * (the `unsupported` marker is one); a runtime that predates the field must
+ * refuse the manifest rather than strip the field and offer the command. The
+ * same holds for the command's parameters and permission-history entries.
  */
-export const CommandSchema = z.object({
-  /** Command name (camelCase) */
-  name: z.string(),
-  /** Human-readable description */
-  description: z.string(),
-  /** Command scope */
-  scope: CommandScopeSchema,
-  /** If resource-scoped, which resource type(s) can be targeted */
-  resourceType: z.union([z.string(), z.array(z.string())]).optional(),
-  /** Input parameters */
-  parameters: z.array(CommandParameterSchema).default([]),
-  /**
-   * The parent the command's target is reached through, as the curator
-   * records it (see {@link CommandParentSchema}). Absent for a command whose
-   * resource is addressed at the application.
-   */
-  parent: CommandParentSchema.optional(),
-  /** Complete navigation path; cannot be combined with the legacy single parent. */
-  parents: z.array(AddressParentSchema).min(1).optional(),
-  /** Explicit final item binding, separate from ancestors and action arguments. */
-  item: AddressSelectionSchema.optional(),
-  /** Mixed paths are explicit calls only; canonical resolving routes remain identity-addressable. */
-  resolvesReferences: z.boolean().optional(),
-  /** Complete plural search between the identity parent and the final identified collection. */
-  identityTraversal: z
-    .object({
-      collections: z.array(z.string().min(1)).min(1),
-      evidence: z.string().min(1),
-    })
-    .strict()
-    .optional(),
-  /** Return type (void if omitted) */
-  returns: z.string().optional(),
-  /**
-   * A property-backed convenience: assign one fixed literal to a writable
-   * property of the selected item, rather than invoking an app command.
-   * Manifest validation checks its target, value, permission, and inputs.
-   */
-  assignsProperty: z
-    .object({
-      property: z.string().min(1),
-      value: z.union([z.string(), z.number(), z.boolean()]),
-    })
-    .strict()
-    .optional(),
-  /** AppleScript four-character code */
-  code: z.string().min(1).max(4).optional(),
-  /**
-   * The command's segment in its public route (`app.resource.<routeName>`) and
-   * in its default permission (`app:resource:<routeName>`). Defaults to the
-   * command's key in `manifest.commands`.
-   *
-   * It lets two manifest commands that share a CRUD verb but differ in
-   * signature (a resource whose `get` takes a different identifier than the
-   * shared `get`, say) each publish the canonical operation name, while
-   * keeping distinct manifest keys. Two routes that end up with the same
-   * route string are a manifest error.
-   */
-  routeName: z
-    .string()
-    .min(1)
-    .regex(/^[^.:]+$/, 'routeName must not contain "." or ":"')
-    .optional(),
-  /**
-   * Fine-grained permission required to execute this command.
-   * Format: `app:resource:operation` (e.g., `calendar:events:list`)
-   */
-  permission: z.string().optional(),
-  /**
-   * Optional risk-classification override.
-   *
-   * When present, this wins over the value derived from the operation name.
-   * When absent (the common case), risk is derived deterministically so no
-   * manifest needs hand-annotation.
-   */
-  risk: RiskClassSchema.optional(),
-  /**
-   * History of permission changes for upgrade messages.
-   * Sorted newest-first.
-   */
-  permissionHistory: z.array(PermissionHistoryEntrySchema).optional(),
-  /**
-   * Set when no caller can have the app carry out the command (the running
-   * app cannot, or the app sends it to scripts as a handler), with the
-   * evidence. A command marked unsupported has no route, and generated
-   * surfaces omit it.
-   */
-  unsupported: CommandUnsupportedSchema.optional(),
-})
+export const CommandSchema = z
+  .object({
+    /** Command name (camelCase) */
+    name: z.string(),
+    /** Human-readable description */
+    description: z.string(),
+    /** Command scope */
+    scope: CommandScopeSchema,
+    /** If resource-scoped, which resource type(s) can be targeted */
+    resourceType: z.union([z.string(), z.array(z.string())]).optional(),
+    /** Input parameters */
+    parameters: z.array(CommandParameterSchema).default([]),
+    /**
+     * The parent the command's target is reached through, as the curator
+     * records it (see {@link CommandParentSchema}). Absent for a command whose
+     * resource is addressed at the application.
+     */
+    parent: CommandParentSchema.optional(),
+    /** Complete navigation path; cannot be combined with the legacy single parent. */
+    parents: z.array(AddressParentSchema).min(1).optional(),
+    /** Explicit final item binding, separate from ancestors and action arguments. */
+    item: AddressSelectionSchema.optional(),
+    /** Mixed paths are explicit calls only; canonical resolving routes remain identity-addressable. */
+    resolvesReferences: z.boolean().optional(),
+    /** Complete plural search between the identity parent and the final identified collection. */
+    identityTraversal: z
+      .object({
+        collections: z.array(z.string().min(1)).min(1),
+        evidence: z.string().min(1),
+      })
+      .strict()
+      .optional(),
+    /** Return type (void if omitted) */
+    returns: z.string().optional(),
+    /**
+     * A property-backed convenience: assign one fixed literal to a writable
+     * property of the selected item, rather than invoking an app command.
+     * Manifest validation checks its target, value, permission, and inputs.
+     */
+    assignsProperty: z
+      .object({
+        property: z.string().min(1),
+        value: z.union([z.string(), z.number(), z.boolean()]),
+      })
+      .strict()
+      .optional(),
+    /** AppleScript four-character code */
+    code: z.string().min(1).max(4).optional(),
+    /**
+     * The command's segment in its public route (`app.resource.<routeName>`) and
+     * in its default permission (`app:resource:<routeName>`). Defaults to the
+     * command's key in `manifest.commands`.
+     *
+     * It lets two manifest commands that share a CRUD verb but differ in
+     * signature (a resource whose `get` takes a different identifier than the
+     * shared `get`, say) each publish the canonical operation name, while
+     * keeping distinct manifest keys. Two routes that end up with the same
+     * route string are a manifest error.
+     */
+    routeName: z
+      .string()
+      .min(1)
+      .regex(/^[^.:]+$/, 'routeName must not contain "." or ":"')
+      .optional(),
+    /**
+     * Fine-grained permission required to execute this command.
+     * Format: `app:resource:operation` (e.g., `calendar:events:list`)
+     */
+    permission: z.string().optional(),
+    /**
+     * Optional risk-classification override.
+     *
+     * When present, this wins over the value derived from the operation name.
+     * When absent (the common case), risk is derived deterministically so no
+     * manifest needs hand-annotation.
+     */
+    risk: RiskClassSchema.optional(),
+    /**
+     * History of permission changes for upgrade messages.
+     * Sorted newest-first.
+     */
+    permissionHistory: z.array(PermissionHistoryEntrySchema).optional(),
+    /**
+     * Set when no caller can have the app carry out the command (the running
+     * app cannot, or the app sends it to scripts as a handler), with the
+     * evidence. A command marked unsupported has no route, and generated
+     * surfaces omit it.
+     */
+    unsupported: CommandUnsupportedSchema.optional(),
+  })
+  .strict()
 export type Command = z.infer<typeof CommandSchema>

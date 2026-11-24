@@ -597,7 +597,7 @@ export const AppManifestSchema: z.ZodObject<{
                     note: z.ZodOptional<z.ZodString>;
                 }, z.core.$strip>], "source">>;
             }, z.core.$strip>>;
-        }, z.core.$strip>>>;
+        }, z.core.$strict>>>;
         parent: z.ZodOptional<z.ZodObject<{
             resource: z.ZodString;
             parameter: z.ZodString;
@@ -644,7 +644,7 @@ export const AppManifestSchema: z.ZodObject<{
             permission: z.ZodString;
             changed: z.ZodString;
             reason: z.ZodOptional<z.ZodString>;
-        }, z.core.$strip>>>;
+        }, z.core.$strict>>>;
         unsupported: z.ZodOptional<z.ZodObject<{
             evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
                 source: z.ZodLiteral<"live">;
@@ -664,7 +664,7 @@ export const AppManifestSchema: z.ZodObject<{
                 statement: z.ZodString;
             }, z.core.$strict>], "source">;
         }, z.core.$strict>>;
-    }, z.core.$strip>>>;
+    }, z.core.$strict>>>;
     permissions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>>>;
     extraction: z.ZodOptional<z.ZodObject<{
         extractedAt: z.ZodOptional<z.ZodISODateTime>;
@@ -1150,7 +1150,7 @@ export const CommandParameterSchema: z.ZodObject<{
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>], "source">>;
     }, z.core.$strip>>;
-}, z.core.$strip>;
+}, z.core.$strict>;
 
 // @public
 export type CommandParent = z.infer<typeof CommandParentSchema>;
@@ -1212,7 +1212,7 @@ export const CommandSchema: z.ZodObject<{
                 note: z.ZodOptional<z.ZodString>;
             }, z.core.$strip>], "source">>;
         }, z.core.$strip>>;
-    }, z.core.$strip>>>;
+    }, z.core.$strict>>>;
     parent: z.ZodOptional<z.ZodObject<{
         resource: z.ZodString;
         parameter: z.ZodString;
@@ -1259,7 +1259,7 @@ export const CommandSchema: z.ZodObject<{
         permission: z.ZodString;
         changed: z.ZodString;
         reason: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>>;
+    }, z.core.$strict>>>;
     unsupported: z.ZodOptional<z.ZodObject<{
         evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
             source: z.ZodLiteral<"live">;
@@ -1279,7 +1279,7 @@ export const CommandSchema: z.ZodObject<{
             statement: z.ZodString;
         }, z.core.$strict>], "source">;
     }, z.core.$strict>>;
-}, z.core.$strip>;
+}, z.core.$strict>;
 
 // @public (undocumented)
 export type CommandScope = z.infer<typeof CommandScopeSchema>;
@@ -2962,7 +2962,7 @@ export const PermissionHistoryEntrySchema: z.ZodObject<{
     permission: z.ZodString;
     changed: z.ZodString;
     reason: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>;
+}, z.core.$strict>;
 
 // @public
 export interface PermissionMap {
