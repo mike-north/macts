@@ -58,7 +58,7 @@ string
 
 </td><td>
 
-_(Optional)_ The scripting language (AppleScript or JavaScript)
+_(Optional)_ The name of the scripting language the document is written in, such as JavaScript
 
 </td></tr>
 <tr><td>

@@ -223,7 +223,7 @@ string
 
 </td><td>
 
-_(Optional)_ Source of attached AppleScript. Cannot be reset: null is rejected.
+_(Optional)_ Source of the attached script. Cannot be reset: null is rejected.
 
 </td></tr>
 <tr><td>

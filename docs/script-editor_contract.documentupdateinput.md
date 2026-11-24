@@ -58,7 +58,7 @@ string
 
 </td><td>
 
-_(Optional)_ The scripting language (AppleScript or JavaScript). Cannot be reset: null is rejected.
+_(Optional)_ The name of the scripting language the document is written in, such as JavaScript. Cannot be reset: null is rejected.
 
 </td></tr>
 <tr><td>

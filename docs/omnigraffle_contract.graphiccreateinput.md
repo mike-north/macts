@@ -223,7 +223,7 @@ string
 
 </td><td>
 
-_(Optional)_ Source of attached AppleScript
+_(Optional)_ Source of the attached script
 
 </td></tr>
 <tr><td>

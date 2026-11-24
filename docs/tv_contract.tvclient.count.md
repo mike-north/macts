@@ -37,7 +37,7 @@ string
 
 </td><td>
 
-the class of the elements to be counted. Keyword 'each' is optional in AppleScript. Does not accept null.
+the class of the elements to be counted. Does not accept null.
 
 </td></tr>
 <tr><td>

@@ -4,7 +4,7 @@
 
 ## DocumentCreateInput.language property
 
-The scripting language (AppleScript or JavaScript)
+The name of the scripting language the document is written in, such as JavaScript
 
 **Signature:**
 

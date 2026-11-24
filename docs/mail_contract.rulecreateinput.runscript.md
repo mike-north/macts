@@ -4,7 +4,7 @@
 
 ## RuleCreateInput.runScript property
 
-If rule matches, run this compiled AppleScript file. Set to empty string to disable this action
+If rule matches, run this compiled script file. Set to empty string to disable this action
 
 **Signature:**
 

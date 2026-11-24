@@ -37,7 +37,7 @@ string
 
 </td><td>
 
-the class of the new element. Keyword 'new' is optional in AppleScript. Does not accept null.
+the class of the new element. Does not accept null.
 
 </td></tr>
 <tr><td>

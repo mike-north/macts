@@ -4,7 +4,7 @@
 
 ## GraphicCreateInput.script property
 
-Source of attached AppleScript
+Source of the attached script
 
 **Signature:**
 

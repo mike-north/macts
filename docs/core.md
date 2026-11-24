@@ -668,6 +668,15 @@ Note: `resource` is accepted so this function can be called directly with a pars
 </td></tr>
 <tr><td>
 
+[findMechanismTermIssues(manifest)](./core.findmechanismtermissues.md)
+
+</td><td>
+
+Every place a manifest's text names the automation mechanism, in document order. Empty when the manifest follows the rule in the module comment.
+
+</td></tr>
+<tr><td>
+
 [finePermission(app, resource, operation)](./core.finepermission.md)
 
 </td><td>
@@ -2666,6 +2675,15 @@ When `source` is `'default'`<!-- -->, no app/operation rule matched and the poli
 </td></tr>
 <tr><td>
 
+[MechanismTermIssue](./core.mechanismtermissue.md)
+
+</td><td>
+
+A place where a manifest's text names the automation mechanism.
+
+</td></tr>
+<tr><td>
+
 [NativeBodyOptions](./core.nativebodyoptions.md)
 
 </td><td>
@@ -3919,6 +3937,17 @@ The most items the probe reads per resource. Enough items to establish a non-nul
 The most output, in bytes, read from the automation process on each of standard output and standard error.
 
 A list result carries every item's properties in one JSON document, so it grows with the collection: a large mailbox or photo library produces tens of megabytes. The whole document is held in memory before it is parsed, so the limit bounds the memory one call can take. A process that exceeds it is stopped and the call fails with `kind: 'output-too-large'`<!-- -->; it is never truncated.
+
+</td></tr>
+<tr><td>
+
+[MECHANISM_TERMS](./core.mechanism_terms.md)
+
+</td><td>
+
+Terms that name the automation mechanism macts drives apps through.
+
+Matched case-insensitively anywhere in a string, so plurals and compounds ("AppleScripts", "osascript's") match too. Ordinary words such as "script" or "JavaScript" do not: an app can be about scripts without its text describing how macts reaches it. This is the one definition every no-leak check shares, from manifest validation to the CLI's acceptance tests.
 
 </td></tr>
 <tr><td>

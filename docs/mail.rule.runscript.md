@@ -4,7 +4,7 @@
 
 ## Rule.runScript property
 
-If rule matches, run this compiled AppleScript file. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
+If rule matches, run this compiled script file. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 

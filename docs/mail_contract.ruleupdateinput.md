@@ -253,7 +253,7 @@ string
 
 </td><td>
 
-_(Optional)_ If rule matches, run this compiled AppleScript file. Set to empty string to disable this action. Cannot be reset: null is rejected.
+_(Optional)_ If rule matches, run this compiled script file. Set to empty string to disable this action. Cannot be reset: null is rejected.
 
 </td></tr>
 <tr><td>

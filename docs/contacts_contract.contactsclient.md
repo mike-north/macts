@@ -133,24 +133,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[actionProperty(options)](./contacts_contract.contactsclient.actionproperty.md)
-
-</td><td>
-
-RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)
-
-</td></tr>
-<tr><td>
-
-[actionTitle(\_with, \_for, options)](./contacts_contract.contactsclient.actiontitle.md)
-
-</td><td>
-
-RollOver - Returns the title that will be placed in the menu for this roll over
-
-</td></tr>
-<tr><td>
-
 [add(to, options)](./contacts_contract.contactsclient.add.md)
 
 </td><td>
@@ -169,15 +151,6 @@ Create a new object.
 </td></tr>
 <tr><td>
 
-[performAction(\_with, \_for, options)](./contacts_contract.contactsclient.performaction.md)
-
-</td><td>
-
-RollOver - Performs the action on the given person and value
-
-</td></tr>
-<tr><td>
-
 [remove(from, options)](./contacts_contract.contactsclient.remove.md)
 
 </td><td>
@@ -192,15 +165,6 @@ Remove a child object.
 </td><td>
 
 Save all Contacts changes. Also see the unsaved property for the application class.
-
-</td></tr>
-<tr><td>
-
-[shouldEnableAction(\_with, \_for, options)](./contacts_contract.contactsclient.shouldenableaction.md)
-
-</td><td>
-
-RollOver - Determines if the rollover action should be enabled for the given person and value
 
 </td></tr>
 </tbody></table>

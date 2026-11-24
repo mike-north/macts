@@ -4,7 +4,7 @@
 
 ## GraphicUpdateInput.script property
 
-Source of attached AppleScript. Cannot be reset: null is rejected.
+Source of the attached script. Cannot be reset: null is rejected.
 
 **Signature:**
 

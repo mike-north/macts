@@ -240,7 +240,7 @@ string \| null
 
 </td><td>
 
-Source of attached AppleScript. Nullable. No evidence that the app always sets it.
+Source of the attached script. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>

@@ -58,7 +58,7 @@ string \| null
 
 </td><td>
 
-The scripting language (AppleScript or JavaScript). Nullable. No evidence that the app always sets it.
+The name of the scripting language the document is written in, such as JavaScript. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
