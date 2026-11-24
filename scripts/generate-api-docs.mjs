@@ -613,11 +613,47 @@ try {
   // Compare rendered links with the destinations named for that page. A valid
   // filename alone cannot prove that a link names the intended declaration.
   const markdown = createRequire(join(toolRoot, 'package.json'))('prettier/plugins/markdown')
-  const files = new Set(readdirSync(stagedDocs))
+  // Record relative paths even in unexpected subdirectories, so no staged
+  // Markdown page can escape the page-write accounting.
+  const stagedPages = (directory, prefix = '') =>
+    readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+      const name = prefix ? `${prefix}/${entry.name}` : entry.name
+      return entry.isDirectory()
+        ? stagedPages(join(directory, entry.name), name)
+        : entry.isFile() && name.endsWith('.md')
+          ? [name]
+          : []
+    })
+  const files = new Set(stagedPages(stagedDocs))
   for (const file of files) {
-    if (!file.endsWith('.md')) continue
+    if (!pageLinks.has(file)) throw new Error(`unrecorded page ${file}`)
+  }
+  for (const file of pageLinks.keys()) {
+    if (!files.has(file)) throw new Error(`missing recorded page ${file}`)
+  }
+
+  /** Extract anchor destinations from HTML nodes, respecting quoted tag attributes and comments. */
+  const htmlLinks = (html) => {
+    const destinations = []
+    // Tags may contain > inside quoted values; comments do not contain tags.
+    const tags = /<!--[\s\S]*?(?:-->|$)|<([a-z][\w:-]*)\b((?:[^"'<>]|"[^"]*"|'[^']*')*)>/gi
+    for (const tag of html.matchAll(tags)) {
+      if (tag[1]?.toLowerCase() !== 'a') continue
+      const attributes = tag[2] ?? ''
+      const attribute = /([^\s=/'">]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s'"=<>`]+)))?/g
+      for (const match of attributes.matchAll(attribute)) {
+        if (match[1].toLowerCase() === 'href') {
+          destinations.push(match[2] ?? match[3] ?? match[4] ?? '')
+          break
+        }
+      }
+    }
+    return destinations
+  }
+
+  for (const file of files) {
     const expected = new Map()
-    for (const link of pageLinks.get(file) ?? []) {
+    for (const link of pageLinks.get(file)) {
       expected.set(link, (expected.get(link) ?? 0) + 1)
     }
     const content = readFileSync(join(stagedDocs, file), 'utf-8')
@@ -629,6 +665,7 @@ try {
     const visit = (node) => {
       if (node.type === 'definition') definitions.set(node.identifier, node.url)
       if (node.type === 'link') links.push(node.url)
+      if (node.type === 'html') links.push(...htmlLinks(node.value))
       if (node.type === 'linkReference') links.push({ identifier: node.identifier })
       for (const child of node.children ?? []) visit(child)
     }

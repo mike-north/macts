@@ -417,6 +417,78 @@ afterEach(async () => {
 })
 
 describe('generate-api-docs', () => {
+  it('rejects an unrecorded page without replacing the reference', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  const result = execute.apply(this, args)
+  fs.writeFileSync(this._outputFolder + '/unaccounted.md', '# Extra\\n')
+  return result
+}`)
+    expect(result.status, result.stderr).toBe(1)
+    expect(result.stderr).toContain('unaccounted.md')
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
+  it('rejects a recorded page that is missing from staging', async () => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  const result = execute.apply(this, args)
+  fs.unlinkSync(this._outputFolder + '/widgets.spin.md')
+  return result
+}`)
+    expect(result.status, result.stderr).toBe(1)
+    expect(result.stderr).toContain('widgets.spin.md')
+    expect(await pages()).toEqual(['kept.md'])
+  })
+
+  it.each([
+    ['inline double quoted', '<a href="./widgets.spin.md">extra</a>'],
+    ['block single quoted', "<div>\n<A HREF='./widgets.spin.md#part'>extra</A>\n</div>"],
+  ])('rejects an unaccounted %s HTML link', async (_label, html) => {
+    await plantPackage('widgets', 'spin')
+    await mkdir(join(workspace, 'docs'))
+    await writeFile(join(workspace, 'docs', 'kept.md'), 'original bytes\n')
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  const result = execute.apply(this, args)
+  fs.appendFileSync(this._outputFolder + '/widgets.md', ${JSON.stringify(`\n${html}\n`)})
+  return result
+}`)
+    expect(result.status, result.stderr).toBe(1)
+    expect(result.stderr).toContain('./widgets.spin.md')
+    expect(await pages()).toEqual(['kept.md'])
+    expect(await page('kept.md')).toBe('original bytes\n')
+  })
+
+  it('ignores HTML examples in code and external or fragment links', async () => {
+    await plantPackage('widgets', 'spin')
+    const content =
+      '\n`<a href="./missing.md">example</a>`\n\n```html\n<a href="./missing.md">example</a>\n```\n\n<a href="https://example.com/missing.md">external</a> <a href="#part">fragment</a>\n'
+    const result = await generateWithDocumenterChange(`
+const fs = (await import('node:fs')).default
+const execute = MarkdownDocumenter.prototype.generateFiles
+MarkdownDocumenter.prototype.generateFiles = function (...args) {
+  const result = execute.apply(this, args)
+  fs.appendFileSync(this._outputFolder + '/widgets.md', ${JSON.stringify(content)})
+  return result
+}`)
+    expect(result.status, result.stderr).toBe(0)
+    expect(await page('widgets.md')).toContain('https://example.com/missing.md')
+  })
+
   it('reports an empty workspace before attempting documentation', async () => {
     await mkdir(join(workspace, 'packages'))
     const result = generate()
