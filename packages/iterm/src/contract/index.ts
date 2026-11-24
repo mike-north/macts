@@ -24,7 +24,6 @@ import {
   type CallOptions,
   type ClientBrand,
   type ClientRuntime,
-  type FileSource,
   type IndexSelectorReference,
   type Integer,
   type ObjectReferenceData,
@@ -840,6 +839,22 @@ export interface SessionResourceClient {
    * @param sessionId - Session identifier within the Window. Does not accept null.
    */
   resolve(windowId: Integer, sessionId: string, options?: CallOptions): Promise<Session>
+  /**
+   * Write text into a session, as though it was typed, optionally followed by a newline.
+   *
+   * @param windowId - Window identifier. Does not accept null.
+   * @param sessionId - Session identifier within the Window. Does not accept null.
+   * @param text - Text to write. Does not accept null.
+   * @param newline - Whether to add a newline after the text (the app adds one when this is
+   * omitted). Does not accept null.
+   */
+  write(
+    windowId: Integer,
+    sessionId: string,
+    text: string,
+    newline?: boolean,
+    options?: CallOptions
+  ): Promise<void>
 }
 
 /**
@@ -944,20 +959,6 @@ export interface iTermClient extends ClientBrand<iTermResources> {
    * @param command - Shell command to run. Does not accept null.
    */
   createWindowWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>
-  /**
-   * Send text as though it was typed.
-   *
-   * @param contentsOfFile - Filename to send the contents of. Does not accept null.
-   * @param text - Text to send. Does not accept null.
-   * @param newline - If newline should be added to end of text (default: yes). Does not accept
-   * null.
-   */
-  write(
-    contentsOfFile?: FileSource,
-    text?: string,
-    newline?: boolean,
-    options?: CallOptions
-  ): Promise<void>
   /** Make receiver visible and selected. */
   select(options?: CallOptions): Promise<void>
   /**
@@ -1484,6 +1485,62 @@ const sessionResolveSessionOperation: OperationDescriptor<
   },
 }
 
+const sessionWriteSessionTextOperation: OperationDescriptor<
+  {
+    readonly windowId: Integer
+    readonly sessionId: string
+    readonly text: string
+    readonly newline?: boolean | undefined
+  },
+  undefined
+> = {
+  id: 'iterm.sessions.writeText',
+  permission: 'iterm:sessions:writeText',
+  target: { command: 'writeSessionText', resource: 'Session' },
+  address: {
+    parents: [{ resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' }],
+    traversal: ['tabs'],
+    collection: 'sessions',
+    item: { by: 'identity', parameter: 'sessionId' },
+  },
+  description:
+    'Write text into a session, as though it was typed, optionally followed by a newline.',
+  input: t.record({
+    windowId: t.integer({ description: 'Window identifier' }),
+    sessionId: t.string({ description: 'Session identifier within the Window' }),
+    text: t.string({ description: 'Text to write' }),
+    newline: t.optional(
+      t.boolean({
+        description:
+          'Whether to add a newline after the text (the app adds one when this is omitted)',
+      })
+    ),
+  }),
+  output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      windowId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Window identifier',
+      },
+      sessionId: { type: 'string', description: 'Session identifier within the Window' },
+      text: { type: 'string', description: 'Text to write' },
+      newline: {
+        type: 'boolean',
+        description:
+          'Whether to add a newline after the text (the app adds one when this is omitted)',
+      },
+    },
+    required: ['windowId', 'sessionId', 'text'],
+    additionalProperties: false,
+  },
+}
+
 const appCountOperation: OperationDescriptor<{ readonly each?: string | undefined }, undefined> = {
   id: 'iterm.app.count',
   permission: 'iterm:app:count',
@@ -1937,70 +1994,6 @@ const appCreateWindowWithDefaultProfileOperation: OperationDescriptor<
   },
 }
 
-const appWriteOperation: OperationDescriptor<
-  {
-    readonly contentsOfFile?: FileSource | undefined
-    readonly text?: string | undefined
-    readonly newline?: boolean | undefined
-  },
-  undefined
-> = {
-  id: 'iterm.app.write',
-  permission: 'iterm:app:write',
-  target: { command: 'write' },
-  description: 'Send text as though it was typed.',
-  input: t.record({
-    contentsOfFile: t.optional(t.fileSource({ description: 'Filename to send the contents of' })),
-    text: t.optional(t.string({ description: 'Text to send' })),
-    newline: t.optional(
-      t.boolean({ description: 'If newline should be added to end of text (default: yes)' })
-    ),
-  }),
-  output: t.none(),
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: {
-      contentsOfFile: {
-        type: 'object',
-        properties: {
-          fileSource: {
-            oneOf: [
-              {
-                type: 'object',
-                properties: {
-                  kind: { type: 'string', const: 'caller-owned-file' },
-                  path: { type: 'string', minLength: 1 },
-                },
-                required: ['kind', 'path'],
-                additionalProperties: false,
-              },
-              {
-                type: 'object',
-                properties: {
-                  kind: { type: 'string', const: 'uploaded-file' },
-                  uploadId: { type: 'string', minLength: 1 },
-                },
-                required: ['kind', 'uploadId'],
-                additionalProperties: false,
-              },
-            ],
-          },
-        },
-        required: ['fileSource'],
-        additionalProperties: false,
-        description: 'Filename to send the contents of',
-      },
-      text: { type: 'string', description: 'Text to send' },
-      newline: {
-        type: 'boolean',
-        description: 'If newline should be added to end of text (default: yes)',
-      },
-    },
-    additionalProperties: false,
-  },
-}
-
 const appSelectOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'iterm.app.select',
   permission: 'iterm:app:select',
@@ -2247,6 +2240,7 @@ const operations: AppContract<iTermClient>['operations'] = {
   'iterm.sessions.list': sessionListSessionsOperation,
   'iterm.sessions.getWithinTab': sessionGetSessionOperation,
   'iterm.sessions.resolve': sessionResolveSessionOperation,
+  'iterm.sessions.writeText': sessionWriteSessionTextOperation,
   'iterm.app.count': appCountOperation,
   'iterm.app.duplicate': appDuplicateOperation,
   'iterm.app.exists': appExistsOperation,
@@ -2261,7 +2255,6 @@ const operations: AppContract<iTermClient>['operations'] = {
   'iterm.app.launchAPIScriptNamed': appLaunchAPIScriptNamedOperation,
   'iterm.app.invokeAPIExpression': appInvokeAPIExpressionOperation,
   'iterm.app.createWindowWithDefaultProfile': appCreateWindowWithDefaultProfileOperation,
-  'iterm.app.write': appWriteOperation,
   'iterm.app.select': appSelectOperation,
   'iterm.app.splitVertically': appSplitVerticallyOperation,
   'iterm.app.splitVerticallyWithDefaultProfile': appSplitVerticallyWithDefaultProfileOperation,
@@ -2295,6 +2288,12 @@ function bind(runtime: ClientRuntime): iTermClient {
         runtime.invoke(sessionGetSessionOperation, { windowId, tabIndex, sessionId }, options),
       resolve: (windowId, sessionId, options) =>
         runtime.invoke(sessionResolveSessionOperation, { windowId, sessionId }, options),
+      write: (windowId, sessionId, text, newline, options) =>
+        runtime.invoke(
+          sessionWriteSessionTextOperation,
+          { windowId, sessionId, text, newline },
+          options
+        ),
     },
     currentWindow: (options) => runtime.invoke(appCurrentWindowOperation, {}, options),
     count: (each, options) => runtime.invoke(appCountOperation, { each }, options),
@@ -2320,8 +2319,6 @@ function bind(runtime: ClientRuntime): iTermClient {
     invokeAPIExpression: (options) => runtime.invoke(appInvokeAPIExpressionOperation, {}, options),
     createWindowWithDefaultProfile: (command, options) =>
       runtime.invoke(appCreateWindowWithDefaultProfileOperation, { command }, options),
-    write: (contentsOfFile, text, newline, options) =>
-      runtime.invoke(appWriteOperation, { contentsOfFile, text, newline }, options),
     select: (options) => runtime.invoke(appSelectOperation, {}, options),
     splitVertically: (withProfile, command, options) =>
       runtime.invoke(appSplitVerticallyOperation, { withProfile, command }, options),

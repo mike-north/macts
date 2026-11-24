@@ -43,7 +43,7 @@
     "src/cli/commands/windows/tabs/sessions/get.ts",
     "src/cli/commands/windows/tabs/sessions/list.ts",
     "src/cli/commands/windows/tabs/sessions/resolve.ts",
-    "src/cli/commands/write.ts",
+    "src/cli/commands/windows/tabs/sessions/write.ts",
     "src/cli/index.ts",
     "src/cli/output/index.ts",
     "src/cli/plugin.ts",

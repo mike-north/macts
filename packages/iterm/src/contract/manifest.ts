@@ -44,7 +44,6 @@ export const manifest: unknown = {
         'launchAPIScriptNamed',
         'invokeAPIExpression',
         'createWindowWithDefaultProfile',
-        'write',
         'select',
         'splitVertically',
         'splitVerticallyWithDefaultProfile',
@@ -1012,6 +1011,63 @@ export const manifest: unknown = {
         parameter: 'sessionId',
       },
     },
+    writeSessionText: {
+      name: 'write',
+      description:
+        'Write text into a session, as though it was typed, optionally followed by a newline.',
+      scope: 'resource',
+      resourceType: 'Session',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'sessionId',
+          type: 'string',
+          description: 'Session identifier within the Window',
+          required: true,
+        },
+        {
+          name: 'text',
+          type: 'string',
+          description: 'Text to write',
+          required: true,
+          code: 'Text',
+        },
+        {
+          name: 'newline',
+          type: 'boolean',
+          description:
+            'Whether to add a newline after the text (the app adds one when this is omitted)',
+          required: false,
+          code: 'Wtnl',
+        },
+      ],
+      parents: [
+        {
+          by: 'identity',
+          parameter: 'windowId',
+          resource: 'Window',
+          collection: 'windows',
+        },
+      ],
+      item: {
+        by: 'identity',
+        parameter: 'sessionId',
+      },
+      identityTraversal: {
+        collections: ['tabs'],
+        evidence:
+          'The dictionary places Sessions in Tabs in Windows; Session identity is scoped to its Window and requires a complete search of those Tabs.',
+      },
+      code: 'sntx',
+      routeName: 'writeText',
+      permission: 'iterm:sessions:writeText',
+      risk: 'write',
+    },
     count: {
       name: 'count',
       description: 'Return the number of elements of a particular class within an object.',
@@ -1224,35 +1280,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'nwwn',
-    },
-    write: {
-      name: 'write',
-      description: 'Send text as though it was typed.',
-      scope: 'application',
-      parameters: [
-        {
-          name: 'contentsOfFile',
-          type: 'file',
-          description: 'Filename to send the contents of',
-          required: false,
-          code: 'Cofl',
-        },
-        {
-          name: 'text',
-          type: 'string',
-          description: 'Text to send',
-          required: false,
-          code: 'Text',
-        },
-        {
-          name: 'newline',
-          type: 'boolean',
-          description: 'If newline should be added to end of text (default: yes)',
-          required: false,
-          code: 'Wtnl',
-        },
-      ],
-      code: 'sntx',
     },
     select: {
       name: 'select',

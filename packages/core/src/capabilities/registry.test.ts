@@ -263,7 +263,7 @@ describe('buildCapabilityRegistry', () => {
 })
 
 /** Distinct read routes remain independently discoverable and use admitted CLI selections. */
-it('discovers every Session read by its operation identity and generated CLI address', async () => {
+it('discovers every Session operation by its operation identity and generated CLI address', async () => {
   const manifest = await loadManifest(
     fileURLToPath(new URL('../../../../manifests/iterm/app.yaml', import.meta.url))
   )
@@ -287,6 +287,13 @@ it('discovers every Session read by its operation identity and generated CLI add
       'iterm.sessions.resolve',
       'macts__iterm__sessions_resolve',
       'macts iterm windows tabs sessions resolve --window-id <windowId> <sessionId>',
+    ],
+    // The write is named by its route on discovery and MCP, and by its command
+    // name on the CLI, as the generated CLI command is (`sessions write`).
+    [
+      'iterm.sessions.writeText',
+      'macts__iterm__sessions_write_text',
+      'macts iterm windows tabs sessions write --window-id <windowId> <sessionId> --text <text>',
     ],
   ])
   delete manifest.commands['getSession']

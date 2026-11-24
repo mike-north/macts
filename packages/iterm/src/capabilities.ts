@@ -580,34 +580,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'iterm.app.write',
-    app: 'iterm',
-    appBundleId: 'com.googlecode.iterm2',
-    resource: 'app',
-    operation: 'write',
-    description: 'Send text as though it was typed.',
-    permission: 'iterm:app:write',
-    risk: 'write',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        contentsOfFile: {
-          description: 'Filename to send the contents of',
-          type: 'string',
-        },
-        text: {
-          description: 'Text to send',
-          type: 'string',
-        },
-        newline: {
-          description: 'If newline should be added to end of text (default: yes)',
-          type: 'boolean',
-        },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'iterm.sessions.getWithinTab',
     app: 'iterm',
     appBundleId: 'com.googlecode.iterm2',
@@ -693,6 +665,41 @@ export const capabilities: readonly CapabilityMetadata[] = [
       },
       additionalProperties: false,
       required: ['windowId', 'sessionId'],
+    },
+  },
+  {
+    name: 'iterm.sessions.writeText',
+    app: 'iterm',
+    appBundleId: 'com.googlecode.iterm2',
+    resource: 'sessions',
+    operation: 'writeText',
+    description:
+      'Write text into a session, as though it was typed, optionally followed by a newline.',
+    permission: 'iterm:sessions:writeText',
+    risk: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'number',
+        },
+        sessionId: {
+          description: 'Session identifier within the Window',
+          type: 'string',
+        },
+        text: {
+          description: 'Text to write',
+          type: 'string',
+        },
+        newline: {
+          description:
+            'Whether to add a newline after the text (the app adds one when this is omitted)',
+          type: 'boolean',
+        },
+      },
+      additionalProperties: false,
+      required: ['windowId', 'sessionId', 'text'],
     },
   },
   {

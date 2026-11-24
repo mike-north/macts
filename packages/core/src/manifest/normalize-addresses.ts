@@ -77,6 +77,14 @@ export function addressNormalization<T extends AddressManifest>(
         refuse(
           'an item operation needs one required item input and a consistent identity or position binding for its resources.'
         )
+      } else if (shape.data.identityTraversal !== undefined && shape.data.name !== 'get') {
+        // A singular parent cannot carry an item binding, and an item command's action
+        // arguments are not selectors, so the item must not be inferred from its inputs.
+        issues.push({
+          path: ['commands', key, 'item'],
+          message: `Command "${key}" address: an identity-traversal item command requires an explicit item binding; declare parents and item rather than a singular parent.`,
+        })
+        canonical.item = { by, parameter: parameter.name }
       } else canonical.item = { by, parameter: parameter.name }
     }
     commands[key] = canonical

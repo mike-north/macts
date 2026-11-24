@@ -377,22 +377,6 @@ export class iTermClient {
   }
 
   /**
-   * Send text as though it was typed.
-   */
-  async write(
-    contentsOfFile?: Parameters<import('./contract/index.js').iTermClient['write']>[0],
-    text?: string,
-    newline?: boolean,
-    __mactsOptions?: import('@macts/contracts').CallOptions
-  ): Promise<void> {
-    await this.#httpClient.invoke<undefined>(
-      'iterm.app.write',
-      { contentsOfFile, text, newline },
-      __mactsOptions
-    )
-  }
-
-  /**
    * Make receiver visible and selected.
    */
   async select(__mactsOptions?: import('@macts/contracts').CallOptions): Promise<void> {

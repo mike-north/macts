@@ -36,7 +36,6 @@ suites:
       - launchAPIScriptNamed
       - invokeAPIExpression
       - createWindowWithDefaultProfile
-      - write
       - select
       - splitVertically
       - splitVerticallyWithDefaultProfile
@@ -724,6 +723,43 @@ commands:
           required: true,
         }
     risk: read
+  # The dictionary's `write` (sntx) is sent to a session, its direct parameter.
+  # The Session is found by its Window-scoped identity, as `resolveSession`
+  # finds it, and is never limited to a current or selected session. Typing is
+  # a write with its own permission, granted neither by Session reads nor by
+  # the screen-text reads. Only `text` and `newline` are offered: sending a
+  # file's contents, and key sequences `write` cannot express, are separate.
+  writeSessionText:
+    name: write
+    routeName: writeText
+    description: Write text into a session, as though it was typed, optionally followed by a newline.
+    scope: resource
+    resourceType: Session
+    code: sntx
+    parents:
+      - { resource: Window, collection: windows, by: identity, parameter: windowId }
+    item: { by: identity, parameter: sessionId }
+    identityTraversal:
+      collections: [tabs]
+      evidence: The dictionary places Sessions in Tabs in Windows; Session identity is scoped to its Window and requires a complete search of those Tabs.
+    parameters:
+      - { name: windowId, type: integer, description: Window identifier, required: true }
+      - {
+          name: sessionId,
+          type: string,
+          description: Session identifier within the Window,
+          required: true,
+        }
+      - { name: text, type: string, description: Text to write, required: true, code: Text }
+      - {
+          name: newline,
+          type: boolean,
+          description: 'Whether to add a newline after the text (the app adds one when this is omitted)',
+          required: false,
+          code: Wtnl,
+        }
+    permission: iterm:sessions:writeText
+    risk: write
   count:
     name: count
     description: Return the number of elements of a particular class within an object.
@@ -885,27 +921,6 @@ commands:
         description: Shell command to run
         required: false
         code: Nwcm
-  write:
-    name: write
-    description: Send text as though it was typed.
-    scope: application
-    code: sntx
-    parameters:
-      - name: contentsOfFile
-        type: file
-        description: Filename to send the contents of
-        required: false
-        code: Cofl
-      - name: text
-        type: string
-        description: Text to send
-        required: false
-        code: Text
-      - name: newline
-        type: boolean
-        description: 'If newline should be added to end of text (default: yes)'
-        required: false
-        code: Wtnl
   select:
     name: select
     description: Make receiver visible and selected.

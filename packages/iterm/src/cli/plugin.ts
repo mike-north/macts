@@ -6,6 +6,7 @@ import { GetTabCommand } from './commands/windows/tabs/get.js'
 import { ListSessionsCommand } from './commands/windows/tabs/sessions/list.js'
 import { GetSessionCommand } from './commands/windows/tabs/sessions/get.js'
 import { ResolveSessionCommand } from './commands/windows/tabs/sessions/resolve.js'
+import { WriteSessionCommand } from './commands/windows/tabs/sessions/write.js'
 import { CurrentWindowCommand } from './commands/current-window.js'
 import { CountCommand } from './commands/count.js'
 import { DuplicateCommand } from './commands/duplicate.js'
@@ -21,7 +22,6 @@ import { CreateHotkeyWindowWithProfileCommand } from './commands/create-hotkey-w
 import { LaunchAPIScriptNamedCommand } from './commands/launch-apiscript-named.js'
 import { InvokeAPIExpressionCommand } from './commands/invoke-apiexpression.js'
 import { CreateWindowWithDefaultProfileCommand } from './commands/create-window-with-default-profile.js'
-import { WriteCommand } from './commands/write.js'
 import { SelectCommand } from './commands/select.js'
 import { SplitVerticallyCommand } from './commands/split-vertically.js'
 import { SplitVerticallyWithDefaultProfileCommand } from './commands/split-vertically-with-default-profile.js'
@@ -49,6 +49,7 @@ export const plugin: CliPlugin = {
     ListSessionsCommand,
     GetSessionCommand,
     ResolveSessionCommand,
+    WriteSessionCommand,
     CurrentWindowCommand,
     CountCommand,
     DuplicateCommand,
@@ -64,7 +65,6 @@ export const plugin: CliPlugin = {
     LaunchAPIScriptNamedCommand,
     InvokeAPIExpressionCommand,
     CreateWindowWithDefaultProfileCommand,
-    WriteCommand,
     SelectCommand,
     SplitVerticallyCommand,
     SplitVerticallyWithDefaultProfileCommand,

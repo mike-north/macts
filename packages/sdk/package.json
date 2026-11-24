@@ -70,6 +70,7 @@
     "@macts/system-events": "workspace:*",
     "@macts/tv": "workspace:*",
     "@macts/xcode": "workspace:*",
+    "clipanion": "catalog:",
     "tsd": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
