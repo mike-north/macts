@@ -1,5 +1,11 @@
 # @macts-e2e/round-trip
 
+## 0.0.5
+
+### Patch Changes
+
+- @macts/calendar@0.5.0
+
 ## 0.0.4
 
 ### Patch Changes

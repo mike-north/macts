@@ -1,5 +1,11 @@
 # @macts/preview-server
 
+## 0.5.0
+
+### Patch Changes
+
+- @macts/preview@0.5.0
+
 ## 0.4.0
 
 ### Patch Changes
