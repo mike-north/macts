@@ -29,7 +29,9 @@
     "api-extractor": "nx run-many -t api-extractor",
     "api-extractor:ci": "nx run-many -t api-extractor:ci",
     "api-docs": "node scripts/generate-api-docs.mjs",
-    "api-docs:full": "pnpm build && pnpm api-extractor && pnpm api-docs"
+    "api-docs:full": "pnpm build && pnpm api-extractor && pnpm api-docs",
+    "test:exports": "node scripts/check-package-exports.mjs",
+    "test:packed-subpaths": "node scripts/test-packed-subpaths.mjs"
   },
   "keywords": [],
   "author": "",
