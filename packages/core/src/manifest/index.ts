@@ -12,6 +12,14 @@ export * from './schemas/index.js'
 
 export { normalizeManifestAddresses } from './normalize-addresses.js'
 
+// The rule that keeps the automation mechanism out of every surface, and the
+// one definition of its terms that every no-leak check shares
+export {
+  MECHANISM_TERMS,
+  findMechanismTermIssues,
+  type MechanismTermIssue,
+} from './mechanism-terms.js'
+
 // Manifest loading and parsing utilities
 export * from './loader.js'
 

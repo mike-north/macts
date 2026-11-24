@@ -19,7 +19,12 @@ import { Writable } from 'node:stream'
 import { runInNewContext } from 'node:vm'
 import { Cli } from 'clipanion'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { APP_VERSION_BODY, type JxaRunner, type NullabilityProbeEnvironment } from '@macts/core'
+import {
+  APP_VERSION_BODY,
+  MECHANISM_TERMS,
+  type JxaRunner,
+  type NullabilityProbeEnvironment,
+} from '@macts/core'
 import { ProbeCommand } from './probe.js'
 
 /** A value that must never reach any output. */
@@ -553,7 +558,7 @@ describe('macts probe --nullability (properties whose every read fails)', () => 
     // `mood` failed on 20 of 40 items, not all: not this defect.
     expect(stdout).toContain('  mood       insufficient sample  (0 of 20 empty, 20 reads failed)\n')
     expect(stdout).not.toContain('Note.mood')
-    expect(stdout).not.toMatch(/applescript|jxa|osascript/i)
+    expect(stdout).not.toMatch(MECHANISM_TERMS)
     expect(stdout).not.toContain(SECRET)
   })
 

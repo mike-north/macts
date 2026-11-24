@@ -1499,6 +1499,14 @@ If a key has the old permission (`calendar:events:read`) but the command now req
 
 This provides a smooth upgrade path when permission requirements evolve.
 
+## Text That Reaches macts Surfaces
+
+Every string a manifest declares (descriptions, names and keys) reaches some macts surface: capability discovery, contracts, the CLI, generated clients and MCP tools. None of those surfaces names how macts drives an app, so manifest text never names the automation mechanism (AppleScript, JXA, `osascript`, JavaScript for Automation). Validation rejects a manifest whose text does, naming where.
+
+When a dictionary's text names the mechanism, rewrite it to say what the app does, or drop a clause that only concerns the mechanism (which keywords its syntax makes optional, say). A YAML comment beside the rewrite can say what the dictionary adds. Two parts of a manifest are exempt because they record the dictionary rather than speak for macts: a claim's `evidence`, which quotes the dictionary verbatim, and the `extraction` notes.
+
+The rule and its list of terms are defined once, in [`mechanism-terms.ts`](../packages/core/src/manifest/mechanism-terms.ts).
+
 ## JSON Schema
 
 A JSON Schema representation of the manifest format is available at [`app-manifest.schema.json`](./app-manifest.schema.json).

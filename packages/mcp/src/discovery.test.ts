@@ -7,7 +7,12 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { buildCapabilityRegistry, parseManifestYaml, type GovernanceFilter } from '@macts/core'
+import {
+  buildCapabilityRegistry,
+  MECHANISM_TERMS,
+  parseManifestYaml,
+  type GovernanceFilter,
+} from '@macts/core'
 import { createDiscoveryTool, DISCOVERY_TOOL_NAME } from './discovery.js'
 
 const yaml = String.raw
@@ -203,7 +208,7 @@ describe('createDiscoveryTool', () => {
 
   it('never leaks automation-mechanism terminology in results', async () => {
     const result = await discover({ intent: 'list notes' })
-    expect(JSON.stringify(result)).not.toMatch(/applescript|jxa|osascript/i)
+    expect(JSON.stringify(result)).not.toMatch(MECHANISM_TERMS)
   })
 })
 
