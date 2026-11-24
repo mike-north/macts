@@ -337,12 +337,22 @@ it('uses the same Session address, output and permission checks through MCP', as
   expect(state.reads).toEqual([])
 })
 
+/**
+ * The CLI path of each Session read: the get selects a Tab, so it sits under
+ * the Tab; the resolve is addressed by its Window alone, so it sits under the
+ * Window.
+ */
+const SESSION_READ_PATHS = {
+  get: 'iterm windows tabs sessions get',
+  resolve: 'iterm windows sessions resolve',
+} as const
+
 it.each(['get', 'resolve'] as const)(
   'reads the Session through the generated CLI %s operation',
   async (operation) => {
     const { app, token } = await setup('remote')
     const Get = plugin.commands.find((command) =>
-      command.paths?.some((path) => path.join(' ') === `iterm windows tabs sessions ${operation}`)
+      command.paths?.some((path) => path.join(' ') === SESSION_READ_PATHS[operation])
     )
     if (Get === undefined) throw new Error('Missing Session CLI get')
     const command = new Get()

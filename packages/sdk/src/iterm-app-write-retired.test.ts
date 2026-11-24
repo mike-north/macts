@@ -59,7 +59,7 @@ describe('iTerm application-level write is retired', () => {
       (command.paths ?? []).map((path) => path.join(' '))
     )
     expect(paths).not.toContain('iterm write')
-    expect(paths).toContain('iterm windows tabs sessions write')
+    expect(paths).toContain('iterm windows sessions write')
   })
 
   it('is absent from the MCP tool list', async () => {

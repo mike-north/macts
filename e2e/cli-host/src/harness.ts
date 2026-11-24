@@ -107,8 +107,11 @@ export function workspaceServerApps(): string[] {
     .sort()
 }
 
-/** Which apps a macts home installs. */
-export type InstalledAppSet = 'default' | 'all-workspace-apps'
+/**
+ * Which apps a macts home installs: the default pair, every workspace app, or
+ * the named workspace apps (e.g. `['iterm']`).
+ */
+export type InstalledAppSet = 'default' | 'all-workspace-apps' | readonly string[]
 
 /**
  * Create a macts home whose plugins directory holds built app packages.
@@ -116,7 +119,8 @@ export type InstalledAppSet = 'default' | 'all-workspace-apps'
  * @param apps - `default` links the packages of {@link INSTALLED_APPS}
  *   through this package's dependencies; `all-workspace-apps`
  *   links every workspace `@macts/<app>-server` package and its
- *   `@macts/<app>` package, from the host package's own dependencies.
+ *   `@macts/<app>` package, from the host package's own dependencies; a list
+ *   of app names links those apps' packages the same way.
  */
 export function createMactsHome(apps: InstalledAppSet = 'default'): MactsHome {
   const root = mkdtempSync(join(tmpdir(), 'macts-cli-host-'))
@@ -125,7 +129,12 @@ export function createMactsHome(apps: InstalledAppSet = 'default'): MactsHome {
   const scope = join(plugins, 'node_modules', '@macts')
   mkdirSync(scope, { recursive: true })
 
-  const installed: readonly string[] = apps === 'default' ? INSTALLED_APPS : workspaceServerApps()
+  const installed: readonly string[] =
+    apps === 'default'
+      ? INSTALLED_APPS
+      : apps === 'all-workspace-apps'
+        ? workspaceServerApps()
+        : [...apps].sort()
   writeFileSync(
     join(plugins, 'package.json'),
     JSON.stringify({

@@ -283,8 +283,9 @@ it('writes through MCP with the same address, arguments and permission check', a
 /**
  * The generated CLI command, driven from argv as a user types it: the Session id is
  * positional, `--text` is required, and the newline choice is sent only when stated.
+ * The write is addressed by its Window alone, so it sits under the Window.
  */
-const SESSION_WRITE = ['iterm', 'windows', 'tabs', 'sessions', 'write']
+const SESSION_WRITE = ['iterm', 'windows', 'sessions', 'write']
 it.each([
   {
     label: 'omits the newline choice by default, leaving the app default',
