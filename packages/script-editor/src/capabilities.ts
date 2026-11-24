@@ -62,7 +62,8 @@ export const capabilities: readonly CapabilityMetadata[] = [
           type: 'string',
         },
         language: {
-          description: 'The scripting language the document is written in',
+          description:
+            'The name of the scripting language the document is written in, such as JavaScript',
           type: 'string',
         },
       },

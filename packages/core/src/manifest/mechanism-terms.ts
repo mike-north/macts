@@ -12,12 +12,19 @@
  * description, a name or a key. A manifest author whose dictionary text names
  * it rewrites the text to say what the app does (or drops a clause that only
  * concerns the mechanism, such as which keywords its syntax makes optional).
- * Two parts of a manifest are exempt because they are records of the
- * dictionary rather than text macts presents as its own:
+ * Two kinds of text are exempt because they record the dictionary rather
+ * than present text macts writes:
  *
- * - `evidence`: a claim's evidence quotes the dictionary verbatim (a term,
- *   a handler's statement) so a reader can check the claim against it.
- * - `extraction`: notes on how the manifest was made, for its maintainers.
+ * - Inside a claim's `evidence`, only the fields that quote the dictionary:
+ *   `term` (a dictionary term as the dictionary writes it) and `statement`
+ *   (a handler's description as the dictionary words it). A reader checks the
+ *   claim against them. Everything else in evidence is provenance (bundle,
+ *   versions, counts, error numbers, timestamps) that cannot name the
+ *   mechanism, or prose the manifest author wrote: a curated `note`, an
+ *   absent-reads `reason`, a live observation's `expression`. The generator
+ *   renders that prose into field documentation, so it follows the rule.
+ * - `extraction`, at the top of a manifest: notes on how the manifest was
+ *   made, for its maintainers. Nothing renders them.
  *
  * `AppManifestSchema` applies the rule, so a manifest that breaks it
  * neither loads nor generates.
@@ -47,11 +54,16 @@ export interface MechanismTermIssue {
 
 /**
  * The field that holds a claim's evidence in any declaration, and the
- * manifest's top-level extraction notes: records of the dictionary rather than
- * macts text. See the module comment.
+ * manifest's top-level extraction notes. See the module comment.
  */
 const EVIDENCE_FIELD = 'evidence'
 const EXTRACTION_FIELD = 'extraction'
+
+/**
+ * The evidence fields that quote the app's dictionary verbatim, the only
+ * evidence text exempt from the rule. Any other evidence field is checked.
+ */
+const DICTIONARY_QUOTE_FIELDS: ReadonlySet<string> = new Set(['term', 'statement'])
 
 /**
  * Manifest fields whose values are maps from a declared name to a declaration.
@@ -86,11 +98,16 @@ export function findMechanismTermIssues(manifest: unknown): MechanismTermIssue[]
   const issues: MechanismTermIssue[] = []
   const report = (term: string, path: (string | number)[], what: string): void => {
     issues.push({
-      message: `${path.join('.')}: ${what} names the automation mechanism ("${term}"). macts surfaces say what the app does, never how macts reaches it: rewrite it without the term, or drop a clause that only concerns the mechanism. The dictionary's own words belong only in evidence.`,
+      message: `${path.join('.')}: ${what} names the automation mechanism ("${term}"). macts surfaces say what the app does, never how macts reaches it: rewrite it without the term, or drop a clause that only concerns the mechanism. The dictionary's own words belong only in an evidence term or statement.`,
       path,
     })
   }
-  const walk = (value: unknown, path: (string | number)[], inDeclarationMap: boolean): void => {
+  const walk = (
+    value: unknown,
+    path: (string | number)[],
+    inDeclarationMap: boolean,
+    inEvidence: boolean
+  ): void => {
     if (typeof value === 'string') {
       const term = namedTerm(value)
       if (term !== undefined) report(term, path, 'the text')
@@ -98,22 +115,28 @@ export function findMechanismTermIssues(manifest: unknown): MechanismTermIssue[]
     }
     if (Array.isArray(value)) {
       value.forEach((item, index) => {
-        walk(item, [...path, index], false)
+        walk(item, [...path, index], false, inEvidence)
       })
       return
     }
     if (typeof value !== 'object' || value === null) return
     for (const [key, child] of Object.entries(value)) {
-      if (!inDeclarationMap && key === EVIDENCE_FIELD) continue
+      if (inEvidence && DICTIONARY_QUOTE_FIELDS.has(key)) continue
       if (path.length === 0 && key === EXTRACTION_FIELD) continue
       const childPath = [...path, key]
       if (inDeclarationMap) {
         const term = namedTerm(key)
         if (term !== undefined) report(term, childPath, 'the name')
       }
-      walk(child, childPath, !inDeclarationMap && DECLARATION_MAPS.has(key))
+      const enteringEvidence = !inDeclarationMap && key === EVIDENCE_FIELD
+      walk(
+        child,
+        childPath,
+        !inEvidence && !inDeclarationMap && DECLARATION_MAPS.has(key),
+        inEvidence || enteringEvidence
+      )
     }
   }
-  walk(manifest, [], false)
+  walk(manifest, [], false, false)
   return issues
 }

@@ -5,7 +5,9 @@
  * Expected outcomes follow from the rule as stated in `./mechanism-terms.ts`:
  * every string a manifest declares reaches some surface (capability
  * discovery, contracts, the CLI, clients and MCP tools), except the
- * dictionary's own words recorded as evidence and the extraction notes. The
+ * dictionary's own words quoted in evidence (`term`, `statement`) and the
+ * extraction notes. Prose an author writes in evidence (a curated `note`, a
+ * `reason`) is documentation text and is checked. The
  * registry-wide check reads every shipped manifest, so it covers each
  * capability's description, input and output schema text, CLI snippet and
  * MCP tool name.
@@ -17,6 +19,7 @@ import { fileURLToPath } from 'node:url'
 import { MECHANISM_TERMS, findMechanismTermIssues } from './mechanism-terms.js'
 import { parseManifestYaml } from './loader.js'
 import { loadManifestsFromDir } from '../capabilities/loader.js'
+import { CONTRACT_MODULE_PATH, generateContract } from '../generator/contract/index.js'
 import { buildCapabilityRegistry } from '../capabilities/registry.js'
 import { NOTEBOOK_MANIFEST_YAML, notebookManifest } from '../capabilities/test-fixtures.js'
 import type { AppManifest } from './schemas/index.js'
@@ -143,6 +146,52 @@ describe('findMechanismTermIssues', () => {
     expect(findMechanismTermIssues(manifest)).toEqual([])
   })
 
+  it('rejects author-written evidence prose: a curated note names the mechanism', () => {
+    // A curated `note` is written by the manifest author and the generator
+    // renders it into field documentation, so it is macts text, not a quote.
+    const manifest = notebookManifest()
+    const body = manifest.resources['Note']?.properties['body']
+    if (body === undefined) throw new Error('the fixture lacks Note.body')
+    body.nullable = true
+    body.evidence = {
+      nullable: { source: 'curated', note: 'Read through AppleScript. A note may have no body.' },
+    }
+    expect(findMechanismTermIssues(manifest).map(({ path }) => path)).toEqual([
+      ['resources', 'Note', 'properties', 'body', 'evidence', 'nullable', 'note'],
+    ])
+  })
+
+  it('rejects author-written evidence prose: an absent-reads reason and a live expression', () => {
+    const manifest = {
+      resources: {
+        Setting: {
+          properties: {
+            folder: {
+              evidence: {
+                nullable: {
+                  source: 'curated',
+                  note: 'The app has one only after the user makes one.',
+                  absentReads: { reason: 'osascript reports no folder until one exists.' },
+                },
+              },
+            },
+          },
+        },
+      },
+      commands: {
+        probeIt: {
+          unsupported: {
+            evidence: { source: 'live', expression: 'the settings, read with JXA' },
+          },
+        },
+      },
+    }
+    expect(findMechanismTermIssues(manifest).map(({ path }) => path.join('.'))).toEqual([
+      'resources.Setting.properties.folder.evidence.nullable.absentReads.reason',
+      'commands.probeIt.unsupported.evidence.expression',
+    ])
+  })
+
   it('accepts extraction notes, which record how the manifest was made', () => {
     const manifest: AppManifest = {
       ...notebookManifest(),
@@ -168,6 +217,27 @@ describe('findMechanismTermIssues', () => {
     note.properties['evidence'] = { ...body, description: 'Evidence, read through JXA' }
     expect(findMechanismTermIssues(manifest).map(({ path }) => path)).toEqual([
       ['resources', 'Note', 'properties', 'evidence', 'description'],
+    ])
+  })
+
+  it('still checks a declaration that happens to be named "extraction"', () => {
+    // Only the manifest's top-level `extraction` is a maintainers' record; a
+    // property or command keyed `extraction` is a declaration that reaches
+    // every surface.
+    const manifest = notebookManifest()
+    const note = manifest.resources['Note']
+    const body = note?.properties['body']
+    if (note === undefined || body === undefined) throw new Error('the fixture lacks Note.body')
+    note.properties['extraction'] = {
+      ...body,
+      description: 'Extraction, read through JXA',
+    }
+    const quit = manifest.commands['quit']
+    if (quit === undefined) throw new Error('the fixture has no quit command')
+    manifest.commands['extraction'] = { ...quit, description: 'Extract, as osascript does' }
+    expect(findMechanismTermIssues(manifest).map(({ path }) => path.join('.'))).toEqual([
+      'resources.Note.properties.extraction.description',
+      'commands.extraction.description',
     ])
   })
 })
@@ -199,6 +269,27 @@ describe('every shipped manifest and capability', () => {
     const leaking = registry.capabilities
       .filter((capability) => MECHANISM_TERMS.test(JSON.stringify(capability)))
       .map(({ name }) => name)
+    expect(leaking).toEqual([])
+  })
+})
+
+describe('generated contracts', () => {
+  it('never name the mechanism in any shipped manifest’s generated contract source', async () => {
+    // The contract module is the generated SDK source whose TSDoc ships in the
+    // published declarations. The other generated file, the embedded manifest
+    // (`src/contract/manifest.ts`), is data that carries the manifest's
+    // evidence quotes verbatim and is not rendered, so it is not checked here.
+    const { manifests } = await loadManifestsFromDir(MANIFESTS_DIR)
+    expect(manifests.length).toBeGreaterThan(30)
+    const leaking = manifests
+      .filter((manifest) => {
+        const contract = generateContract(manifest).files.find(
+          ({ path }) => path === CONTRACT_MODULE_PATH
+        )
+        if (contract === undefined) throw new Error(`${manifest.app.name}: no contract module`)
+        return MECHANISM_TERMS.test(contract.content)
+      })
+      .map(({ app }) => app.name)
     expect(leaking).toEqual([])
   })
 })

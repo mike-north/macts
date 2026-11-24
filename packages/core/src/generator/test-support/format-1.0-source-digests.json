@@ -1203,14 +1203,14 @@
         "client/src/resources/document.ts": "1b81d42b8374192a9c01d14ac540fb855f4aafd395f15aa1e3dd6da161552aae",
         "client/src/index.ts": "14e2959e28b375e0098819b068118137d9bcbfb2ab45f34ae15dd06b3672941a",
         "client/src/cli/commands/documents/list.ts": "da0a76e12f20dfb8e482d759381c4925b1d9444305a578231faa286be91ae657",
-        "client/src/cli/commands/documents/create.ts": "e7f29956697e705d16c086fc1ac29fee6a9ebe887da4cbfccfb0451080a9b1a2",
+        "client/src/cli/commands/documents/create.ts": "cadb9d4000ebe27838eb632091f7edb558be2ce5a25969315181a05b7f87c366",
         "client/src/cli/commands/documents/get.ts": "b7ec2f08beda6c2e25753a554a5fce336324278967e7bd84dd66f936e5160b75",
         "client/src/cli/plugin.ts": "b50b1dfd4ac9b87c036b9d1309fd7e30500c3db3a016f6bab5ac641b3382b8b1",
         "client/src/cli/index.ts": "47187b5cc8d23c032546c68ff1fdad6dcd39e872481d87e9e474d9677487f538",
         "client/src/cli/sdk.ts": "540f5664b680311777c1b9516d1de7433303d0a17531b269575260a24d907348",
         "client/src/cli/output/index.ts": "5a749ca35ef31085847940f756e06444594993718eb8c0962da00ca5ea4448da",
-        "client/src/contract/index.ts": "e1c6a89daf29e4d8a239d6997ef6e08edf5956900f3f4e453ddd5695f39edc76",
-        "client/src/contract/manifest.ts": "7ddc8cee993f1a076b48e185af91d976a214a178e24ebf7c3e5a6c72bda32b4c",
+        "client/src/contract/index.ts": "72ed2b9532a150ce140038a221f9582b3db3d5be1d024e51ad4983806285a87c",
+        "client/src/contract/manifest.ts": "36dc88450a5c1eb5c13867d8a9b3fd64c574c3435505100f3b96cb87e2e31193",
         "server/src/index.ts": "cd0344cb9db282fe860aef399c8be494c8bae142a843fe9b3048267e56b5f2a8"
       },
       "methods": {

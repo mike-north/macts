@@ -45,8 +45,8 @@ resources:
         # The dictionary names the two languages a document can be written in.
         # One of them shares its name with the automation mechanism, which no
         # macts surface names, so the description says what the value is and
-        # leaves the names to the value itself.
-        description: The scripting language the document is written in
+        # leaves the names to the value itself, with JavaScript as the example.
+        description: The name of the scripting language the document is written in, such as JavaScript
         code: slng
         optional: false
       modified:
