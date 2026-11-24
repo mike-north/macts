@@ -8,9 +8,14 @@
  * entry page per entry point. These tests read the committed tree: each
  * report's exports must all be members of one of its package's entry pages,
  * and every member link must name a page that documents that member: the page
- * exists and its breadcrumb ends in the member's name. A link that merely
- * resolves is not enough, because a page written for another member (one
- * whose name differs only in case, say) would satisfy it. A subpath entry page is
+ * exists, its breadcrumb ends in the member's name and its heading names the
+ * member's kind (`## ArcClient class`). A link that merely resolves is not
+ * enough, because a page written for another member would satisfy it: one
+ * whose name differs only in case, or another declaration of the same name
+ * (TypeScript merges a class and an interface, or a constant and a type,
+ * named alike, and API Extractor documents each). An export is therefore
+ * identified by its name and its kind, and an entry page lists it in the
+ * table for its kind (`## Classes`, `## Interfaces`, ...). A subpath entry page is
  * titled with the subpath's import path, which must be one the package
  * declares in its `exports`.
  *
@@ -34,6 +39,50 @@ const PACKAGES_DIR = join(REPO_ROOT, 'packages')
 const EXCLUDED = new Set(['@macts/cli', '@macts/mcp'])
 
 /**
+ * The kind of declaration, in the word api-documenter puts in a page's
+ * heading (`## Integer variable`, `## Integer type`).
+ */
+type DeclarationKind =
+  | 'class'
+  | 'interface'
+  | 'variable'
+  | 'type'
+  | 'function'
+  | 'enum'
+  | 'namespace'
+
+/** The declaration keyword an API report uses for each kind. */
+const REPORT_KINDS: Record<string, DeclarationKind> = {
+  class: 'class',
+  'abstract class': 'class',
+  interface: 'interface',
+  const: 'variable',
+  let: 'variable',
+  var: 'variable',
+  type: 'type',
+  function: 'function',
+  enum: 'enum',
+  namespace: 'namespace',
+}
+
+/** The table an entry page lists each kind in, by its `##` heading. */
+const SECTION_KINDS: Record<string, DeclarationKind> = {
+  Classes: 'class',
+  'Abstract Classes': 'class',
+  Interfaces: 'interface',
+  Variables: 'variable',
+  'Type Aliases': 'type',
+  Functions: 'function',
+  Enumerations: 'enum',
+  Namespaces: 'namespace',
+}
+
+/** The key of one declaration: its name and kind (`ArcClient|class`). */
+function declarationKey(name: string, kind: DeclarationKind): string {
+  return `${name}|${kind}`
+}
+
+/**
  * One export recorded in an API report. A local export is documented on the
  * report's own entry page, under the name API Extractor gives the declaration
  * (`export { Event_2 as Event }` is documented as `Event_2`). A re-export of
@@ -45,6 +94,11 @@ interface ReportedExport {
   name: string
   /** The name of the page member that documents it. */
   member: string
+  /**
+   * The kinds the report declares the member as: one, or several for a merged
+   * declaration. Empty for a re-export, whose kinds the source entry page gives.
+   */
+  kinds: DeclarationKind[]
   /** The import path of the entry point that declares it, when it is not this one. */
   from?: string
 }
@@ -70,16 +124,40 @@ function importedNames(report: string): Map<string, { from: string; name: string
 }
 
 /**
+ * The top-level declarations of an API report, exported or not, by name: the
+ * kinds each name is declared as. A report writes a declaration that an export
+ * list exports without `export` (`interface Event_2 {`).
+ */
+function declaredKinds(report: string): Map<string, Set<DeclarationKind>> {
+  const declared = new Map<string, Set<DeclarationKind>>()
+  const declaration =
+    /^(?:export )?(?:declare )?(abstract class|class|const|let|var|function|interface|type|enum|namespace) ([A-Za-z0-9_$]+)/gm
+  for (const match of report.matchAll(declaration)) {
+    const kind = REPORT_KINDS[match[1] ?? '']
+    const name = match[2] ?? ''
+    if (kind === undefined) continue
+    const kinds = declared.get(name) ?? new Set<DeclarationKind>()
+    kinds.add(kind)
+    declared.set(name, kinds)
+  }
+  return declared
+}
+
+/**
  * The exports an API report records: declarations (`export declare function
  * x`, `export interface X`, ...) and export lists (`export { x, y as z }`).
+ * A name declared more than once (a class and an interface `ArcClient`) is
+ * one export with several kinds.
  */
 function reportedExports(report: string): ReportedExport[] {
   const exports = new Map<string, ReportedExport>()
+  const declared = declaredKinds(report)
+  const kindsOf = (name: string): DeclarationKind[] => [...(declared.get(name) ?? [])].sort()
   const declaration =
     /^export (?:declare )?(?:abstract )?(?:class|const|let|var|function|interface|type|enum|namespace) ([A-Za-z0-9_$]+)/gm
   for (const match of report.matchAll(declaration)) {
     const name = match[1] ?? ''
-    exports.set(name, { name, member: name })
+    exports.set(name, { name, member: name, kinds: kindsOf(name) })
   }
   const imported = importedNames(report)
   for (const match of report.matchAll(/^export \{([^}]*)\}/gm)) {
@@ -90,8 +168,8 @@ function reportedExports(report: string): ReportedExport[] {
       exports.set(
         name,
         source === undefined
-          ? { name, member: local }
-          : { name, member: source.name, from: source.from }
+          ? { name, member: local, kinds: kindsOf(local) }
+          : { name, member: source.name, kinds: [], from: source.from }
       )
     }
   }
@@ -128,29 +206,50 @@ function entryPages(): Map<string, string> {
   return pages
 }
 
-/** The members an entry page links to: member name to page file. */
+/**
+ * The members an entry page links to, by declaration key (`ArcClient|class`)
+ * to page file. A member's kind is the table it is listed in.
+ */
 function entryMembers(page: string): Map<string, string> {
   const content = readFileSync(join(DOCS_DIR, page), 'utf-8')
   const members = new Map<string, string>()
-  for (const match of content.matchAll(
-    /^\[([A-Za-z0-9_$]+)(?:\([^)]*\))?\]\(\.\/([^)]+\.md)\)/gm
-  )) {
-    members.set(match[1] ?? '', match[2] ?? '')
+  let kind: DeclarationKind | undefined
+  for (const line of content.split('\n')) {
+    const section = /^## (.+)$/.exec(line)?.[1]
+    if (section !== undefined) kind = SECTION_KINDS[section]
+    const link = /^\[([A-Za-z0-9_$]+)(?:\([^)]*\))?\]\(\.\/([^)]+\.md)\)/.exec(line)
+    if (link !== null && kind !== undefined) {
+      members.set(declarationKey(link[1] ?? '', kind), link[2] ?? '')
+    }
   }
   return members
 }
 
+/** The names an entry page lists, with every kind each is listed as. */
+function memberKinds(members: Map<string, string>): Map<string, DeclarationKind[]> {
+  const kinds = new Map<string, DeclarationKind[]>()
+  for (const key of members.keys()) {
+    const [name = '', kind] = key.split('|') as [string, DeclarationKind]
+    kinds.set(name, [...(kinds.get(name) ?? []), kind])
+  }
+  return kinds
+}
+
 /**
- * The member a page documents: the last segment of its breadcrumb
- * (`[Home](./index.md) &gt; [@macts/core](./core.md) &gt; [Name](./core.name.md)`),
- * or `undefined` for a missing page or one without a breadcrumb.
+ * The declaration a page documents: the last segment of its breadcrumb
+ * (`[Home](./index.md) &gt; [@macts/core](./core.md) &gt; [Name](./core.name.md)`)
+ * and the kind word that ends its heading (`## Name interface`), as a
+ * declaration key; `undefined` for a missing page or one without either.
  */
-function documentedMember(page: string): string | undefined {
+function documentedDeclaration(page: string): string | undefined {
   const path = join(DOCS_DIR, page)
   if (!existsSync(path)) return undefined
-  const breadcrumb = /^\[Home\]\(\.\/index\.md\).*$/m.exec(readFileSync(path, 'utf-8'))?.[0]
-  if (breadcrumb === undefined) return undefined
-  return [...breadcrumb.matchAll(/\[([^\]]+)\]\(\.\/[^)]+\.md\)/g)].at(-1)?.[1]
+  const content = readFileSync(path, 'utf-8')
+  const breadcrumb = /^\[Home\]\(\.\/index\.md\).*$/m.exec(content)?.[0]
+  const heading = /^## .* ([a-z]+)$/m.exec(content)?.[1]
+  if (breadcrumb === undefined || heading === undefined) return undefined
+  const name = [...breadcrumb.matchAll(/\[([^\]]+)\]\(\.\/[^)]+\.md\)/g)].at(-1)?.[1]
+  return name === undefined ? undefined : `${name}|${heading}`
 }
 
 /** The entry pages of one package: its root (`@macts/x`) and its subpaths (`@macts/x/...`). */
@@ -176,7 +275,9 @@ describe('API reference coverage', () => {
         const local = reported.filter((entry) => entry.from === undefined)
         // A report describes one entry point, so one entry page must hold all its local exports.
         const coverage = (members: Map<string, string>): number =>
-          local.filter((entry) => members.has(entry.member)).length
+          local.filter((entry) =>
+            entry.kinds.some((kind) => members.has(declarationKey(entry.member, kind)))
+          ).length
         const own = entries.reduce<Map<string, string> | undefined>(
           (chosen, members) =>
             chosen === undefined || coverage(members) > coverage(chosen) ? members : chosen,
@@ -190,9 +291,18 @@ describe('API reference coverage', () => {
               : sourcePage === undefined
                 ? undefined
                 : entryMembers(sourcePage)
-          const page = members?.get(entry.member)
-          if (page === undefined || documentedMember(page) !== entry.member) {
-            missing.push(`${pkg.dir}/api-report/${report}: ${entry.name}`)
+          // A re-export has the kinds its source entry page lists it as.
+          const kinds =
+            entry.from === undefined
+              ? entry.kinds
+              : ((members === undefined ? undefined : memberKinds(members).get(entry.member)) ?? [])
+          if (kinds.length === 0) missing.push(`${pkg.dir}/api-report/${report}: ${entry.name}`)
+          for (const kind of kinds) {
+            const key = declarationKey(entry.member, kind)
+            const page = members?.get(key)
+            if (page === undefined || documentedDeclaration(page) !== key) {
+              missing.push(`${pkg.dir}/api-report/${report}: ${entry.name} (${kind})`)
+            }
           }
         }
       }

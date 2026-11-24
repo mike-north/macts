@@ -155,6 +155,93 @@ function typeAliasMember(name: string, type: string, aliased: string): ModelMemb
   }
 }
 
+/**
+ * One overload of a public function `<fn>` of package `@x/<name>`, taking one
+ * parameter `a` of type `<param>`. API Extractor numbers a function's
+ * overloads from 1 in declaration order (`overloadIndex`).
+ */
+function overloadMember(
+  name: string,
+  fn: string,
+  overloadIndex: number,
+  param: string
+): ModelMember {
+  return {
+    kind: 'Function',
+    canonicalReference: `@x/${name}!${fn}:function(${String(overloadIndex)})`,
+    docComment: `/**\n * Does ${fn} with a ${param}.\n */\n`,
+    excerptTokens: [
+      { kind: 'Content', text: `export declare function ${fn}(a: ` },
+      { kind: 'Content', text: param },
+      { kind: 'Content', text: '): void;' },
+    ],
+    returnTypeTokenRange: { startIndex: 0, endIndex: 0 },
+    releaseTag: 'Public',
+    overloadIndex,
+    parameters: [
+      {
+        parameterName: 'a',
+        parameterTypeTokenRange: { startIndex: 1, endIndex: 2 },
+        isOptional: false,
+      },
+    ],
+    name: fn,
+  }
+}
+
+/** A public class `<cls>` of package `@x/<name>`, with one `spin()` method. */
+function classMember(name: string, cls: string): ModelMember {
+  return {
+    kind: 'Class',
+    canonicalReference: `@x/${name}!${cls}:class`,
+    docComment: `/**\n * Builds ${cls}.\n */\n`,
+    excerptTokens: [{ kind: 'Content', text: `export declare class ${cls} ` }],
+    releaseTag: 'Public',
+    isAbstract: false,
+    name: cls,
+    preserveMemberOrder: false,
+    members: [
+      {
+        kind: 'Method',
+        canonicalReference: `@x/${name}!${cls}#spin:member(1)`,
+        docComment: '',
+        excerptTokens: [
+          { kind: 'Content', text: 'spin(): ' },
+          { kind: 'Content', text: 'void' },
+          { kind: 'Content', text: ';' },
+        ],
+        isStatic: false,
+        returnTypeTokenRange: { startIndex: 1, endIndex: 2 },
+        releaseTag: 'Public',
+        isProtected: false,
+        overloadIndex: 1,
+        parameters: [],
+        isOptional: false,
+        isAbstract: false,
+        name: 'spin',
+      },
+    ],
+    implementsTokenRanges: [],
+  }
+}
+
+/** A public constant `<variable>: number` of package `@x/<name>`. */
+function variableMember(name: string, variable: string): ModelMember {
+  return {
+    kind: 'Variable',
+    canonicalReference: `@x/${name}!${variable}:var`,
+    docComment: `/**\n * Holds ${variable}.\n */\n`,
+    excerptTokens: [
+      { kind: 'Content', text: `${variable}: ` },
+      { kind: 'Content', text: 'number' },
+    ],
+    isReadonly: true,
+    releaseTag: 'Public',
+    name: variable,
+    variableTypeTokenRange: { startIndex: 1, endIndex: 2 },
+  }
+}
+
 /** A doc model declaring one public function, `<fn>`, in package `@x/<name>`. */
 function docModel(name: string, fn: string): string {
   return packageModel(name, [functionMember(name, fn)])
@@ -259,6 +346,24 @@ function linkTarget(content: string, text: string): string | undefined {
 function git(...args: string[]): void {
   const run = spawnSync('git', args, { cwd: workspace, env: GIT_ENV, encoding: 'utf-8' })
   if (run.status !== 0) throw new Error(`git ${args.join(' ')} failed: ${run.stderr}`)
+}
+
+/**
+ * The page a link with exactly `text` points at within one `## <section>` of
+ * `content` (an entry page's `Classes`, `Interfaces`, ... table).
+ */
+function sectionLinkTarget(content: string, section: string, text: string): string | undefined {
+  const start = content.indexOf(`\n## ${section}\n`)
+  if (start === -1) return undefined
+  const end = content.indexOf('\n## ', start + 1)
+  return linkTarget(content.slice(start, end === -1 ? undefined : end), text)
+}
+
+/** Every page a link whose text matches `text` points at, in `content`. */
+function linkTargets(content: string, text: RegExp): string[] {
+  return [...content.matchAll(new RegExp(`\\[${text.source}\\]\\(\\./([^)]+\\.md)\\)`, 'g'))].map(
+    (match) => match[1] ?? ''
+  )
 }
 
 /** Run the tree check over `docs` in the scratch workspace. */
@@ -374,12 +479,135 @@ describe('generate-api-docs', () => {
     expect(linkTarget(entry, 'spin()')).toBe('widgets.spin.md')
   })
 
+  it('gives each declaration of a merged name a page of its own, linked from every page that names it (same-name declaration merge regression, issue 335)', async () => {
+    await plantPackage('widgets', undefined)
+    await writeFile(
+      join(workspace, 'packages', 'widgets', 'temp', 'widgets.api.json'),
+      packageModel('widgets', [
+        // A class and an interface named `Gizmo`, as every app client is declared.
+        classMember('widgets', 'Gizmo'),
+        interfaceMember('widgets', 'Gizmo'),
+        // A function whose name differs only in case from the merged pair.
+        functionMember('widgets', 'gizmo'),
+        // A constant and a type named `count`, with an interface `Count`.
+        variableMember('widgets', 'count'),
+        typeAliasMember('widgets', 'count', 'number'),
+        interfaceMember('widgets', 'Count'),
+        functionMember('widgets', 'build', {
+          text: 'Gizmo',
+          reference: '@x/widgets!Gizmo:class',
+        }),
+        functionMember('widgets', 'describe', {
+          text: 'Gizmo',
+          reference: '@x/widgets!Gizmo:interface',
+        }),
+        functionMember('widgets', 'tally', { text: 'count', reference: '@x/widgets!count:type' }),
+      ])
+    )
+
+    expect(generate().status).toBe(0)
+
+    const entry = await page('widgets.md')
+    const classPage = sectionLinkTarget(entry, 'Classes', 'Gizmo')
+    const interfacePage = sectionLinkTarget(entry, 'Interfaces', 'Gizmo')
+    const variablePage = sectionLinkTarget(entry, 'Variables', 'count')
+    const typePage = sectionLinkTarget(entry, 'Type Aliases', 'count')
+    // The rule: a value-side declaration (class, function, variable, enum,
+    // namespace) keeps the plain name; a type-side declaration of the same
+    // name (interface, type alias) has its kind appended. The case rule
+    // applies first: `Count` sorts before `count`, which has `-2` appended.
+    expect(classPage).toBe('widgets.gizmo.md')
+    expect(interfacePage).toBe('widgets.gizmo-interface.md')
+    expect(linkTarget(entry, 'gizmo()')).toBe('widgets.gizmo-2.md')
+    expect(sectionLinkTarget(entry, 'Interfaces', 'Count')).toBe('widgets.count.md')
+    expect(variablePage).toBe('widgets.count-2.md')
+    expect(typePage).toBe('widgets.count-2-type.md')
+    expect(await page('widgets.gizmo.md')).toMatch(/^## Gizmo class$/m)
+    expect(await page('widgets.gizmo-interface.md')).toMatch(/^## Gizmo interface$/m)
+    expect(await page('widgets.gizmo-2.md')).toMatch(/^## gizmo\(\) function$/m)
+    expect(await page('widgets.count.md')).toMatch(/^## Count interface$/m)
+    expect(await page('widgets.count-2.md')).toMatch(/^## count variable$/m)
+    expect(await page('widgets.count-2-type.md')).toMatch(/^## count type$/m)
+    // A reference to one declaration links to that declaration's page.
+    expect(linkTarget(await page(linkTarget(entry, 'build()') ?? ''), 'Gizmo')).toBe(classPage)
+    expect(linkTarget(await page(linkTarget(entry, 'describe()') ?? ''), 'Gizmo')).toBe(
+      interfacePage
+    )
+    expect(linkTarget(await page(linkTarget(entry, 'tally()') ?? ''), 'count')).toBe(typePage)
+    // Each declaration's members are documented under, and link back to, it.
+    const spinPage = linkTarget(await page('widgets.gizmo.md'), 'spin()')
+    expect(spinPage).toBe('widgets.gizmo.spin.md')
+    const spin = await page('widgets.gizmo.spin.md')
+    expect(spin).toMatch(/^## Gizmo\.spin\(\) method$/m)
+    expect(linkTarget(spin, 'Gizmo')).toBe(classPage)
+    const sizePage = linkTarget(await page('widgets.gizmo-interface.md'), 'size')
+    expect(sizePage).toBe('widgets.gizmo-interface.size.md')
+    const size = await page('widgets.gizmo-interface.size.md')
+    expect(size).toMatch(/^## Gizmo\.size property$/m)
+    expect(linkTarget(size, 'Gizmo')).toBe(interfacePage)
+  })
+
+  it('gives each overload of a function a page of its own, numbered after the first, also when its name collides by case', async () => {
+    await plantPackage('widgets', undefined)
+    await writeFile(
+      join(workspace, 'packages', 'widgets', 'temp', 'widgets.api.json'),
+      packageModel('widgets', [
+        overloadMember('widgets', 'make', 1, 'number'),
+        overloadMember('widgets', 'make', 2, 'string'),
+        interfaceMember('widgets', 'Make'),
+        overloadMember('widgets', 'twist', 1, 'number'),
+        overloadMember('widgets', 'twist', 2, 'string'),
+      ])
+    )
+
+    expect(generate().status).toBe(0)
+
+    const entry = await page('widgets.md')
+    // api-documenter numbers every overload after the first `_<n - 1>`; the
+    // case rule gives `make` (after `Make`) the segment `make-2`.
+    expect(linkTargets(entry, /twist\([^)]*\)/).sort()).toEqual([
+      'widgets.twist.md',
+      'widgets.twist_1.md',
+    ])
+    expect(linkTargets(entry, /make\([^)]*\)/).sort()).toEqual([
+      'widgets.make-2.md',
+      'widgets.make-2_1.md',
+    ])
+    expect(sectionLinkTarget(entry, 'Interfaces', 'Make')).toBe('widgets.make.md')
+    expect(await page('widgets.twist.md')).toContain('twist(a: number)')
+    expect(await page('widgets.twist_1.md')).toContain('twist(a: string)')
+    expect(await page('widgets.make-2.md')).toContain('make(a: number)')
+    expect(await page('widgets.make-2_1.md')).toContain('make(a: string)')
+    expect(await page('widgets.make.md')).toMatch(/^## Make interface$/m)
+  })
+
+  it('fails, naming the page, instead of writing two members to one page', async () => {
+    await plantPackage('widgets', undefined)
+    // The second overload of `make` is named `make_1`, as is the function `make_1`.
+    await writeFile(
+      join(workspace, 'packages', 'widgets', 'temp', 'widgets.api.json'),
+      packageModel('widgets', [
+        overloadMember('widgets', 'make', 1, 'number'),
+        overloadMember('widgets', 'make', 2, 'string'),
+        functionMember('widgets', 'make_1'),
+      ])
+    )
+
+    const { status, stderr } = generate()
+
+    expect(status).toBe(1)
+    expect(stderr).toContain('widgets.make_1.md')
+  })
+
   it("links a subpath member to the subpath's own declaration of a name the root entry also declares", async () => {
     await plantPackage('widgets', undefined, [{ path: 'local', fn: undefined }])
     const temp = join(workspace, 'packages', 'widgets', 'temp')
     await writeFile(
       join(temp, 'widgets.api.json'),
-      packageModel('widgets', [typeAliasMember('widgets', 'Size', 'string')])
+      packageModel('widgets', [
+        typeAliasMember('widgets', 'Size', 'string'),
+        interfaceMember('widgets', 'Shape'),
+      ])
     )
     // API Extractor names a subpath model after its package, so the subpath's
     // reference to its own `Size` reads `@x/widgets!Size`, like the root's.
@@ -388,6 +616,11 @@ describe('generate-api-docs', () => {
       packageModel('widgets', [
         typeAliasMember('widgets', 'Size', 'number'),
         functionMember('widgets', 'measure', { text: 'Size', reference: '@x/widgets!Size:type' }),
+        // `Shape` is declared by the root entry only.
+        functionMember('widgets', 'outline', {
+          text: 'Shape',
+          reference: '@x/widgets!Shape:interface',
+        }),
       ])
     )
 
@@ -405,6 +638,12 @@ describe('generate-api-docs', () => {
     }
     expect(linkTarget(await page('widgets.md'), 'Size')).not.toBe(subpathSize)
     expect(linkTarget(await page(measure), 'Size')).toBe(subpathSize)
+    // A reference to a name only the root entry declares links to the root's page.
+    const outline = linkTarget(entry, 'outline()')
+    if (outline === undefined)
+      throw new Error(`the subpath entry page does not link outline():\n${entry}`)
+    expect(linkTarget(await page(outline), 'Shape')).toBe('widgets.shape.md')
+    expect(await page('widgets.shape.md')).toMatch(/^## Shape interface$/m)
   })
 
   it('fails, naming the config, when an entry point writes an API report but no doc model', async () => {
@@ -449,6 +688,8 @@ describe('generate-api-docs', () => {
     ['--root=<dir>', (dir: string) => [`--root=${dir}`]],
     ['an unknown flag', (dir: string) => ['--root', dir, '--verbose']],
     ['a stray argument', (dir: string) => [dir]],
+    ['an empty directory', () => ['--root', '']],
+    ['a flag in place of the directory', () => ['--root', '--verbose']],
   ])('stops with a usage error, writing nothing, given %s', async (_case, args) => {
     await plantPackage('widgets', 'spin')
 

@@ -42,9 +42,11 @@
  * deleted, instead of silently dropping that entry point's pages, because a
  * partial `docs/` is indistinguishable from a deliberate removal.
  *
- * Page names. `api-documenter` lowercases page file names, so members whose
- * names differ only in case would share a page. The script gives each its own,
- * by a deterministic rule that leaves every other page's name unchanged; see
+ * Page names. `api-documenter` lowercases page file names and names a page
+ * after its member's name alone, so members whose names differ only in case,
+ * and declarations that share one name (a class and an interface, a constant
+ * and a type), would share a page. The script gives each its own, by a
+ * deterministic rule that leaves every other page's name unchanged; see
  * `documentWithDistinctPageNames`.
  *
  * Usage: `node scripts/generate-api-docs.mjs [--root <dir>]`. `--root` selects
@@ -236,24 +238,48 @@ for (const { packageName, identity, model } of entryPoints) {
 }
 
 /**
- * Page file names that stay distinct when member names differ only in case.
+ * Page file names that stay distinct when member names differ only in case or
+ * one name is declared more than once.
  *
  * `api-documenter` names a page after the path of names leading to its item
  * (`core.coarsepermission.md`), each name lowercased with characters a file
- * name cannot hold replaced by `_`. Two siblings whose names differ only in
- * case, such as the function `coarsePermission` and the interface
- * `CoarsePermission`, therefore get the same file: the page written last
- * replaces the other, and every link to either opens it.
+ * name cannot hold replaced by `_`. Two different members can therefore get
+ * the same file: the page written last replaces the other, and every link to
+ * either opens it. That happens when
+ * - two siblings' names differ only in case, such as the function
+ *   `coarsePermission` and the interface `CoarsePermission`;
+ * - one name has several declarations of different kinds that TypeScript
+ *   merges, such as the class and the interface `ArcClient`, or the constant
+ *   and the type `Integer`. API Extractor documents each declaration.
  *
- * The rule: among the members of one container (an entry point, interface,
- * class, namespace, ...), the distinct names that map to the same file name
- * segment are ordered by UTF-16 code unit (`CoarsePermission` before
- * `coarsePermission`). The first keeps the plain segment; the n-th has `-n`
- * appended (`core.coarsepermission-2.md`). `-` never occurs in a segment
- * derived from a TypeScript identifier, so a suffixed name cannot meet another
- * member's. A member whose segment no sibling shares keeps the name
+ * The rule, applied among the members of one container (an entry point,
+ * interface, class, namespace, ...), to the segment of a member's own name:
+ * 1. Case. The distinct names that map to the same segment are ordered by
+ *    UTF-16 code unit (`CoarsePermission` before `coarsePermission`). The
+ *    first keeps the plain segment; the n-th has `-n` appended
+ *    (`core.coarsepermission-2.md`).
+ * 2. Kind. Among the siblings with exactly the same name, the value-side
+ *    declaration (class, enum, function, variable, then namespace, in that
+ *    order) keeps the segment; each other kind, normally the type-side
+ *    interface or type alias, has `-<kind>` appended, the kind word the page's
+ *    heading uses (`arc.arcclient-interface.md`, `contracts.integer-type.md`).
+ *    This follows the case suffix (`count-2-type`).
+ * 3. Overloads, which share both name and kind, keep `api-documenter`'s
+ *    numbering: every overload after the first has `_<n - 1>` appended.
+ *
+ * A member whose name and kind no sibling shares keeps the name
  * `api-documenter` gives it, so adding or removing an unrelated export moves
  * no page. The segment carries over to the pages of the member's own members.
+ *
+ * The suffixes cannot make one sibling's segment equal another's: a segment
+ * derived from a TypeScript identifier holds no `-`, and API Extractor keeps
+ * the quotes of a string-literal member name (`"content-type"`), which become
+ * `_`, so a plain segment that holds `-` ends in `_`, which no suffix does.
+ * `api-documenter`'s overload numbering can still meet a sibling's own name
+ * (the second overload of `make` and a function `make_1`), and other
+ * characters it replaces can make two paths meet, so every page file is also
+ * checked to belong to one item only: a second item ends the run instead of
+ * replacing a page.
  *
  * `api-documenter` computes every page file and every link to a page through
  * one method, so replacing that method keeps each link pointed at its page.
@@ -276,20 +302,59 @@ function documentWithDistinctPageNames(inputFolder, outputFolder) {
     )
   }
 
+  /**
+   * The kinds that keep the plain segment when one name is declared as several,
+   * first preferred, and the word each kind's page heading uses.
+   */
+  const KIND_ORDER = [
+    ApiItemKind.Class,
+    ApiItemKind.Enum,
+    ApiItemKind.Function,
+    ApiItemKind.Variable,
+    ApiItemKind.Namespace,
+    ApiItemKind.Interface,
+    ApiItemKind.TypeAlias,
+  ]
+  const KIND_WORDS = {
+    [ApiItemKind.Class]: 'class',
+    [ApiItemKind.Enum]: 'enum',
+    [ApiItemKind.Function]: 'function',
+    [ApiItemKind.Variable]: 'variable',
+    [ApiItemKind.Namespace]: 'namespace',
+    [ApiItemKind.Interface]: 'interface',
+    [ApiItemKind.TypeAlias]: 'type',
+  }
+  const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0)
+  const kindRank = (kind) => {
+    const rank = KIND_ORDER.indexOf(kind)
+    return rank === -1 ? KIND_ORDER.length : rank
+  }
+
   const safeName = (name) => Utilities.getSafeFilenameForName(name)
   /** The file name segment of one item: its safe name, made distinct from its siblings'. */
   const segment = (item) => {
+    const siblings = item.parent?.members ?? []
     const own = safeName(item.displayName)
     const spellings = [
       ...new Set(
-        (item.parent?.members ?? [])
-          .map((sibling) => sibling.displayName)
-          .filter((name) => safeName(name) === own)
+        siblings.map((sibling) => sibling.displayName).filter((name) => safeName(name) === own)
       ),
-    ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+    ].sort(byCodeUnit)
     const rank = spellings.indexOf(item.displayName)
-    return rank > 0 ? `${own}-${String(rank + 1)}` : own
+    const kinds = [
+      ...new Set(
+        siblings
+          .filter((sibling) => sibling.displayName === item.displayName)
+          .map((sibling) => sibling.kind)
+      ),
+    ].sort((a, b) => kindRank(a) - kindRank(b) || byCodeUnit(a, b))
+    const caseSuffix = rank > 0 ? `-${String(rank + 1)}` : ''
+    const kindSuffix =
+      kinds.indexOf(item.kind) > 0 ? `-${KIND_WORDS[item.kind] ?? item.kind.toLowerCase()}` : ''
+    return `${own}${caseSuffix}${kindSuffix}`
   }
+  /** The item each page file was given to, so no file is given to two. */
+  const owners = new Map()
   MarkdownDocumenter.prototype._getFilenameForApiItem = function (apiItem) {
     if (apiItem.kind === ApiItemKind.Model) return 'index.md'
     let baseName = ''
@@ -312,7 +377,20 @@ function documentWithDistinctPageNames(inputFolder, outputFolder) {
         }
       }
     }
-    return `${baseName}.md`
+    const fileName = `${baseName}.md`
+    // An entry point shares its package's page and an enum member its enum's.
+    const owner =
+      apiItem.kind === ApiItemKind.EntryPoint || apiItem.kind === ApiItemKind.EnumMember
+        ? apiItem.parent
+        : apiItem
+    const previous = owners.get(fileName)
+    if (previous !== undefined && previous !== owner) {
+      throw new Error(
+        `${previous.canonicalReference.toString()} and ${owner.canonicalReference.toString()} would both be written to ${fileName}`
+      )
+    }
+    owners.set(fileName, owner)
+    return fileName
   }
 
   return new ApiDocumenterCommandLine().executeAsync([
