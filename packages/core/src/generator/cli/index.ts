@@ -15,7 +15,9 @@ import {
   createCliGeneratorContext,
   type CliGeneratorOptions,
   type CliGeneratorContext,
+  type HierarchyPath,
 } from './context.js'
+import { placeCommand } from './placement.js'
 import {
   generateListCommand,
   generateCreateCommand,
@@ -77,33 +79,46 @@ export function generateCliPlugin(
         undefined
       const available = (c: (typeof resourceCommands)[number]): boolean =>
         ctx.isOperationAvailable(c, hierarchyPath.resourceName)
-      const hasOp = (op: string): boolean => {
+      // The command backing a CRUD operation, when it can be called.
+      const backing = (op: string): (typeof resourceCommands)[number] | undefined => {
         const chosen = resourceCommands.find((c) => c.name === op)
-        return chosen !== undefined && callable(chosen) && available(chosen)
+        return chosen !== undefined && callable(chosen) && available(chosen) ? chosen : undefined
       }
+      // Each command sits where its address places it (`./placement.ts`), and
+      // is generated only from the hierarchy entry its address reaches.
+      const placed = (command: (typeof resourceCommands)[number]): HierarchyPath | undefined =>
+        placeCommand(manifest, command, hierarchyPath)
 
       // List command
-      if (hasOp('list')) {
-        commands.push(generateListCommand(hierarchyPath, ctx))
+      const list = backing('list')
+      const listAt = list === undefined ? undefined : placed(list)
+      if (listAt !== undefined) {
+        commands.push(generateListCommand(listAt, ctx))
       }
 
       // Create command (only when a backing create command exists and the
       // resource is writable)
-      if (hasOp('create')) {
-        const createCmd = generateCreateCommand(hierarchyPath, ctx)
+      const create = backing('create')
+      const createAt = create === undefined ? undefined : placed(create)
+      if (createAt !== undefined) {
+        const createCmd = generateCreateCommand(createAt, ctx)
         if (createCmd) {
           commands.push(createCmd)
         }
       }
 
       // Get command
-      if (hasOp('get')) {
-        commands.push(generateGetCommand(hierarchyPath, ctx))
+      const get = backing('get')
+      const getAt = get === undefined ? undefined : placed(get)
+      if (getAt !== undefined) {
+        commands.push(generateGetCommand(getAt, ctx))
       }
 
       // Resource-level commands (like "show" for events)
       // Skip standard CRUD commands since they're already generated above
       for (const cmd of resourceCommands) {
+        const at = placed(cmd)
+        if (at === undefined) continue
         // A separate identity get is a declared read operation on every surface.
         if (
           cmd.name === 'get' &&
@@ -111,10 +126,10 @@ export function generateCliPlugin(
           cmd !== resourceCommands.find((command) => command.name === 'get') &&
           available(cmd)
         ) {
-          commands.push(generateGetCommand(hierarchyPath, ctx, cmd))
+          commands.push(generateGetCommand(at, ctx, cmd))
         }
         if (standardOps.has(cmd.name) || !callable(cmd) || !available(cmd)) continue
-        commands.push(generateResourceCommand(cmd, hierarchyPath, ctx))
+        commands.push(generateResourceCommand(cmd, at, ctx))
       }
     }
 
