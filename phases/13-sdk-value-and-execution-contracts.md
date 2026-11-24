@@ -1029,12 +1029,12 @@ The native `Executor` maps a `NativeOutcome` failure to canonical errors:
   `InternalError`, never `ValidationError` or `UnexpectedValueError`: no input
   or result at that position can be converted, so neither the caller nor the
   app is at fault. Its message names the operation, the kind and the position.
-  For a reference it reads: The Contacts operation "actionTitle" takes a
-  reference at `for` that the macOS provider cannot convert yet.
+  For a reference it reads: The <App> operation "<command>" takes a
+  reference at `<position>` that the macOS provider cannot convert yet.
 - A codec `decode` failure with `missingResource` maps to
   `TargetNotFoundError` with `details: { resource }`, the referenced resource,
-  and a message naming the position: Contacts has no Person matching the
-  reference at `for`. It is not read from an app error number; the codec
+  and a message naming the position: <App> has no <Resource> matching the
+  reference at `<position>`. It is not read from an app error number; the codec
   checks existence before any command runs.
 - An app failure with -1728 and `missingResource` maps to
   `TargetNotFoundError` with `details: { resource }`, that resource: a scoped

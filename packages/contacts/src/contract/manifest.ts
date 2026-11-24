@@ -1859,6 +1859,18 @@ export const manifest: unknown = {
       parameters: [],
       returns: 'string',
       code: 'az57',
+      unsupported: {
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.3',
+          term: 'action property',
+          finding: 'handler',
+          statement:
+            'These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.',
+        },
+      },
     },
     actionTitle: {
       name: 'actionTitle',
@@ -1885,6 +1897,18 @@ export const manifest: unknown = {
       ],
       returns: 'string',
       code: 'az58',
+      unsupported: {
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.3',
+          term: 'action title',
+          finding: 'handler',
+          statement:
+            'These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.',
+        },
+      },
     },
     performAction: {
       name: 'performAction',
@@ -1910,6 +1934,18 @@ export const manifest: unknown = {
       ],
       returns: 'boolean',
       code: 'az60',
+      unsupported: {
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.3',
+          term: 'perform action',
+          finding: 'handler',
+          statement:
+            'These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.',
+        },
+      },
     },
     shouldEnableAction: {
       name: 'shouldEnableAction',
@@ -1936,6 +1972,18 @@ export const manifest: unknown = {
       ],
       returns: 'boolean',
       code: 'az59',
+      unsupported: {
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.AddressBook',
+          appVersion: '14.0',
+          osVersion: '27.3',
+          term: 'should enable action',
+          finding: 'handler',
+          statement:
+            'These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.',
+        },
+      },
     },
   },
 }

@@ -1511,6 +1511,15 @@ commands:
     description: RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)
     scope: application
     code: az57
+    unsupported:
+      evidence:
+        source: dictionary
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.3'
+        term: action property
+        finding: handler
+        statement: These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.
     # Contacts.sdef:434 declares text. Keep default nullable result semantics;
     # a dictionary type does not establish that every invocation yields a value.
     returns: string
@@ -1520,6 +1529,15 @@ commands:
     description: RollOver - Returns the title that will be placed in the menu for this roll over
     scope: application
     code: az58
+    unsupported:
+      evidence:
+        source: dictionary
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.3'
+        term: action title
+        finding: handler
+        statement: These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.
     # Contacts.sdef:444 declares the menu title as text.
     returns: string
     parameters:
@@ -1539,6 +1557,15 @@ commands:
     description: RollOver - Performs the action on the given person and value
     scope: application
     code: az60
+    unsupported:
+      evidence:
+        source: dictionary
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.3'
+        term: perform action
+        finding: handler
+        statement: These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.
     # Contacts.sdef:454 declares boolean; false is an ordinary returned value.
     returns: boolean
     parameters:
@@ -1558,6 +1585,15 @@ commands:
     description: RollOver - Determines if the rollover action should be enabled for the given person and value
     scope: application
     code: az59
+    unsupported:
+      evidence:
+        source: dictionary
+        bundleId: com.apple.AddressBook
+        appVersion: '14.0'
+        osVersion: '27.3'
+        term: should enable action
+        finding: handler
+        statement: These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.
     # Contacts.sdef:464 declares whether the action should be enabled.
     returns: boolean
     parameters:

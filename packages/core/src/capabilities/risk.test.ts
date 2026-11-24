@@ -137,7 +137,7 @@ describe('classifyRiskFromOperation — predicate-style queries classify as read
   // (they observe state), so they must classify as `read`, not be mis-gated as
   // `system-change` (via tokens like `enable`/`disable`) or `delete`/`write`.
   const predicateCases: readonly (readonly [operation: string, expected: RiskClass])[] = [
-    ['shouldEnableAction', 'read'], // Contacts — boolean query, contains `enable`
+    ['shouldEnableAction', 'read'], // boolean query, contains `enable`
     ['canDelete', 'read'], // contains the `delete` token
     ['isRunning', 'read'],
     ['hasUpdate', 'read'], // contains the `update` write token

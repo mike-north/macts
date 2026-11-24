@@ -183,19 +183,68 @@ describe('listKnownPermissions of the shipped manifests', () => {
     expect(known).toContain('mail:app:*')
   })
 
-  it('keeps the permissions of operations whose required reference has a get', async () => {
-    // manifests/contacts/app.yaml: `actionTitle`, `performAction` and
-    // `shouldEnableAction` require `for`, a `person`, and `people.get` gets one.
+  it('keeps the permission of an operation whose required reference has a get', () => {
+    // A stand-in app: `describePerson` requires `for`, a `Person`, and `getPerson`
+    // gets one, so the input can be satisfied and the operation can be called
+    // (phases/13 D7, "Resolvable targets").
+    const roster: AppManifest = {
+      version: '1.0',
+      app: { name: 'Roster', bundleId: 'com.example.roster', tccEntitlements: [] },
+      resources: {
+        Person: {
+          name: 'Person',
+          plural: 'People',
+          description: 'A person',
+          properties: {},
+          identifiers: [{ property: 'id', primary: true, targeting: 'byId' }],
+        },
+      },
+      enums: {},
+      hierarchy: { children: {} },
+      suites: [],
+      relationships: [],
+      commands: {
+        getPerson: {
+          name: 'get',
+          routeName: 'get',
+          description: 'Get one person',
+          scope: 'resource',
+          resourceType: 'Person',
+          parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
+        },
+        describePerson: {
+          name: 'describePerson',
+          description: 'Describe a person',
+          scope: 'application',
+          parameters: [
+            {
+              name: 'for',
+              type: { resource: 'Person' },
+              description: 'The person to describe',
+              required: true,
+            },
+          ],
+        },
+      },
+    }
+    expect(listKnownPermissions(roster)).toContain('roster:app:describePerson')
+  })
+
+  it('lists none of the handlers Contacts sends to Rollover plug-ins', async () => {
+    // manifests/contacts/app.yaml: the hidden Address Book Rollover Suite is
+    // marked unsupported with dictionary handler evidence.
     const known = listKnownPermissions(
       await loadManifest(resolve(MANIFESTS_DIR, 'contacts', 'app.yaml'))
     )
     for (const permission of [
+      'contacts:app:actionProperty',
       'contacts:app:actionTitle',
       'contacts:app:performAction',
       'contacts:app:shouldEnableAction',
     ]) {
-      expect(known).toContain(permission)
+      expect(known).not.toContain(permission)
     }
+    expect(known).toContain('contacts:people:get')
   })
 
   it('keeps the permission of an operation whose unsatisfiable input is optional', async () => {

@@ -89,7 +89,7 @@ describe('the client of every real contract', () => {
     expect(methods).toBeGreaterThan(apps.length)
   })
 
-  it('leaves out the Mail method whose required input admits no value, and keeps those Contacts can satisfy', async () => {
+  it('leaves out the Mail method whose required input admits no value, and keeps its siblings', async () => {
     const byApp = new Map(apps.map((app) => [app.name, app]))
     const methodsOf = async (name: string): Promise<string[]> => {
       const app = byApp.get(name)
@@ -102,25 +102,25 @@ describe('the client of every real contract', () => {
     const mail = await methodsOf('mail')
     expect(mail).not.toContain('synchronize')
     expect(mail).toContain('checkForNewMail')
-    // Hand-written from manifests/contacts/app.yaml: the actions' required
-    // `for` takes a person, and `people.get` gets one, so they are offered.
+    // Hand-written from manifests/contacts/app.yaml: the Rollover handlers the
+    // app sends to plug-ins are marked unsupported and have no method; the
+    // person operations stay.
     const contacts = await methodsOf('contacts')
-    expect(contacts).toContain('actionTitle')
-    expect(contacts).toContain('performAction')
-    expect(contacts).toContain('shouldEnableAction')
+    for (const handler of ['actionProperty', 'actionTitle', 'performAction', 'shouldEnableAction'])
+      expect(contacts).not.toContain(handler)
     expect(contacts).toContain('people.get')
   })
 })
 
 // The client interfaces agree: no member for the unavailable Mail operation,
-// and members for the Contacts actions a person reference can satisfy.
+// and none for a Contacts handler.
 type HasMember<Client, Name extends string> = Name extends keyof Client ? true : false
 const contactsMembers: [
   HasMember<ContactsClient, 'actionTitle'>,
   HasMember<ContactsClient, 'performAction'>,
   HasMember<ContactsClient, 'shouldEnableAction'>,
   HasMember<ContactsClient, 'actionProperty'>,
-] = [true, true, true, true]
+] = [false, false, false, false]
 const mailMembers: [
   HasMember<MailClient, 'synchronize'>,
   HasMember<MailClient, 'checkForNewMail'>,

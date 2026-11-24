@@ -2,17 +2,20 @@
  * Integration: a command the app's dictionary documents as a handler the app
  * sends to scripts is never served as an MCP tool.
  *
- * The shipped Mail manifest marks such a handler `unsupported` with
- * dictionary evidence: "perform mail action with messages", which Mail's
- * dictionary calls a "Script handler invoked by rules and menus". A marked
+ * The shipped manifests mark such handlers `unsupported` with dictionary
+ * evidence: Mail's "perform mail action with messages", which its dictionary
+ * calls a "Script handler invoked by rules and menus", and the four events of
+ * Contacts' Address Book Rollover Suite, which its dictionary says are used
+ * for constructing Rollover plug-ins. A marked
  * command has no route, so the runtime registers no operation for it and the
  * adapter lists no tool. Tool names are written by hand from the naming rule
  * `macts__<app>__app_<command key in snake case>`.
  *
- * The manifest also keeps a usable application command, `synchronize`, whose
- * tool must be listed, so the absence is never vacuous.
+ * Each manifest also keeps usable commands (Mail's `synchronize`, Contacts'
+ * `people.get`), whose tools must be listed, so the absence is never vacuous.
  *
  * @see ../../../../manifests/mail/app.yaml
+ * @see ../../../../manifests/contacts/app.yaml
  * @see ../../../../manifests/README.md (Unsupported commands)
  * @see https://modelcontextprotocol.io/specification/2025-11-25/server/tools#listing-tools
  */
@@ -33,17 +36,29 @@ const manifestPath = (app: string): string =>
   fileURLToPath(new URL(`../../../../manifests/${app}/app.yaml`, import.meta.url))
 
 /** The tools the marked handlers would have if they were served. */
-const HANDLER_TOOLS = ['macts__mail__app_perform_mail_action_with_messages']
+const HANDLER_TOOLS = [
+  'macts__mail__app_perform_mail_action_with_messages',
+  'macts__contacts__app_action_property',
+  'macts__contacts__app_action_title',
+  'macts__contacts__app_perform_action',
+  'macts__contacts__app_should_enable_action',
+]
 
 /** A usable application command of the same manifest, which is served. */
-const USABLE_TOOLS = ['macts__mail__app_synchronize']
+const USABLE_TOOLS = ['macts__mail__app_synchronize', 'macts__contacts__people_get']
 
 const SECRET = 'macts_sk_app-sent-handlers-secret-never-logged'
 
 /** Holds the permission each handler would need if it were served. */
 const OPERATOR: Authority = {
   subject: 'key_operator',
-  permissions: ['mail:app:performMailActionWithMessages'],
+  permissions: [
+    'mail:app:performMailActionWithMessages',
+    'contacts:app:actionProperty',
+    'contacts:app:actionTitle',
+    'contacts:app:performAction',
+    'contacts:app:shouldEnableAction',
+  ],
 }
 const CONTEXT: InvocationContext = { credential: createBearerCredential(SECRET) }
 const SILENT: RuntimeLogger = {
@@ -75,6 +90,7 @@ beforeAll(async () => {
     logger: SILENT,
   })
   runtime.registerManifest(await loadManifest(manifestPath('mail')))
+  runtime.registerManifest(await loadManifest(manifestPath('contacts')))
   adapter = createMcpAdapter(runtime, { logger: SILENT })
 })
 
