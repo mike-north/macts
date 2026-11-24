@@ -57,10 +57,11 @@ function capabilityKey(resource: string, operation: string): string {
 function targetKey(manifest: AppManifest, target: OperationTarget): string {
   const command = manifest.commands[target.command]
   if (command === undefined) throw new Error(`no command "${target.command}"`)
-  if (target.resource === undefined) return capabilityKey(APP_RESOURCE, command.name)
+  const operation = command.routeName ?? target.command
+  if (target.resource === undefined) return capabilityKey(APP_RESOURCE, operation)
   const resource = manifest.resources[target.resource]
   if (resource === undefined) throw new Error(`no resource "${target.resource}"`)
-  return capabilityKey(normalizeResourceRouteSegment(resource.plural), command.name)
+  return capabilityKey(normalizeResourceRouteSegment(resource.plural), operation)
 }
 
 describe('MCP tool names of every real operation', () => {

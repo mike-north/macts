@@ -12,7 +12,7 @@
 
 /** The iTerm manifest. */
 export const manifest: unknown = {
-  version: '1.0',
+  version: '1.1',
   app: {
     bundleId: 'com.googlecode.iterm2',
     name: 'iTerm',
@@ -337,6 +337,11 @@ export const manifest: unknown = {
           description: 'The currently visible contents of the session.',
           code: 'Cntt',
           optional: false,
+          separateRead: {
+            operation: 'readContents',
+            permission: 'iterm:sessions:readContents',
+            reason: 'Screen text has independent read cost, volatility and permission.',
+          },
         },
         text: {
           access: 'r',
@@ -344,6 +349,11 @@ export const manifest: unknown = {
           description: 'The currently visible contents of the session.',
           code: 'pcnt',
           optional: false,
+          separateRead: {
+            operation: 'readText',
+            permission: 'iterm:sessions:readText',
+            reason: 'Screen text has independent read cost, volatility and permission.',
+          },
         },
         colorPreset: {
           access: 'rw',
@@ -835,11 +845,15 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      parent: {
-        resource: 'Window',
-        parameter: 'windowId',
-      },
       routeName: 'list',
+      parents: [
+        {
+          resource: 'Window',
+          parameter: 'windowId',
+          by: 'identity',
+          collection: 'windows',
+        },
+      ],
     },
     getTab: {
       name: 'get',
@@ -860,11 +874,143 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      parent: {
-        resource: 'Window',
-        parameter: 'windowId',
-      },
       routeName: 'get',
+      parents: [
+        {
+          resource: 'Window',
+          parameter: 'windowId',
+          by: 'identity',
+          collection: 'windows',
+        },
+      ],
+      item: {
+        by: 'index',
+        parameter: 'index',
+      },
+    },
+    listSessions: {
+      name: 'list',
+      description: 'List the sessions in the tab at a window position.',
+      scope: 'resource',
+      resourceType: 'Session',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'tabIndex',
+          type: 'integer',
+          description: 'Zero-based tab position',
+          required: true,
+        },
+      ],
+      parents: [
+        {
+          by: 'identity',
+          parameter: 'windowId',
+          resource: 'Window',
+          collection: 'windows',
+        },
+        {
+          by: 'index',
+          parameter: 'tabIndex',
+          resource: 'Tab',
+          collection: 'tabs',
+        },
+      ],
+      resolvesReferences: false,
+      routeName: 'list',
+      risk: 'read',
+    },
+    getSession: {
+      name: 'get',
+      description: 'Read a session by id in the tab at a window position.',
+      scope: 'resource',
+      resourceType: 'Session',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'tabIndex',
+          type: 'integer',
+          description: 'Zero-based tab position',
+          required: true,
+        },
+        {
+          name: 'sessionId',
+          type: 'string',
+          description: 'Session identifier within the Window',
+          required: true,
+        },
+      ],
+      parents: [
+        {
+          by: 'identity',
+          parameter: 'windowId',
+          resource: 'Window',
+          collection: 'windows',
+        },
+        {
+          by: 'index',
+          parameter: 'tabIndex',
+          resource: 'Tab',
+          collection: 'tabs',
+        },
+      ],
+      item: {
+        by: 'identity',
+        parameter: 'sessionId',
+      },
+      resolvesReferences: false,
+      routeName: 'getWithinTab',
+      risk: 'read',
+    },
+    resolveSession: {
+      name: 'get',
+      description:
+        'Read a session identity across all tabs of its Window. A move to another Window makes this identity missing.',
+      scope: 'resource',
+      resourceType: 'Session',
+      parameters: [
+        {
+          name: 'windowId',
+          type: 'integer',
+          description: 'Window identifier',
+          required: true,
+        },
+        {
+          name: 'sessionId',
+          type: 'string',
+          description: 'Session identifier within the Window',
+          required: true,
+        },
+      ],
+      identityTraversal: {
+        collections: ['tabs'],
+        evidence:
+          'The dictionary places Sessions in Tabs in Windows; Session identity is scoped to its Window and requires a complete search of those Tabs.',
+      },
+      routeName: 'resolve',
+      risk: 'read',
+      parents: [
+        {
+          resource: 'Window',
+          parameter: 'windowId',
+          by: 'identity',
+          collection: 'windows',
+        },
+      ],
+      item: {
+        by: 'identity',
+        parameter: 'sessionId',
+      },
     },
     count: {
       name: 'count',

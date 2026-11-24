@@ -15,6 +15,7 @@
  *
  * @packageDocumentation
  */
+import { addressNormalization } from '../../manifest/normalize-addresses.js'
 
 import type { AppManifest } from '../../manifest/index.js'
 import { deriveCapabilities } from '../../capabilities/registry.js'
@@ -56,7 +57,9 @@ function toMetadata(capability: Capability): Record<string, unknown> {
  *   its identifier property, and saying what to declare.
  */
 export function generateCapabilitiesModule(manifest: AppManifest): string {
-  const refusals = generationRefusals(manifest)
+  const normalized = addressNormalization(manifest)
+  manifest = normalized.manifest
+  const refusals = generationRefusals(manifest, normalized.issues)
   if (refusals.length > 0) throw new Error(refusals.join('\n'))
   const capabilities = deriveCapabilities(manifest)
   const data = capabilities.map(toMetadata)

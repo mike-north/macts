@@ -235,7 +235,7 @@ describe('composeNativeScript', () => {
     )
     // The environment supplies the default channel scale and position reader.
     expect(envLine?.trim()).toBe(
-      `var env = { app: app, references: JSON.parse(${JSON.stringify(JSON.stringify(references))}), rgbChannels: JSON.parse(${JSON.stringify(JSON.stringify('integer16'))}), positionOf: __mactsPositionOf };`
+      `var env = { app: app, contexts: new WeakMap(), identities: new WeakMap(), references: JSON.parse(${JSON.stringify(JSON.stringify(references))}), rgbChannels: JSON.parse(${JSON.stringify(JSON.stringify('integer16'))}), positionOf: __mactsPositionOf };`
     )
     const others = lines.filter((line) => line !== argsLine && line !== envLine).join('\n')
     for (const sentinel of [...Object.values(input), 'SENTINEL_RESOURCE_51f0']) {
@@ -245,9 +245,9 @@ describe('composeNativeScript', () => {
     expect(source).toContain(
       'return { ok: true, value: __mactsEncode(value, JSON.parse("{\\"kind\\":\\"passthrough\\"}"), env) };'
     )
-    expect(source).toContain('(function (app, args, page) {\nreturn args;\n')
+    expect(source).toContain('(function (app, args, page, env) {\nreturn args;\n')
     // With no page window, the body's `page` argument is embedded null.
-    expect(source).toContain(`})(app, args, JSON.parse(${JSON.stringify('null')}));`)
+    expect(source).toContain(`})(app, args, JSON.parse(${JSON.stringify('null')}), env);`)
     expect(source.trimEnd().endsWith('JSON.stringify(__mactsOutcome);')).toBe(true)
   })
 
@@ -258,7 +258,7 @@ describe('composeNativeScript', () => {
     )
     const envLine = source.split('\n').find((line) => line.trimStart().startsWith('var env = '))
     expect(envLine?.trim()).toBe(
-      `var env = { app: app, references: JSON.parse(${JSON.stringify('{}')}), rgbChannels: JSON.parse(${JSON.stringify(JSON.stringify('normalized'))}), positionOf: __mactsPositionOf };`
+      `var env = { app: app, contexts: new WeakMap(), identities: new WeakMap(), references: JSON.parse(${JSON.stringify('{}')}), rgbChannels: JSON.parse(${JSON.stringify(JSON.stringify('normalized'))}), positionOf: __mactsPositionOf };`
     )
   })
 
@@ -292,7 +292,7 @@ describe('composeNativeScript', () => {
       .split('\n')
       .find((line) => line.trimStart().startsWith('})(app, args, '))
     expect(callLine?.trim()).toBe(
-      `})(app, args, JSON.parse(${JSON.stringify(JSON.stringify(page))}));`
+      `})(app, args, JSON.parse(${JSON.stringify(JSON.stringify(page))}), env);`
     )
     expect(source.split('\n').filter((line) => line.includes(page.anchor))).toEqual([callLine])
   })

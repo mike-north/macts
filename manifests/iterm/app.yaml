@@ -1,4 +1,4 @@
-version: '1.0'
+version: '1.1'
 app:
   bundleId: com.googlecode.iterm2
   name: iTerm
@@ -266,11 +266,19 @@ resources:
         type: string
         description: The currently visible contents of the session.
         code: Cntt
+        separateRead:
+          operation: readContents
+          permission: iterm:sessions:readContents
+          reason: Screen text has independent read cost, volatility and permission.
       text:
         access: r
         type: string
         description: The currently visible contents of the session.
         code: pcnt
+        separateRead:
+          operation: readText
+          permission: iterm:sessions:readText
+          reason: Screen text has independent read cost, volatility and permission.
       colorPreset:
         access: rw
         type: string
@@ -661,6 +669,61 @@ commands:
         type: integer
         description: The zero-based position of the tab within its window
         required: true
+  # Session locations are explicit inputs; their identity is scoped to the Window.
+  listSessions:
+    name: list
+    routeName: list
+    description: List the sessions in the tab at a window position.
+    scope: resource
+    resourceType: Session
+    resolvesReferences: false
+    parents:
+      - { resource: Window, collection: windows, by: identity, parameter: windowId }
+      - { resource: Tab, collection: tabs, by: index, parameter: tabIndex }
+    parameters:
+      - { name: windowId, type: integer, description: Window identifier, required: true }
+      - { name: tabIndex, type: integer, description: Zero-based tab position, required: true }
+    risk: read
+  getSession:
+    name: get
+    routeName: getWithinTab
+    description: Read a session by id in the tab at a window position.
+    scope: resource
+    resourceType: Session
+    resolvesReferences: false
+    parents:
+      - { resource: Window, collection: windows, by: identity, parameter: windowId }
+      - { resource: Tab, collection: tabs, by: index, parameter: tabIndex }
+    item: { by: identity, parameter: sessionId }
+    parameters:
+      - { name: windowId, type: integer, description: Window identifier, required: true }
+      - { name: tabIndex, type: integer, description: Zero-based tab position, required: true }
+      - {
+          name: sessionId,
+          type: string,
+          description: Session identifier within the Window,
+          required: true,
+        }
+    risk: read
+  resolveSession:
+    name: get
+    routeName: resolve
+    description: Read a session identity across all tabs of its Window. A move to another Window makes this identity missing.
+    scope: resource
+    resourceType: Session
+    parent: { resource: Window, parameter: windowId }
+    identityTraversal:
+      collections: [tabs]
+      evidence: The dictionary places Sessions in Tabs in Windows; Session identity is scoped to its Window and requires a complete search of those Tabs.
+    parameters:
+      - { name: windowId, type: integer, description: Window identifier, required: true }
+      - {
+          name: sessionId,
+          type: string,
+          description: Session identifier within the Window,
+          required: true,
+        }
+    risk: read
   count:
     name: count
     description: Return the number of elements of a particular class within an object.

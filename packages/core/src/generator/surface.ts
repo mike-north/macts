@@ -25,6 +25,7 @@ import {
 import { untargetedIdentifiers } from '../manifest/identifier-targeting.js'
 import { resolveIdentifierTargeting } from '../manifest/identifier.js'
 import { positionalProblems } from '../manifest/positional.js'
+import { findAddressIssues, type AddressIssue } from '../manifest/address.js'
 import { resolvePrimaryIdentifier } from '../manifest/primary-identifier.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
@@ -40,6 +41,7 @@ import {
   type CrudOperation,
 } from '../manifest/resource-commands.js'
 import type { DeclaredType } from '../manifest/value-shapes.js'
+import { safeIdentifier } from '../manifest/callable-commands.js'
 
 // Which commands apply to a resource and which backs each CRUD shape are
 // manifest knowledge (../manifest/resource-commands.ts). They are re-exported
@@ -52,68 +54,7 @@ export {
   type CrudOperation,
 } from '../manifest/resource-commands.js'
 
-/**
- * Words that cannot name a JavaScript binding or method without escaping.
- */
-const RESERVED_WORDS: ReadonlySet<string> = new Set([
-  'arguments',
-  'break',
-  'case',
-  'catch',
-  'class',
-  'const',
-  'continue',
-  'debugger',
-  'default',
-  'delete',
-  'do',
-  'else',
-  'enum',
-  'eval',
-  'export',
-  'extends',
-  'false',
-  'finally',
-  'for',
-  'function',
-  'if',
-  'implements',
-  'import',
-  'in',
-  'instanceof',
-  'interface',
-  'let',
-  'new',
-  'null',
-  'of',
-  'package',
-  'private',
-  'protected',
-  'public',
-  'return',
-  'static',
-  'super',
-  'switch',
-  'this',
-  'throw',
-  'true',
-  'try',
-  'typeof',
-  'var',
-  'void',
-  'while',
-  'with',
-  'yield',
-])
-
-/**
- * The binding or method name a generated client uses for a manifest name: the
- * name itself, or the name prefixed with `_` when it is a reserved word (a
- * command named `delete` becomes the method `_delete`).
- */
-export function safeIdentifier(name: string): string {
-  return RESERVED_WORDS.has(name) ? `_${name}` : name
-}
+export { safeIdentifier } from '../manifest/callable-commands.js'
 
 /** Whether a command `name` is one of the standard CRUD shapes. */
 export function isCrudName(name: string): name is CrudOperation {
@@ -193,7 +134,7 @@ export function firstMatchNote(resource: Resource | undefined): string | undefin
  * The sentence a generated doc adds about parents that share the value an
  * operation looks its parent up by, or `undefined` when none can.
  *
- * A resource-scoped command that records a parent (`command.parent`) looks
+ * A resource-scoped command that records an identified parent looks
  * the parent up in its collection by the parent resource's identifier
  * targeting (phases/13 D10, command parents): a list, get, create, update or
  * delete, and any other resource command, which selects its item as a get
@@ -209,7 +150,7 @@ export function firstMatchNote(resource: Resource | undefined): string | undefin
  *   the parent in prose.
  */
 export function parentFirstMatchNote(command: Command, manifest: AppManifest): string | undefined {
-  const parent = command.parent
+  const parent = command.parents?.at(-1) ?? command.parent
   if (parent === undefined || command.scope !== 'resource' || sendsNoItem(command)) {
     return undefined
   }
@@ -323,12 +264,18 @@ export function findResourceCreateCommand(
  * declare, and no surface looks an item up by an id specifier that cannot
  * find it. Registration refuses the same manifests by the same rules.
  */
-export function generationRefusals(manifest: AppManifest): string[] {
+export function generationRefusals(
+  manifest: AppManifest,
+  normalizationIssues: readonly AddressIssue[] = []
+): string[] {
   const refused = `App "${manifest.app.name}" cannot be generated from its manifest`
+  if (normalizationIssues.length > 0)
+    return normalizationIssues.map(({ message }) => `${refused}: ${message}`)
   return [
     ...unselectableItemCommands(manifest).map(({ problem }) => `${refused}: ${problem}`),
     ...untargetedIdentifiers(manifest).map(({ problem }) => `${refused}: ${problem}`),
     ...positionalProblems(manifest).map((problem) => `${refused}: ${problem}`),
+    ...findAddressIssues(manifest).map(({ message }) => `${refused}: ${message}`),
   ]
 }
 
@@ -337,10 +284,10 @@ export function generationRefusals(manifest: AppManifest): string[] {
  * command that acts on one item: a get, update or delete, or any other
  * resource command but a list or create (`selectsOneItem`).
  *
- * A command on a nested resource records its parent (`command.parent`), and
- * the parent scope is the parameter it names (`calendarId` on `getEvent`).
- * The child identifier is the parameter `itemIdentifierParameter` selects:
- * the first other required parameter (`id`). A command that records no parent
+ * A command on a nested resource records its ancestors; this pair names the
+ * nearest parent input (`calendarId` on `getEvent`) and the item input selected
+ * by `itemIdentifierParameter`. Canonical paths name that item explicitly;
+ * unscoped and format 1.0 commands use the first required non-parent input. A command that records no parent
  * has no parent scope, whatever its parameters are named or however many are
  * required: nothing about the parent is inferred.
  *
@@ -356,7 +303,7 @@ export function resolveIdParams(command: Command): {
   parentParam: string | undefined
   childParam: string
 } {
-  const parentParam = command.parent?.parameter
+  const parentParam = command.parents?.at(-1)?.parameter ?? command.parent?.parameter
   const child = itemIdentifierParameter(command)
   if (child === undefined) {
     const besideParent =
@@ -408,9 +355,10 @@ export interface BodyField {
  * The positional signature and request body of a command method (an app
  * command, or a resource command that is not a CRUD shape).
  *
- * A resource command acts on one item, so its signature starts as a get's
- * does: the parent's identifier parameter, when the command records a
- * parent, then the item's ({@link resolveIdParams}). The other parameters
+ * A canonical resource address leads with its ordered ancestors and any item.
+ * A legacy resource item command leads with its parent and item
+ * ({@link resolveIdParams}); legacy collection and application commands retain
+ * required-first declaration order even when parent metadata is recorded. Other parameters
  * follow, required first, then optional ones, each in declaration order, with
  * reserved words escaped; an app command has only those, and so has a known
  * gap, which declares no item ({@link itemNotSentNote}). The body forwards
@@ -425,11 +373,16 @@ export function commandMethodParameters(command: Command): {
     command.scope === 'resource' && selectsOneItem(command)
       ? itemIdentifierParameter(command)
       : undefined
-  const parent =
-    item === undefined
-      ? undefined
-      : command.parameters.find((p) => p.name === command.parent?.parameter)
-  const leading = [parent, item].filter((p): p is Command['parameters'][number] => p !== undefined)
+  const parents =
+    command.scope === 'resource' && command.parents !== undefined
+      ? command.parents.map(({ parameter }) => parameter)
+      : item === undefined || command.parent === undefined
+        ? []
+        : [command.parent.parameter]
+  const leading = [
+    ...parents.map((name) => command.parameters.find((p) => p.name === name)),
+    item,
+  ].filter((p): p is Command['parameters'][number] => p !== undefined)
   const rest = command.parameters
     .filter((p) => !leading.includes(p))
     .sort((a, b) => {

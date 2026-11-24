@@ -6,8 +6,8 @@
  * the app's dictionary defines on the resource's class (Notes' `show`,
  * Xcode's `build`, Mail's `send`), whose direct parameter is that item. It
  * selects the item by a parameter the manifest declares:
- * its first required parameter other than its parent's (the parameter
- * `command.parent` names). The generated contract, HTTP client and CLI take
+ * the explicit item binding in a canonical scoped address, or otherwise its
+ * first required parameter other than its parent's. The generated contract, HTTP client and CLI take
  * that parameter as the item's identifier, the native body addresses the item
  * in its resource's collection by it, exactly as a get does, and
  * registration admits it as input.
@@ -34,48 +34,12 @@
  */
 
 import type { AppManifest } from './schemas/app.js'
-import type { Command, CommandParameter } from './schemas/command.js'
+import type { Command } from './schemas/command.js'
+import { selectsOneItem, itemIdentifierParameter } from './item-binding.js'
 import { knownItemSelectionGap } from './item-selection-gaps.js'
 import { resolveManifestRoutes } from './route.js'
 
-/**
- * The command names that act on a resource's collection rather than on one
- * of its items when the command is resource-scoped: a `list` reads the
- * collection and a `create` adds to it. Every other resource-scoped command
- * selects one item.
- */
-const COLLECTION_COMMAND_NAMES: readonly string[] = ['list', 'create']
-
-/**
- * Whether a command must declare a required identifier parameter: any
- * resource-scoped command other than a `list` or `create`, or a `delete` at
- * application scope, which has no other way to name what it removes.
- *
- * @param command - A manifest command.
- * @returns `true` when the command acts on one item it must name.
- *
- * @internal Used within this package only; the public rule is
- *   {@link itemSelectionProblem} and {@link unselectableItemCommands}.
- */
-export function selectsOneItem(command: Command): boolean {
-  if (command.scope === 'resource') return !COLLECTION_COMMAND_NAMES.includes(command.name)
-  return command.name === 'delete'
-}
-
-/**
- * The declared parameter that identifies a command's item: its first required
- * parameter, in declaration order, other than its parent's. A resource-scoped
- * command's native body addresses the item by it; an application-scoped
- * delete passes it to the app's delete with its other declared parameters.
- *
- * @param command - A manifest command.
- * @returns The identifier parameter, or `undefined` when the command declares
- *   no required parameter besides its parent's.
- */
-export function itemIdentifierParameter(command: Command): CommandParameter | undefined {
-  const parent = command.parent?.parameter
-  return command.parameters.find((p) => p.required && p.name !== parent)
-}
+export { selectsOneItem, itemIdentifierParameter } from './item-binding.js'
 
 /**
  * Why a command cannot be offered, when it must name one item

@@ -219,6 +219,6 @@ describe('generateCapabilitiesModule refuses a command that cannot select its it
         parameters: [{ name: 'name', type: 'string', description: 'Name', required: true }],
       },
     })
-    expect(generateCapabilitiesModule(declared)).toContain('"name": "widgets.widgets.get"')
+    expect(generateCapabilitiesModule(declared)).toContain('"name": "widgets.widgets.getWidget"')
   })
 })

@@ -1366,8 +1366,6 @@ describe('real app manifests', () => {
       ['arc', 'Window', 'activeSpace', 'Space', 'no-get'],
       ['finder', 'FinderWindow', 'listViewOptions', 'ListViewOptions', 'no-get'],
       ['finder', 'ListViewOptions', 'sortColumn', 'Column', 'no-get'],
-      ['iterm', 'Window', 'currentSession', 'Session', 'no-get'],
-      ['iterm', 'Tab', 'currentSession', 'Session', 'no-get'],
       ['mail', 'MessageViewer', 'draftsMailbox', 'Mailbox', 'no-get'],
       ['mail', 'MessageViewer', 'inbox', 'Mailbox', 'no-get'],
       ['mail', 'MessageViewer', 'junkMailbox', 'Mailbox', 'no-get'],
@@ -1411,7 +1409,7 @@ describe('real app manifests', () => {
       ['xcode', 'RunDestination', 'device', 'Device', 'no-get'],
       ['xcode', 'RunDestination', 'companionDevice', 'Device', 'no-get'],
     ]
-    expect(expected).toHaveLength(34)
+    expect(expected).toHaveLength(32)
     expect(found.sort()).toEqual(expected.sort())
   })
 

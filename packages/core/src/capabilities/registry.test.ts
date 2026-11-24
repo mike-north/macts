@@ -14,6 +14,22 @@ import { deriveCapabilities, buildCapabilityRegistry } from './registry.js'
 import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
 import { NOTEBOOK_MANIFEST_YAML, notebookManifest } from './test-fixtures.js'
 import type { AppManifest } from '../manifest/index.js'
+import { panesManifest } from '../manifest/test-support/panes-positional.js'
+
+/** Collection inputs remain flags; only an operation selecting an item has an item positional. */
+it('distinguishes an unscoped 1.1 list flag from the get item positional', () => {
+  const manifest = { ...panesManifest(), version: '1.1' as const }
+  const list = manifest.commands['listWindows']
+  if (list === undefined) throw new Error('Missing Window list')
+  list.parameters = [{ name: 'view', type: 'string', required: true, description: 'Selected view' }]
+  const caps = deriveCapabilities(manifest)
+  expect(caps.find(({ name }) => name === 'panes.windows.listWindows')?.cliSnippet).toBe(
+    'macts panes windows list --view <view>'
+  )
+  expect(caps.find(({ name }) => name === 'panes.windows.getWindow')?.cliSnippet).toBe(
+    'macts panes windows get <id>'
+  )
+})
 
 /** Repo-root-relative path to the calendar manifest (a real nested hierarchy). */
 const CALENDAR_MANIFEST = resolve(
@@ -149,15 +165,15 @@ describe('deriveCapabilities — permission from the resolved route (issue #148)
   it('derives the permission from the command key when there is no routeName', () => {
     // The route is `notebook.notes.getNote`, so the server enforces
     // `notebook:notes:getNote`, not `notebook:notes:get`.
-    expect(byName.get('notebook.notes.get')?.permission).toBe('notebook:notes:getNote')
+    expect(byName.get('notebook.notes.getNote')?.permission).toBe('notebook:notes:getNote')
   })
 
   it('derives the permission from the routeName when there is one', () => {
-    expect(byName.get('notebook.notes.find')?.permission).toBe('notebook:notes:lookup')
+    expect(byName.get('notebook.notes.lookup')?.permission).toBe('notebook:notes:lookup')
   })
 
   it('keeps an explicit permission that differs from the derived one', () => {
-    expect(byName.get('notebook.notes.archive')?.permission).toBe('notebook:notes:write')
+    expect(byName.get('notebook.notes.archiveNote')?.permission).toBe('notebook:notes:write')
   })
 
   it('fails loudly when a capability has no resolved route', () => {
@@ -244,4 +260,37 @@ describe('buildCapabilityRegistry', () => {
     expect(registry.capabilities).toHaveLength(0)
     expect(registry.names).toHaveLength(0)
   })
+})
+
+/** Distinct read routes remain independently discoverable and use admitted CLI selections. */
+it('discovers every Session read by its operation identity and generated CLI address', async () => {
+  const manifest = await loadManifest(
+    fileURLToPath(new URL('../../../../manifests/iterm/app.yaml', import.meta.url))
+  )
+  const sessions = buildCapabilityRegistry([manifest]).capabilities.filter(
+    ({ resource }) => resource === 'sessions'
+  )
+  expect(
+    sessions.map(({ name, mcpToolName, cliSnippet }) => [name, mcpToolName, cliSnippet])
+  ).toEqual([
+    [
+      'iterm.sessions.getWithinTab',
+      'macts__iterm__sessions_get_within_tab',
+      'macts iterm windows tabs sessions get --window-id <windowId> --tab-index <tabIndex> <sessionId>',
+    ],
+    [
+      'iterm.sessions.list',
+      'macts__iterm__sessions_list',
+      'macts iterm windows tabs sessions list --window-id <windowId> --tab-index <tabIndex>',
+    ],
+    [
+      'iterm.sessions.resolve',
+      'macts__iterm__sessions_resolve',
+      'macts iterm windows tabs sessions resolve --window-id <windowId> <sessionId>',
+    ],
+  ])
+  delete manifest.commands['getSession']
+  expect(
+    deriveCapabilities(manifest).find(({ name }) => name === 'iterm.sessions.resolve')?.cliSnippet
+  ).toBe('macts iterm windows tabs sessions get --window-id <windowId> <sessionId>')
 })

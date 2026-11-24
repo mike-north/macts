@@ -5,6 +5,7 @@
  *
  * @packageDocumentation
  */
+import { addressNormalization } from '../manifest/normalize-addresses.js'
 
 import type { AppManifest } from '../manifest/index.js'
 import { generateClientPackage } from './client/index.js'
@@ -66,7 +67,9 @@ export function generateConsolidatedPackages(
   const clientPackageName = options.clientPackageName ?? `@macts/${appName}`
   const serverPackageName = options.serverPackageName ?? `@macts/${appName}-server`
 
-  const refusals = generationRefusals(manifest)
+  const normalized = addressNormalization(manifest)
+  manifest = normalized.manifest
+  const refusals = generationRefusals(manifest, normalized.issues)
   if (refusals.length > 0) {
     return {
       client: { dir: appName, files: [] },

@@ -28,6 +28,7 @@
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from '../manifest/normalize-addresses.js'
 
 import {
   AppAuthorizationRequiredError,
@@ -53,6 +54,7 @@ import {
   type WireValue,
 } from '@macts/contracts'
 import type { AppManifest } from '../manifest/schemas/app.js'
+import { assertAddressInput, commandAddress } from '../manifest/address.js'
 import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution/executor.js'
 import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
 import {
@@ -188,8 +190,17 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
   return {
     provider: 'macos',
     async execute(request: ExecutionRequest): Promise<WireValue> {
-      const { manifest, target, input, inputPlan, outputPlan, page, resourcePlans, signal } =
-        request
+      const {
+        manifest: sourceManifest,
+        target,
+        input,
+        inputPlan,
+        outputPlan,
+        page,
+        resourcePlans,
+        signal,
+      } = request
+      const manifest = normalizeManifestAddresses(sourceManifest)
       throwIfAborted(signal)
 
       // Legacy identifier aliases belong only to results that pass through
@@ -203,6 +214,13 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         absentValueMarkers: outputPlan.kind !== 'passthrough',
       })
       assertRequiredArguments(plan.requiredArguments, input)
+      const command = manifest.commands[target.command]
+      assertAddressInput(
+        command !== undefined && target.resource !== undefined && manifest.version === '1.1'
+          ? commandAddress(manifest, command, target.resource)
+          : undefined,
+        input
+      )
       const script: NativeScript = {
         bundleId: manifest.app.bundleId,
         ...(manifest.app.rgbChannels === undefined
@@ -223,7 +241,8 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       })
     },
     async resolve(request: ResolutionRequest): Promise<WireValue> {
-      const { manifest, reference, outputPlan, resourcePlans, signal } = request
+      const { manifest: sourceManifest, reference, outputPlan, resourcePlans, signal } = request
+      const manifest = normalizeManifestAddresses(sourceManifest)
       throwIfAborted(signal)
 
       const rooted = resolveRoots(manifest, reference.resource) !== undefined

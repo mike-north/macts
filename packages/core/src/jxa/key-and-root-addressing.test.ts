@@ -842,7 +842,7 @@ describe('references the app reports missing as they are encoded', () => {
     if (script === undefined) throw new Error('Expected the get to run one script')
     expect(script.body).toContain(`Symbol.for(${JSON.stringify(NATIVE_ABSENT_AS_NULL_KEY)})`)
     const composed = composeNativeScript(script, NATIVE_CODEC)
-    expect(composed).toContain(`var value = (function (app, args, page) {\n${script.body}`)
+    expect(composed).toContain(`var value = (function (app, args, page, env) {\n${script.body}`)
     expect(composed).toContain(`value: ${NATIVE_ENCODE_FUNCTION}(value, `)
   })
 

@@ -372,24 +372,32 @@ ${generateListFieldMapping(ctx.manifest, hierarchyPath.resourceName, resource, '
 }
 
 /**
- * Generate a get command for a hierarchy path.
+ * Generate a record read for a hierarchy path. A distinct identity read uses
+ * its declared route while the ordinary get retains its explicit location inputs.
  */
 export function generateGetCommand(
   hierarchyPath: HierarchyPath,
-  ctx: CliGeneratorContext
+  ctx: CliGeneratorContext,
+  override?: ManifestCommand
 ): GeneratedCommand {
   const resource = ctx.getResource(hierarchyPath.resourceName)
   if (!resource) {
     throw new Error(`Resource not found: ${hierarchyPath.resourceName}`)
   }
 
+  const methodName =
+    override === undefined
+      ? 'get'
+      : (override.routeName ??
+        Object.entries(ctx.manifest.commands).find(([, command]) => command === override)?.[0] ??
+        override.name)
   const appName = ctx.getAppNameLower()
   const sdkImportPath = buildSdkImportPath(hierarchyPath.path.length)
   const outputImportPath = buildOutputImportPath(hierarchyPath.path.length)
   const resourceAccess = buildResourceAccess(resource)
 
   // Build command path with positional ID
-  const cliPath = [appName, ...hierarchyPath.path, 'get']
+  const cliPath = [appName, ...hierarchyPath.path, toKebabCase(methodName)]
 
   const idParamName = `${toCamelCase(resource.name)}Id`
 
@@ -397,19 +405,45 @@ export function generateGetCommand(
   // like list — NOT the resource hierarchy), so the CLI passes exactly what the SDK
   // get() accepts: the parent the command records, if any, as a --<param> option, then
   // the child id positionally (see `resolveIdParams`).
-  const getCommand = ctx
-    .getResourceCommands(hierarchyPath.resourceName)
-    .find((cmd) => cmd.name === 'get')
+  const getCommand =
+    override ??
+    ctx.getResourceCommands(hierarchyPath.resourceName).find((cmd) => cmd.name === 'get')
   // A get command is generated only when a get command backs it, and that
   // command declares the identifier parameter it selects its item by.
   if (getCommand === undefined) {
     throw new Error(`Resource ${resource.name} has no get command to generate a get command from`)
   }
   const parentParamName = resolveIdParams(getCommand).parentParam
-  const parentScopeParams = getCommand.parameters.filter((p) => p.name === parentParamName)
+  const parentNames =
+    getCommand.parents?.map(({ parameter }) => parameter) ??
+    (parentParamName === undefined ? [] : [parentParamName])
+  const parentScopeParams = parentNames.flatMap((name) =>
+    getCommand.parameters.filter((p) => p.name === name)
+  )
   const parentOptions = generateListParamOptions(parentScopeParams)
   const identifier = addressingIdentifier(resource, getCommand)
-  const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
+  // Explicit gets use the same admitted signature and collision handling as item commands.
+  const explicit =
+    ctx.manifest.version === '1.0'
+      ? undefined
+      : itemCommandInputs(
+          getCommand,
+          hierarchyPath,
+          resource,
+          `client.${resourceAccess}.${safeIdentifier(methodName)}`,
+          ctx
+        )
+  const inputs =
+    explicit?.inputs ?? `${parentOptions}\n${identifierPositional(idParamName, identifier)}`
+  const methodArgs =
+    explicit?.methodArgs ??
+    [
+      ...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`),
+      `this.${idParamName}`,
+    ].join(', ')
+  const summary =
+    override?.description.replace(/\.$/, '') ??
+    `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
   // The usage description adds the first-match sentences for an item, and a
   // parent, matched on a property that is not claimed unique.
   const description = usageDescription(summary, [
@@ -418,14 +452,14 @@ export function generateGetCommand(
     itemSelectionNote(ctx.manifest, hierarchyPath.resourceName),
   ])
 
-  const content = `import { Command, Option } from 'clipanion';
+  const content = `import { Command, Option } from 'clipanion';${inputs.includes('t.isEnum') ? "\nimport * as t from 'typanion';" : ''}
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
 /**
  * ${summary}.
  */
-export class Get${resource.name}Command extends Command {
+export class ${toPascalCase(methodName)}${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
@@ -433,15 +467,14 @@ export class Get${resource.name}Command extends Command {
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
-${parentOptions}
-${identifierPositional(idParamName, identifier)}
+${inputs}
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
 
     try {
       const client = getClient();
-      const item = await client.${resourceAccess}.get(${[...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`), `this.${idParamName}`].join(', ')});
+      const item = await client.${resourceAccess}.${safeIdentifier(methodName)}(${methodArgs});
 
       const output = formatter.format({
 ${generateListFieldMapping(ctx.manifest, hierarchyPath.resourceName, resource)}
@@ -459,7 +492,7 @@ ${generateListFieldMapping(ctx.manifest, hierarchyPath.resourceName, resource)}
 `
 
   return {
-    path: buildCommandPath(hierarchyPath.path, 'get'),
+    path: buildCommandPath(hierarchyPath.path, toKebabCase(methodName)),
     content,
   }
 }
@@ -661,7 +694,7 @@ interface ResourceCommandInputs {
 }
 
 /**
- * Expose exactly the operation's inputs in SDK order: recorded parent flag,
+ * Expose get and item-command inputs in SDK order: recorded parent flag,
  * one item positional labelled as get labels it, then other parameter flags.
  * Hierarchy alone supplies no parent flag or argument.
  */
@@ -696,14 +729,14 @@ function itemCommandInputs(
     )
     .join('\n')
   const methodArgs = signature
-    .map(({ parameter }, i) =>
-      sdkArgument(
-        parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name),
-        methodRef,
-        i,
-        parameter
-      )
-    )
+    .map(({ parameter }, i) => {
+      const property =
+        parameter.name === childParam ? itemProperty : safeParamProperty(parameter.name, cmd.name)
+      // Get methods accept numeric text through SDK coercion, preserving their CLI input form.
+      return cmd.name === 'get'
+        ? `this.${property} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+        : sdkArgument(property, methodRef, i, parameter)
+    })
     .join(', ')
   return { inputs, methodArgs }
 }

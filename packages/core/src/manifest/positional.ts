@@ -22,13 +22,14 @@
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md §D7, §D10
  */
+import { addressNormalization } from './normalize-addresses.js'
 
 import type { AppManifest } from './schemas/app.js'
 import type { Command } from './schemas/command.js'
 import { placedEntries, type PlacedEntry } from './hierarchy-placement.js'
 import { resolvePrimaryIdentifierProperty } from './identifier.js'
 import { itemIdentifierParameter, selectsOneItem } from './item-selection.js'
-import { resourceCommandEntries, resolvingCommand } from './resource-commands.js'
+import { resourceCommandEntries, resolvingCommand, referenceParent } from './resource-commands.js'
 import { isUnsupportedResourceKey } from './unsupported.js'
 import { resolveManifestRoutes } from './route.js'
 
@@ -53,7 +54,7 @@ export interface PositionalIssue {
 }
 
 /**
- * A recorded parent supplies one identity, with no ancestor arguments. It must
+ * A format 1.0 recorded parent supplies one identity, with no ancestor arguments. It must
  * therefore be an ordinary identified collection item resolved at application
  * scope. Sparse placement is unknown; known nested-only placement contradicts
  * that address even when its get omits the missing ancestor. Conversely, an
@@ -100,7 +101,7 @@ function recordedParentIssue(
   command: Command,
   placements: readonly PlacedEntry[]
 ): PositionalIssue | undefined {
-  if (command.parent === undefined) return undefined
+  if (manifest.version !== '1.0' || command.parent === undefined) return undefined
   const parameter = command.parameters.find(({ name }) => name === command.parent?.parameter)
   const problem = !parameter?.required
     ? 'needs its declared required parent parameter'
@@ -135,7 +136,7 @@ function commandIssues(
     ]
   }
   const [getKey, getCommand] = get
-  const parent = getCommand.parent?.resource
+  const parent = referenceParent(getCommand)
   const issues: PositionalIssue[] = []
   if (parent === undefined) {
     issues.push({
@@ -148,7 +149,7 @@ function commandIssues(
     if (qualification !== undefined) issues.push(qualification)
     const containment = collectionPlacementIssue(commandKey, command, resourceKey, placements)
     if (containment !== undefined) issues.push(containment)
-    if (parent !== undefined && selectsOneItem(command) && command.parent?.resource !== parent) {
+    if (parent !== undefined && selectsOneItem(command) && referenceParent(command) !== parent) {
       // Its body finds the item within the parent the command records, so a
       // command recording none, or another, could not find it.
       issues.push({
@@ -178,7 +179,7 @@ function collectionPlacementIssue(
     .filter(({ child }) => child.resource === resourceKey)
     .map(({ holder }) => holder)
   if (holders.length === 0) return undefined
-  const parent = command.parent?.resource
+  const parent = referenceParent(command)
   if (holders.includes(parent)) return undefined
   return {
     message:
@@ -231,15 +232,19 @@ function positionParameterIssue(
  * declaration order: a marked resource with a primary identifier, which is
  * found by that identifier instead, the issues of its commands
  * ({@link commandIssues}), and any executable command that records a positional
- * resource as its parent. A body binds its parent by the parent's identifier
+ * resource as its format 1.0 parent. A format 1.0 body binds its parent by the parent's identifier
  * (`recordedParentScope`), and a positional resource has none, so such a
  * command is refused until native binding supports positional parents. The
  * manifest schema reports them at their paths;
  * generation and registration refuse by them too ({@link positionalProblems}).
+ * Format 1.1 ancestor modes and complete namespaces are checked by address validation.
  *
  * @param manifest - The manifest, as validation reads it after flattening.
  */
 export function findPositionalIssues(manifest: AppManifest): PositionalIssue[] {
+  const normalized = addressNormalization(manifest)
+  if (normalized.issues.length > 0) return normalized.issues
+  manifest = normalized.manifest
   const issues: PositionalIssue[] = []
   const placements = placedEntries(manifest)
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {

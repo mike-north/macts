@@ -192,6 +192,30 @@ function docAbove(text: string, signature: string): string {
 }
 
 describe('the generated Panes CLI and HTTP client', () => {
+  it.each(['parent', 'parents'] as const)(
+    'retains position-drift guidance across format 1.1 surfaces for %s',
+    (syntax) => {
+      const manifest = { ...panesManifest(), version: '1.1' as const }
+      const get = manifest.commands['getTab']
+      if (get === undefined) throw new Error('Missing Tab get')
+      if (syntax === 'parents') {
+        delete get.parent
+        get.parents = [
+          { resource: 'Window', collection: 'windows', by: 'identity', parameter: 'windowId' },
+        ]
+        get.item = { by: 'index', parameter: 'index' }
+      }
+      const result = generateConsolidatedPackages(manifest, { appName: 'panes' })
+      expect(result.errors).toEqual([])
+      const files = new Map(result.client.files.map((file) => [file.path, file.content]))
+      expect(docAbove(files.get('src/resources/tab.ts') ?? '', 'async get(')).toContain(
+        SELECTION_NOTE
+      )
+      expect(files.get('src/cli/commands/windows/tabs/get.ts')).toContain(SELECTION_NOTE)
+      expect(files.get('src/contract/index.ts')).toContain(SELECTION_NOTE)
+    }
+  )
+
   const result = generateClientPackage(PANES_WITH_TAB_UPDATE_AND_DELETE, {
     appName: 'panes',
     clientPackageName: '@macts/panes',

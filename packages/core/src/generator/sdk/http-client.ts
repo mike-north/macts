@@ -1,3 +1,6 @@
+import { callableResourceCommand } from '../../manifest/callable-commands.js'
+import { referenceParent } from '../../manifest/resource-commands.js'
+import { addressNormalization } from '../../manifest/normalize-addresses.js'
 /**
  * HTTP client SDK generator for macts.
  *
@@ -16,6 +19,7 @@ import {
   resolveCanonicalIdentifierSource,
   resolveParameterNullability,
   commandRouteSegment,
+  itemIdentifierParameter,
 } from '../../manifest/index.js'
 import { usableResources } from '../../manifest/unsupported.js'
 import { outputProperties } from '../../manifest/output-references.js'
@@ -85,7 +89,9 @@ export function generateHttpClientSdk(
   manifest: AppManifest,
   options: HttpClientGeneratorOptions
 ): GeneratedHttpClientSdk {
-  const refusals = generationRefusals(manifest)
+  const normalized = addressNormalization(manifest)
+  manifest = normalized.manifest
+  const refusals = generationRefusals(manifest, normalized.issues)
   if (refusals.length > 0) return { files: [], errors: refusals }
   const files: { path: string; content: string }[] = []
   const errors: string[] = []
@@ -637,7 +643,9 @@ function generateResourceClient(
   const nameWords = identifierWords(resource.name)
   const pluralWords = identifierWords(resource.plural)
 
-  const allCommands = resourceCommandEntries(manifest, resourceName)
+  const allCommands = resourceCommandEntries(manifest, resourceName).filter(
+    ([key]) => callableResourceCommand(manifest, resourceName, key) !== undefined
+  )
   // An operation whose required input admits no value gets no method, and
   // every other one takes only the parameters its operation takes.
   const available = (cmd: Command): boolean => isOperationAvailable(manifest, cmd, resourceName)
@@ -699,6 +707,7 @@ function generateResourceClient(
       : '',
     getCmd
       ? generateGetMethod(
+          manifest.version,
           commandRouteSegment(...getCmd),
           getCmd[1],
           resourceName,
@@ -732,6 +741,25 @@ function generateResourceClient(
           notesOf(deleteCmd[1], true)
         )
       : '',
+    ...allCommands
+      .filter(
+        ([key, command]) =>
+          command.name === 'get' &&
+          callableResourceCommand(manifest, resourceName, key) !== undefined &&
+          key !== getCmd?.[0] &&
+          available(command)
+      )
+      .map(([key, command]) =>
+        generateGetMethod(
+          manifest.version,
+          commandRouteSegment(key, command),
+          command,
+          resourceName,
+          nameWords,
+          notesOf(command, true),
+          safeIdentifier(callableResourceCommand(manifest, resourceName, key) ?? key)
+        )
+      ),
   ]
     .filter(Boolean)
     .join('\n')
@@ -873,10 +901,9 @@ function generateListMethod(
   const bodyArg = bodyProps.length === 0 ? '' : `, { ${bodyProps.join(', ')} }`
   const returnType = `${pagingNames.page}<${resourceName}>`
   // A list under a command parent returns that parent's items, not all of them.
+  const parent = referenceParent(command)
   const scope =
-    command.parent === undefined
-      ? undefined
-      : `the ${pluralWords} of one ${identifierWords(command.parent.resource)}`
+    parent === undefined ? undefined : `the ${pluralWords} of one ${identifierWords(parent)}`
   const listed = scope ?? `all ${pluralWords}`
   const doc = paged
     ? `   * List ${scope ?? pluralWords}, one page at a time. When the result has a \`nextCursor\`,
@@ -925,14 +952,39 @@ function docNoteLines(notes: readonly string[]): string {
  *
  * Integer identifiers are checked before the shared codec encodes them
  * ({@link bodyField}); other identifiers retain their declared addressing text.
+ * Every signature retains its positional-selection and first-match guidance.
  */
 function generateGetMethod(
+  version: AppManifest['version'],
   routeSegment: string,
   command: Command,
   resourceName: string,
   nameWords: string,
-  notes: readonly string[]
+  notes: readonly string[],
+  methodName = 'get'
 ): string {
+  if (version === '1.1' || methodName !== 'get') {
+    const selectors = new Set(
+      [
+        ...(command.parents?.map(({ parameter }) => parameter) ??
+          (command.parent === undefined ? [] : [command.parent.parameter])),
+        itemIdentifierParameter(command)?.name,
+      ].filter((name): name is string => name !== undefined)
+    )
+    const { signature, bodyArg } = buildParamsAndBody(
+      command,
+      `import('../contract/index.js').${resourceName}ResourceClient['${methodName}']`,
+      selectors
+    )
+    return `
+  /**
+   * ${command.description}${docNoteLines(notes)}
+   */
+  async ${methodName}(${signature}): Promise<${resourceName}> {
+    return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});
+  }
+`
+  }
   const { parentParam, childParam } = resolveIdParams(command)
   const noteLine = docNoteLines(notes)
   const field = (name: string): string => identifierField(command, name)
@@ -941,7 +993,7 @@ function generateGetMethod(
   /**
    * Get a ${nameWords} by ${childParam} within a parent scope.${noteLine}
    */
-  async get(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+  async ${methodName}(${parentParam}: ${identifierType(command, parentParam)}, ${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
     return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(parentParam)}, ${field(childParam)} });
   }
 `
@@ -950,7 +1002,7 @@ function generateGetMethod(
   /**
    * Get a ${nameWords} by ${childParam}.${noteLine}
    */
-  async get(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+  async ${methodName}(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
     return this.#http.invoke<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${field(childParam)} });
   }
 `
@@ -1169,15 +1221,20 @@ function generateDeleteMethod(
  * Render a command method's signature and request-body argument from the shared
  * surface derivation (`commandMethodParameters`). Each parameter, a resource
  * command's item identifier included, is sent through {@link bodyField}.
+ * Explicit reads admit identifier text only for declared selectors; other
+ * inputs retain ordinary command typing, optionality and null semantics.
  */
 function buildParamsAndBody(
   command: Command,
-  canonicalMethod: string
+  canonicalMethod: string,
+  selectors: ReadonlySet<string> = new Set()
 ): { signature: string; bodyArg: string } {
   const { signature: signatureParams, body } = commandMethodParameters(command)
   const signature = signatureParams
     .map(({ parameter, bindingName, optional }, index) => {
-      const tsType = convenienceParameterType(parameter, canonicalMethod, index)
+      const tsType = selectors.has(parameter.name)
+        ? identifierType(command, parameter.name)
+        : convenienceParameterType(parameter, canonicalMethod, index)
       return `${bindingName}${optional ? '?' : ''}: ${tsType}`
     })
     .join(', ')

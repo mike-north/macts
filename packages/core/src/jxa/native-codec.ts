@@ -105,7 +105,9 @@ export interface NativeCodec {
  *   `windows.byId(W).activeTab`).
  * - `container` is the record's item, whose id the codec reads by the
  *   parent's addressing; `containerId` is the record's identifier, already
- *   read (a list row's).
+ *   read (a list row's). A row may also carry `ancestors`, the validated
+ *   resource/item provenance of its address, to encode a nested identity
+ *   container without rereading the row.
  *
  * The codec encodes the reference with the container in identity form, in the
  * same request. The marker is honoured only at a reference position whose
@@ -249,6 +251,8 @@ export type NativeAddressing =
  * whatever its targeting.
  */
 export interface NativeCollectionAddressing {
+  /** Plural containment edges between the identity container and this collection. */
+  readonly traversal?: readonly string[]
   /**
    * The app's spelling of the resource's collection: at the application, or
    * at the container when `within` is set.
@@ -336,6 +340,13 @@ export type NativeReferenceTable = Readonly<Record<string, NativeReferencePlans>
  * which the script composes from {@link NATIVE_POSITION_READER}.
  */
 export interface NativeCodecEnvironment {
+  /** Expected identities of traversal matches, checked again when their records are read. */
+  readonly identities?: WeakMap<object, { readonly property: string; readonly id: unknown }>
+  /** Validated ancestor provenance, retained while resolving and reading nested records. */
+  readonly contexts?: WeakMap<
+    object,
+    readonly { readonly resource: string; readonly item: unknown }[]
+  >
   /**
    * The app's declared color interface from the invocation plan. Omission
    * means 16-bit integer channels; normalized channels are never inferred.
@@ -360,7 +371,7 @@ export interface NativeCodecEnvironment {
  * text.
  *
  * @remarks
- * `body` is a function body invoked as `(app, args, page)`, where `app` is the
+ * `body` is a function body invoked as `(app, args, page, env)`, where `app` is the
  * target application, `args` is the decoded input record, and `page` is the
  * page window a paged list reads (`null` when there is none). The executor
  * composes the script as: codec prelude, then the application object, then
@@ -380,7 +391,7 @@ export interface NativeScript {
 
   /** Bundle identifier of the target application. */
   readonly bundleId: string
-  /** Function body run as `(app, args, page)`. */
+  /** Function body run as `(app, args, page, env)`. */
   readonly body: string
   /** Validated wire input record (plain JSON under a passthrough plan). */
   readonly input: WireRecord

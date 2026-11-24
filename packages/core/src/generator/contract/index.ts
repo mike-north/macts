@@ -23,6 +23,8 @@
  *
  * @packageDocumentation
  */
+import { callableResourceCommand } from '../../manifest/callable-commands.js'
+import { normalizeManifestAddresses } from '../../manifest/normalize-addresses.js'
 
 import { z } from 'zod'
 import {
@@ -61,11 +63,12 @@ import { lowerCamel } from '../../manifest/lower-camel.js'
 import { reportsAbsence } from '../../manifest/schemas/evidence.js'
 import { manifestGeneratedNotice } from '../generated-header.js'
 import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
-import { resolvingCommand } from '../../manifest/resource-commands.js'
+import { resolvingCommand, referenceParent } from '../../manifest/resource-commands.js'
+import { commandAddress } from '../../manifest/address.js'
 import {
   omittedOutput,
   omittedOutputPositions,
-  omittedOutputProperties,
+  outputProperties,
   omittedOutputResult,
   withEmittedForms,
   type OmittedOutputReason,
@@ -328,6 +331,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
  * @param manifest - The validated app manifest.
  */
 export function generateContract(manifest: AppManifest): GeneratedContract {
+  manifest = normalizeManifestAddresses(manifest)
   const builder = new ContractBuilder(manifest)
   const contract = builder.build()
   return {
@@ -535,6 +539,7 @@ class ContractBuilder {
   readonly #pagingNames: { readonly page: string; readonly pageRequest: string }
 
   constructor(manifest: AppManifest) {
+    manifest = normalizeManifestAddresses(manifest)
     this.#manifest = manifest
     this.#names = contractNames(manifest)
     this.#pagingNames = pagingTypeNames(manifest)
@@ -609,7 +614,8 @@ class ContractBuilder {
       const parents: { get?: string; list?: string } = {}
       for (const route of ['get', 'list'] as const) {
         if (routes[route] === undefined) continue
-        const parent = resolvingCommand(this.#manifest, resourceKey, route)?.[1].parent?.resource
+        const command = resolvingCommand(this.#manifest, resourceKey, route)?.[1]
+        const parent = command === undefined ? undefined : referenceParent(command)
         if (parent !== undefined) parents[route] = parent
       }
       return [
@@ -969,9 +975,10 @@ class ContractBuilder {
     resourceKey: string,
     resource: Resource
   ): (FieldModel & { readonly readOnly: boolean })[] {
-    return this.#allRecordFields(resource).filter((field) =>
-      this.#resolvesOutput(field.shape, resourceKey)
+    const kept = new Set(
+      outputProperties(this.#manifest, resourceKey, resource).map(([name]) => name)
     )
+    return this.#allRecordFields(resource).filter(({ name }) => kept.has(name))
   }
 
   /**
@@ -1018,7 +1025,12 @@ class ContractBuilder {
    */
   #checkOutputs(): void {
     for (const [resourceKey, resource] of usableResources(this.#manifest)) {
-      const judged = [...omittedOutputProperties(this.#manifest, resourceKey, resource).keys()]
+      const output = new Set(
+        outputProperties(this.#manifest, resourceKey, resource).map(([name]) => name)
+      )
+      const judged = usableProperties(resource)
+        .filter(([name]) => !output.has(name))
+        .map(([name]) => name)
       const kept = new Set(this.#recordFields(resourceKey, resource).map(({ name }) => name))
       const omitted = this.#allRecordFields(resource)
         .map(({ name }) => name)
@@ -1055,6 +1067,18 @@ class ContractBuilder {
    *   declare (the manifest schema rejects both).
    */
   #identifierFields(command: Command, resourceKey: string | undefined): FieldModel[] {
+    if (this.#manifest.version === '1.1') {
+      const positional = this.#positionalResource(resourceKey)
+      return commandMethodParameters(command).signature.map(({ parameter }) => {
+        const model = this.#parameterField(parameter)
+        return positional === undefined || parameter.name !== command.item?.parameter
+          ? model
+          : {
+              ...model,
+              description: `${sentence(model.description)} ${positionalSelectionNote(this.#manifest, positional)}`,
+            }
+      })
+    }
     const { parentParam, childParam } = resolveIdParams(command)
     const positional = this.#positionalResource(resourceKey)
     const field = (name: string): FieldModel => {
@@ -1185,7 +1209,11 @@ class ContractBuilder {
       const methods: MethodModel[] = []
       const crud = (shape: CrudOperation): [Command, OperationModel] | undefined => {
         const found = findCrudCommand(commands, shape)
-        if (found === undefined) return undefined
+        if (
+          found === undefined ||
+          callableResourceCommand(this.#manifest, resourceKey, found[0]) === undefined
+        )
+          return undefined
         const operation = this.#callableOperation(this.#routeOf(found[0], resourceKey))
         return operation === undefined ? undefined : [found[1], operation]
       }
@@ -1200,7 +1228,23 @@ class ContractBuilder {
       const remove = crud('delete')
       if (remove) methods.push(this.#deleteMethod(resource, ...remove))
       for (const [commandKey, command] of commands) {
-        if (isCrudName(command.name)) continue
+        // Identity retrieval remains callable when the ordinary get uses a
+        // different explicit address, rather than being hidden as a second get.
+        const callable = callableResourceCommand(this.#manifest, resourceKey, commandKey)
+        if (
+          command.name === 'get' &&
+          callable !== undefined &&
+          findCrudCommand(commands, 'get')?.[0] !== commandKey
+        ) {
+          const operation = this.#callableOperation(this.#routeOf(commandKey, resourceKey))
+          if (operation !== undefined)
+            methods.push({
+              ...this.#getMethod(resource, command, operation),
+              name: safeIdentifier(callable),
+              doc: this.#withFirstMatchNotes(command.description, command, resource),
+            })
+        }
+        if (isCrudName(command.name) || callable === undefined) continue
         const operation = this.#callableOperation(this.#routeOf(commandKey, resourceKey))
         if (operation !== undefined) methods.push(this.#commandMethod(command, operation, resource))
       }
@@ -1214,11 +1258,12 @@ class ContractBuilder {
     return namespaces
   }
 
+  /** Positional placement preserves each field's declared presence, including optional get inputs. */
   #positional(fields: readonly FieldModel[]): MethodModel['params'] {
     return fields.map((field) => ({
       binding: safeIdentifier(field.name),
       type: this.#renderer.sdkType(field.shape, 'input'),
-      optional: false,
+      optional: field.optional,
       doc: fieldDoc(field, ' '),
     }))
   }
@@ -1842,7 +1887,7 @@ ${valueEntries.join('\n')}
     return `const ${operation.binding}: OperationDescriptor<${this.#inputType(operation.input)}, ${this.#outputType(operation.output)}> = {
   id: ${stringLiteral(route.route)},
   permission: ${stringLiteral(route.permission)},
-  target: ${target},
+  target: ${target},${route.resourceType !== undefined && this.#manifest.version === '1.1' ? `\n  address: ${JSON.stringify(commandAddress(this.#manifest, route.command, route.resourceType))},` : ''}
   description: ${stringLiteral(route.command.description)},
   input: ${input},
   output: ${this.#outputExpression(operation.output)},

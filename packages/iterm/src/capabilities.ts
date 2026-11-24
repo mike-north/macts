@@ -608,6 +608,94 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
+    name: 'iterm.sessions.getWithinTab',
+    app: 'iterm',
+    appBundleId: 'com.googlecode.iterm2',
+    resource: 'sessions',
+    operation: 'getWithinTab',
+    description: 'Read a session by id in the tab at a window position.',
+    permission: 'iterm:sessions:getWithinTab',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'number',
+        },
+        tabIndex: {
+          description: 'Zero-based tab position',
+          type: 'number',
+        },
+        sessionId: {
+          description: 'Session identifier within the Window',
+          type: 'string',
+        },
+        id: {
+          description: 'The unique identifier of the session.',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['windowId', 'tabIndex', 'sessionId'],
+    },
+  },
+  {
+    name: 'iterm.sessions.list',
+    app: 'iterm',
+    appBundleId: 'com.googlecode.iterm2',
+    resource: 'sessions',
+    operation: 'list',
+    description: 'List the sessions in the tab at a window position.',
+    permission: 'iterm:sessions:list',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'number',
+        },
+        tabIndex: {
+          description: 'Zero-based tab position',
+          type: 'number',
+        },
+      },
+      additionalProperties: false,
+      required: ['windowId', 'tabIndex'],
+    },
+  },
+  {
+    name: 'iterm.sessions.resolve',
+    app: 'iterm',
+    appBundleId: 'com.googlecode.iterm2',
+    resource: 'sessions',
+    operation: 'resolve',
+    description:
+      'Read a session identity across all tabs of its Window. A move to another Window makes this identity missing.',
+    permission: 'iterm:sessions:resolve',
+    risk: 'read',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        windowId: {
+          description: 'Window identifier',
+          type: 'number',
+        },
+        sessionId: {
+          description: 'Session identifier within the Window',
+          type: 'string',
+        },
+        id: {
+          description: 'The unique identifier of the session.',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['windowId', 'sessionId'],
+    },
+  },
+  {
     name: 'iterm.tabs.get',
     app: 'iterm',
     appBundleId: 'com.googlecode.iterm2',

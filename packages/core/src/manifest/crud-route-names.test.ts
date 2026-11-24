@@ -32,10 +32,18 @@ const CRUD_NAMES: ReadonlySet<string> = new Set(['get', 'list', 'create', 'updat
 
 /**
  * Key-named CRUD routes that are deliberately kept, by route, each with the
- * reason. Empty: every shipped CRUD route is published under its operation
- * name. An entry needs a written reason and review.
+ * reason. Explicit-address reads may differ from their identity resolving route. An entry needs a written reason and review.
  */
-const ALLOWED_KEY_NAMED_ROUTES: ReadonlyMap<string, string> = new Map()
+const ALLOWED_KEY_NAMED_ROUTES: ReadonlyMap<string, string> = new Map([
+  [
+    'iterm.sessions.getWithinTab',
+    'The explicit Tab address is distinct from Window-scoped identity resolution.',
+  ],
+  [
+    'iterm.sessions.resolve',
+    'Canonical Session identity searches every Tab in one identified Window.',
+  ],
+])
 
 let manifests: { dir: string; manifest: AppManifest }[] = []
 

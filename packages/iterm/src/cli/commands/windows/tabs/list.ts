@@ -45,6 +45,7 @@ export class ListTabsCommand extends Command {
 
       const output = formatter.formatList(
         page.items.map((item) => ({
+          currentSession: item.currentSession,
           index: item.index,
           title: item.title,
         }))

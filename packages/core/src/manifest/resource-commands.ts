@@ -15,9 +15,11 @@
  *
  * Internal to this package: nothing here is part of the public entry.
  */
+import { normalizeManifestAddresses } from './normalize-addresses.js'
 
 import type { AppManifest } from './schemas/app.js'
-import type { Command } from './schemas/command.js'
+import type { AddressParent, Command } from './schemas/command.js'
+import { resolveCollectionAccessor } from './native-accessor.js'
 import { isUnsupportedResourceKey, usableCommands } from './unsupported.js'
 
 /**
@@ -51,6 +53,7 @@ export function resourceCommandEntries(
   manifest: AppManifest,
   resourceName: string
 ): [string, Command][] {
+  manifest = normalizeManifestAddresses(manifest)
   if (isUnsupportedResourceKey(manifest, resourceName)) return []
   return usableCommands(manifest).filter(([, cmd]) => commandAppliesToResource(cmd, resourceName))
 }
@@ -85,5 +88,32 @@ export function resolvingCommand(
   resourceName: string,
   shape: 'get' | 'list'
 ): [string, Command] | undefined {
-  return findCrudCommand(resourceCommandEntries(manifest, resourceName), shape)
+  return findCrudCommand(
+    resourceCommandEntries(manifest, resourceName).filter(
+      ([, command]) => command.resolvesReferences !== false
+    ),
+    shape
+  )
+}
+
+/** The identified container of a canonical resolving route. @internal */
+export function referenceParent(command: Command): string | undefined {
+  return command.parent?.resource ?? command.parents?.at(-1)?.resource
+}
+
+/** Shared ancestor selections for navigation and output identity context. @internal */
+export function commandParents(manifest: AppManifest, command: Command): readonly AddressParent[] {
+  if (manifest.version === '1.1') return command.parents ?? []
+  const parent = command.parent
+  return parent === undefined
+    ? []
+    : [
+        {
+          ...parent,
+          by: 'identity' as const,
+          collection: resolveCollectionAccessor(
+            manifest.resources[parent.resource] ?? { plural: parent.resource }
+          ),
+        },
+      ]
 }

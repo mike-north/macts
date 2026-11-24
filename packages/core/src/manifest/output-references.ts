@@ -77,7 +77,7 @@ import { nestedOnlyResources } from './hierarchy-placement.js'
 import { isPositional } from './positional.js'
 import { resolvePrimaryIdentifier } from './primary-identifier.js'
 import { resolveRoots } from './roots.js'
-import { resolvingCommand } from './resource-commands.js'
+import { commandParents, resolvingCommand, referenceParent } from './resource-commands.js'
 import { usableCommands, usableProperties, usableResources } from './unsupported.js'
 import {
   createNameResolver,
@@ -213,9 +213,25 @@ export function omittedOutputReason(
   ) {
     return 'no-identifier'
   }
-  const parent = get[1].parent?.resource
+  const parent = referenceParent(get[1])
   if (parent !== undefined) {
-    if (parent !== sourceKey || !isValidContainer(manifest, parent)) return 'parent-scoped'
+    const sourceGet =
+      sourceKey === undefined ? undefined : resolvingCommand(manifest, sourceKey, 'get')
+    const context =
+      sourceGet === undefined || sourceKey === undefined
+        ? []
+        : commandParents(manifest, sourceGet[1])
+    const available =
+      parent === sourceKey ||
+      (manifest.version === '1.1' &&
+        context.some(({ resource, by }) => resource === parent && by === 'identity'))
+    if (
+      !available ||
+      (manifest.version === '1.0'
+        ? !isValidContainer(manifest, parent)
+        : isNameKeyed(manifest, parent))
+    )
+      return 'parent-scoped'
   } else if (nestedOnlyResources(manifest).has(resourceKey)) {
     return 'unrecorded-parent'
   }
@@ -232,7 +248,8 @@ export function omittedOutputReason(
  * @param resourceKey - The manifest key of the referenced resource.
  */
 export function outputContainer(manifest: AppManifest, resourceKey: string): string | undefined {
-  return resolvingCommand(manifest, resourceKey, 'get')?.[1].parent?.resource
+  const get = resolvingCommand(manifest, resourceKey, 'get')
+  return get === undefined ? undefined : referenceParent(get[1])
 }
 
 /**
@@ -361,7 +378,9 @@ export function outputProperties(
   resource: Pick<Resource, 'properties'>
 ): [string, Property][] {
   const omitted = omittedOutputProperties(manifest, resourceKey, resource)
-  return usableProperties(resource).filter(([name]) => !omitted.has(name))
+  return usableProperties(resource).filter(
+    ([name, property]) => !omitted.has(name) && property.separateRead === undefined
+  )
 }
 
 /**
@@ -386,10 +405,25 @@ export function containedOutputProperties(
   return outputProperties(manifest, resourceKey, resource)
     .filter(([, property]) =>
       referencedResources(outputShape(property.type, names)).some(
-        (target) => outputContainer(manifest, target) === resourceKey
+        (target) => outputContainer(manifest, target) !== undefined
       )
     )
     .map(([name]) => name)
+}
+
+/** Ordered identity namespace needed by a retained field's canonical get, including the row's ancestors. */
+export function outputPropertyContainers(manifest: AppManifest, property: Property): string[] {
+  const target = referencedResources(outputShape(property.type, createNameResolver(manifest)))[0]
+  const get = target === undefined ? undefined : resolvingCommand(manifest, target, 'get')
+  return get === undefined ? [] : commandParents(manifest, get[1]).map(({ resource }) => resource)
+}
+
+/** Immediate container used by the native field renderer; namespace admission checks the full chain. */
+export function outputPropertyContainer(
+  manifest: AppManifest,
+  property: Property
+): string | undefined {
+  return outputPropertyContainers(manifest, property).at(-1)
 }
 
 /**

@@ -66,6 +66,18 @@ export interface OperationTarget {
  * @typeParam Output - The SDK result.
  */
 export interface OperationDescriptor<Input, Output> {
+  /** Complete explicit navigation, distinct from the resource's canonical identity resolver. @public */
+  readonly address?: {
+    readonly parents: readonly {
+      readonly resource: string
+      readonly collection: string
+      readonly by: 'identity' | 'index'
+      readonly parameter: string
+    }[]
+    readonly collection: string
+    readonly item?: { readonly by: 'identity' | 'index'; readonly parameter: string }
+    readonly traversal?: readonly string[]
+  }
   /** Stable operation identity and route. */
   readonly id: OperationId
   /** The permission the operation requires. */

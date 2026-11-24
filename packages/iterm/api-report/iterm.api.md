@@ -76,6 +76,7 @@ export class iTermClient {
     requestCookie(andKeyForAppNamed?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     revealHotkeyWindow(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     select(__mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
+    readonly sessions: SessionResourceClient;
     setVariable(named: string, to: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     splitHorizontally(withProfile: string, command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
     splitHorizontallyWithDefaultProfile(command?: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<void>;
@@ -118,6 +119,13 @@ export type iTermResources = Readonly<{
             readonly list: 'Window';
         };
     };
+    Session: ResourceDescriptor<Session, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'iterm.sessions.resolve';
+        readonly parents: {
+            readonly get: 'Window';
+        };
+    };
 }>;
 
 // @public
@@ -147,7 +155,6 @@ export interface Session {
     boldColor: Rgb | null;
     colorPreset: string | null;
     columns: Integer | null;
-    contents: string | null;
     cursorColor: Rgb | null;
     cursorTextColor: Rgb | null;
     foregroundColor: Rgb | null;
@@ -159,7 +166,6 @@ export interface Session {
     rows: Integer | null;
     selectedTextColor: Rgb | null;
     selectionColor: Rgb | null;
-    readonly text: string | null;
     transparency: number | null;
     readonly tty: string | null;
     underlineColor: Rgb | null;
@@ -176,6 +182,14 @@ export type SessionCreateInput = Omit<SessionCreateInput_2, 'columns' | 'rows'> 
 };
 
 // @public
+export class SessionResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(windowId: string | number, tabIndex: string | number, sessionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Session>;
+    list(windowId: number, tabIndex: number, __mactsOptions?: _macts_contracts.CallOptions): Promise<Page<Session>>;
+    resolve(windowId: string | number, sessionId: string, __mactsOptions?: _macts_contracts.CallOptions): Promise<Session>;
+}
+
+// @public
 export const SessionSchema: z.ZodObject<{
     id: z.ZodString;
     isProcessing: z.ZodBoolean;
@@ -183,8 +197,6 @@ export const SessionSchema: z.ZodObject<{
     columns: z.ZodNumber;
     rows: z.ZodNumber;
     tty: z.ZodString;
-    contents: z.ZodString;
-    text: z.ZodString;
     colorPreset: z.ZodString;
     backgroundColor: z.ZodObject<{
         red: z.ZodNumber;
@@ -325,6 +337,7 @@ export type SessionUpdateInput = Omit<SessionUpdateInput_2, 'columns' | 'rows'> 
 
 // @public
 export interface Tab {
+    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
     index: Integer | null;
     title: string | null;
 }
@@ -345,6 +358,7 @@ export class TabResourceClient {
 
 // @public
 export const TabSchema: z.ZodObject<{
+    currentSession: z.ZodString;
     index: z.ZodNumber;
     title: z.ZodString;
 }, z.core.$strip>;
@@ -361,6 +375,7 @@ export interface Window {
     readonly alternateIdentifier: string | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
+    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
     currentTab: IndexSelectorReference<Tab, 'Tab'> | null;
     frame?: Rectangle | null;
     frontmost: boolean | null;
@@ -415,6 +430,7 @@ export const WindowSchema: z.ZodObject<{
     zoomed: z.ZodBoolean;
     frontmost: z.ZodBoolean;
     currentTab: z.ZodString;
+    currentSession: z.ZodString;
     isHotkeyWindow: z.ZodBoolean;
     hotkeyWindowProfile: z.ZodString;
     position: z.ZodOptional<z.ZodObject<{

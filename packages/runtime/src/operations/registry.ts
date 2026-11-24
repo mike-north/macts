@@ -17,13 +17,17 @@
  * @packageDocumentation
  */
 
+import { isDeepStrictEqual } from 'node:util'
 import type { AppManifest, Command, PermissionHistoryEntry, RiskClass } from '@macts/core'
 import {
   classifyCommandRisk,
+  commandAddress,
   contractResourcePlans,
   listOperationPages,
   normalizeAppRouteSegment,
+  normalizeManifestAddresses,
   positionalProblems,
+  findAddressIssues,
   resolveCommandRoutes,
   unselectableItemCommands,
   untargetedIdentifiers,
@@ -32,6 +36,7 @@ import {
   EMPTY_RESOURCE_PLAN_TABLE,
   PAGING_INPUT_NAMES,
   resourcePlanTable,
+  ValidationError,
   type AnyOperationDescriptor,
   type AppContract,
   type OperationId,
@@ -199,8 +204,8 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
  * applies too: every resource-scoped command other than a list or create (a
  * get, update or delete, or a command such as `show` or `build` that the app
  * sends the item as its direct parameter), and a delete at application
- * scope, must declare a required parameter other than its parent's (the
- * parameter `command.parent` names). For a resource-scoped command that
+ * scope, must declare a required item input: the canonical address names it,
+ * or an unscoped/format 1.0 command uses its first required non-parent input. For a resource-scoped command that
  * parameter is the identifier its native body addresses the item by; an
  * application-scoped delete's body passes its declared parameters to the
  * app's delete (`planNativeInvocation` in `@macts/core`). Such a manifest is
@@ -270,6 +275,12 @@ function assertIdentifiersTargeted(manifest: AppManifest, registration: Registra
  *   or command, and saying what the marker needs.
  */
 function assertPositionalMarkersHold(manifest: AppManifest, registration: Registration): void {
+  const [address] = findAddressIssues(manifest)
+  if (address !== undefined) {
+    throw new OperationRegistrationError(
+      `${refusedApp(manifest, registration)}: ${address.message}`
+    )
+  }
   const [first] = positionalProblems(manifest)
   if (first === undefined) return
   throw new OperationRegistrationError(`${refusedApp(manifest, registration)}: ${first}`)
@@ -285,6 +296,19 @@ function refusedApp(manifest: AppManifest, registration: Registration): string {
       ? 'cannot be registered from its manifest'
       : 'cannot be registered from its contract, because its manifest is refused'
   return `App "${manifest.app.name}" ${refused}`
+}
+
+/** Canonicalization failures are configuration errors at either registration boundary. */
+function registrationManifest(manifest: AppManifest, registration: Registration): AppManifest {
+  try {
+    return normalizeManifestAddresses(manifest)
+  } catch (error) {
+    if (!(error instanceof ValidationError)) throw error
+    throw new OperationRegistrationError(
+      `${refusedApp(manifest, registration)}: ${error.details.issues[0]?.message ?? error.message}`,
+      { cause: error }
+    )
+  }
 }
 
 /** Combine a descriptor with the manifest-side facts for its command. */
@@ -338,6 +362,7 @@ function toRegisteredOperation(
  *   is not the class's dictionary id.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
+  manifest = registrationManifest(manifest, 'manifest')
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'manifest')
   assertIdentifiersTargeted(manifest, 'manifest')
@@ -350,6 +375,9 @@ export function operationsFromManifest(manifest: AppManifest): RegisteredOperati
       inputTypes.set(target.command, input)
     }
     const descriptor: AnyOperationDescriptor = {
+      ...(target.resource !== undefined && manifest.version === '1.1'
+        ? { address: commandAddress(manifest, command, target.resource) }
+        : {}),
       id,
       permission,
       target,
@@ -411,6 +439,7 @@ export function operationsFromContract(
   contract: AppContract<unknown>,
   manifest: AppManifest
 ): RegisteredOperation[] {
+  manifest = registrationManifest(manifest, 'contract')
   assertAppSegmentNotReserved(manifest)
   assertItemsSelectable(manifest, 'contract')
   assertIdentifiersTargeted(manifest, 'contract')
@@ -444,6 +473,15 @@ export function operationsFromContract(
     if (!sameTarget(descriptor.target, expected.target)) {
       throw new OperationRegistrationError(
         `Contract operation "${descriptor.id}" targets a different manifest command than the manifest route does`
+      )
+    }
+    const address =
+      expected.target.resource !== undefined && manifest.version === '1.1'
+        ? commandAddress(manifest, expected.command, expected.target.resource)
+        : undefined
+    if (!isDeepStrictEqual(descriptor.address, address)) {
+      throw new OperationRegistrationError(
+        `Contract operation "${descriptor.id}" has stale or unsupported address metadata. Regenerate the contract for manifest format 1.1.`
       )
     }
     if (takesPagingInputs(descriptor) !== expected.pages) {

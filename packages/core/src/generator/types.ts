@@ -97,7 +97,9 @@ export function propertyTypeToTs(type: PropertyType | undefined): string {
  * ```
  */
 export function generateReadType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
-  const properties = usableProperties(resource)
+  const properties = usableProperties(resource).filter(
+    ([, property]) => property.separateRead === undefined
+  )
   const imports: string[] = []
 
   const propLines = properties.map(([name, prop]) => {

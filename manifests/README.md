@@ -77,7 +77,19 @@ extraction: { ... }
 
 #### `version` (required)
 
-The manifest format version. Currently must be `'1.0'`.
+The manifest format version is `'1.0'` or `'1.1'`. Existing manifests retain
+`'1.0'`. Explicit operation addresses (`parents` and `item`), identity traversal,
+reference-route selection and separate-read property metadata require `'1.1'`.
+Parsing, generation and registration refuse those fields under `'1.0'` rather
+than discarding them. A runtime that accepts only `'1.0'` rejects a `'1.1'`
+manifest before it can reinterpret a nested address as an application read.
+
+An address names containment edges outside-in, with identity or zero-based
+index selection and explicit parameter bindings. Identity references contain
+only identified containers; index ancestors remain explicit operation inputs.
+The legacy single `parent` remains available in both formats with the same input
+and reference shapes. Format `1.1` validates its normalized scoped address by the
+same rules as `parents`; format `1.0` retains its existing validation.
 
 ```yaml
 version: '1.0'

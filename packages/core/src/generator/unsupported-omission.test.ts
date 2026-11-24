@@ -176,12 +176,12 @@ describe('a fixture with properties marked unsupported', () => {
   it('leaves them out of the capability input schemas', () => {
     // createNote: its parameters, plus the writable properties not already
     // parameters (priority).
-    expect(fieldsOf(lists, 'capability jotter.notes.create input schema', 'Note').sort()).toEqual(
-      ['attachment', 'folderId', 'priority', 'title'].sort()
-    )
-    expect(fieldsOf(lists, 'capability jotter.notes.update input schema', 'Note')).not.toContain(
-      'rating'
-    )
+    expect(
+      fieldsOf(lists, 'capability jotter.notes.createNote input schema', 'Note').sort()
+    ).toEqual(['attachment', 'folderId', 'priority', 'title'].sort())
+    expect(
+      fieldsOf(lists, 'capability jotter.notes.updateNote input schema', 'Note')
+    ).not.toContain('rating')
   })
 
   it('leaves them out of the shared create input', () => {

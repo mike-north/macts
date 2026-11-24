@@ -6,6 +6,8 @@ import { HierarchySchema, type HierarchyChild } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findPositionalIssues } from '../positional.js'
+import { addressNormalization } from '../normalize-addresses.js'
+import { findAddressIssues } from '../address.js'
 import { itemIdentifierParameter } from '../item-selection.js'
 import { findDuplicateRoutes } from '../route.js'
 import { findRootIssues, normalizeRoots } from '../roots.js'
@@ -46,10 +48,11 @@ interface ManifestIssue {
 }
 
 /**
- * The issues of every command's recorded parent (`command.parent`): a parent
+ * The issues of format 1.0 commands' recorded parents (`command.parent`): a parent
  * that names a resource the manifest does not declare, or names a parameter
  * that is not one of the command's required parameters, leaves a body nothing
- * to address the parent by. On a usable command, a parent resource marked
+ * to address the parent by. Format 1.1 ancestors are canonicalized before this
+ * pass and checked by address validation. On a usable command, a parent resource marked
  * unsupported is an issue too: no generated surface declares it, and the app
  * has no such collection to reach the target through.
  */
@@ -123,38 +126,59 @@ function findHierarchyResourceIssues(
  * Top-level manifest schema for a macOS application.
  * This is the complete representation of an app's scriptable interface.
  */
-export const AppManifestSchema = z
-  .object({
-    /** Manifest format version */
-    version: z.literal('1.0'),
-    /** Application metadata */
-    app: AppMetadataSchema,
-    /** Suite organization (from dictionary) */
-    suites: z.array(SuiteSchema).default([]),
-    /** Resource type definitions (at least one required) */
-    resources: z.record(z.string(), ResourceSchema),
-    /** Enumeration definitions */
-    enums: z.record(z.string(), EnumSchema).default({}),
-    /** Containment hierarchy */
-    hierarchy: HierarchySchema,
-    /** Non-hierarchical relationships */
-    relationships: z.array(RelationshipSchema).default([]),
-    /** Command definitions */
-    commands: z.record(z.string(), CommandSchema).default({}),
-    /**
-     * Permissions mapping section.
-     * Maps coarse CRUD-style permissions to fine-grained per-command permissions.
-     * Example: events.read → [calendar:events:list, calendar:events:get, calendar:events:show]
-     */
-    permissions: PermissionsSectionSchema.optional(),
-    /** Extraction metadata (confidence, open questions) */
-    extraction: ExtractionMetadataSchema.optional(),
-  })
-  .refine((data) => Object.keys(data.resources).length > 0, {
+const ManifestDeclarations = z.object({
+  /** Manifest format version */
+  version: z.enum(['1.0', '1.1']),
+  /** Application metadata */
+  app: AppMetadataSchema,
+  /** Suite organization (from dictionary) */
+  suites: z.array(SuiteSchema).default([]),
+  /** Resource type definitions (at least one required) */
+  resources: z.record(z.string(), ResourceSchema),
+  /** Enumeration definitions */
+  enums: z.record(z.string(), EnumSchema).default({}),
+  /** Containment hierarchy */
+  hierarchy: HierarchySchema,
+  /** Non-hierarchical relationships */
+  relationships: z.array(RelationshipSchema).default([]),
+  /** Command definitions */
+  commands: z.record(z.string(), CommandSchema).default({}),
+  /**
+   * Permissions mapping section.
+   * Maps coarse CRUD-style permissions to fine-grained per-command permissions.
+   * Example: events.read → [calendar:events:list, calendar:events:get, calendar:events:show]
+   */
+  permissions: PermissionsSectionSchema.optional(),
+  /** Extraction metadata (confidence, open questions) */
+  extraction: ExtractionMetadataSchema.optional(),
+})
+// Zod owns each parsed object. Share the prepared value between validation and
+// overwrite so address normalization runs once while JSON Schema retains the input shape.
+const canonicalAddresses = new WeakMap<
+  z.infer<typeof ManifestDeclarations>,
+  z.infer<typeof ManifestDeclarations>
+>()
+
+/** The validated manifest, with one address representation for format 1.1 consumers. */
+export const AppManifestSchema = ManifestDeclarations.refine(
+  (data) => Object.keys(data.resources).length > 0,
+  {
     message: 'At least one resource is required',
     path: ['resources'],
+  }
+)
+  .superRefine((data, ctx) => {
+    const normalized = addressNormalization(data)
+    for (const issue of normalized.issues) ctx.addIssue({ code: 'custom', ...issue })
+    canonicalAddresses.set(data, normalized.manifest)
+  })
+  .overwrite((data) => {
+    const canonical = canonicalAddresses.get(data) ?? data
+    canonicalAddresses.delete(data)
+    return canonical
   })
   .superRefine((data, ctx) => {
+    // Recoverable subschema issues must not suppress cross-field root and route diagnostics.
     // A route string identifies one operation; two commands that resolve to
     // the same route (through `routeName`, say) would shadow each other.
     for (const { route, commandKeys } of findDuplicateRoutes(data)) {
@@ -251,6 +275,9 @@ export const AppManifestSchema = z
     // A positional marker is judged on what the resource inherits too: an
     // inherited primary identifier means it is found by that identifier.
     for (const issue of findPositionalIssues(data)) {
+      ctx.addIssue({ code: 'custom', ...issue })
+    }
+    for (const issue of findAddressIssues(data)) {
       ctx.addIssue({ code: 'custom', ...issue })
     }
     // An inherited property is checked where it is used: a usable subclass of

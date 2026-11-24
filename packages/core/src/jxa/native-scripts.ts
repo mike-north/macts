@@ -3,14 +3,14 @@
  * one manifest-defined operation against a target app, or reads the records a
  * resolved reference denotes.
  *
- * Each body is a function body run as `(app, args, page)` (see
+ * Each body is a function body run as `(app, args, page, env)` (see
  * `NativeScript.body`): `app` is the target application, `args` is the
  * operation's input record, and `page` is the window a paged list reads
  * (`null` for every other body).
  * The bodies encode live-app behavior that the manifest alone does not express:
  *
- * - a command on a nested resource reaches its target through the parent the
- *   manifest records for it (`command.parent`): the parent resource's
+ * - a command on a nested resource reaches its target through its recorded
+ *   ancestor path (one parent in format 1.0): each ancestor resource's
  *   collection, the parent item in it, then the resource's collection under
  *   that item (Calendar events exist only under a calendar, never as a
  *   collection of the application). The parent is never inferred from a
@@ -53,13 +53,13 @@
  * emitted as JSON string literals in bracket form wherever the syntax allows, so
  * an unusual manifest key cannot change the meaning of the script.
  *
- * A body references only `app`, `args`, `page`, its own locals, and standard
- * ECMAScript built-ins: no host globals, no codec bindings, and no per-call state. That
- * keeps a body independent of how it is run, so a long-lived automation
- * process can compile it once and invoke it for many calls.
+ * Bodies use `app`, `args`, `page`, and the invocation's `env` provenance map,
+ * plus their own locals and language built-ins. Ancestor context belongs to
+ * one invocation and is never retained as application selection state.
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from '../manifest/normalize-addresses.js'
 
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
 import type { AppManifest } from '../manifest/schemas/app.js'
@@ -82,11 +82,12 @@ import {
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import {
   containedOutputProperties,
-  omittedOutputProperties,
   outputProperties,
+  outputPropertyContainer,
 } from '../manifest/output-references.js'
 import { isPositional } from '../manifest/positional.js'
-import { resolvingCommand } from '../manifest/resource-commands.js'
+import { commandAddress } from '../manifest/address.js'
+import { resolvingCommand, referenceParent } from '../manifest/resource-commands.js'
 import { ROOT_KIND_PROPERTY, rootProperties } from '../manifest/roots.js'
 import { ABSENT_VALUE_ERROR_NUMBER, readsAbsentAsNull } from '../manifest/schemas/evidence.js'
 import {
@@ -104,7 +105,7 @@ import {
  * and the operation target alone.
  */
 export interface NativeInvocationPlan {
-  /** Function body run as `(app, args, page)`. */
+  /** Function body run as `(app, args, page, env)`. */
   readonly body: string
   /**
    * Input keys the body cannot run without. The command's required parameters,
@@ -189,7 +190,7 @@ interface RecordSource {
  * @param manifest - The validated manifest of the target app.
  * @param target - The manifest command (and resource) to run.
  * @param options - How returned records are shaped.
- * @returns A function body run as `(app, args, page)`.
+ * @returns A function body run as `(app, args, page, env)`.
  * @throws `InternalError` when `target` names a command the manifest does not
  *   declare.
  */
@@ -224,6 +225,7 @@ export function planNativeInvocation(
   target: OperationTarget,
   options: NativeBodyOptions = {}
 ): NativeInvocationPlan {
+  manifest = normalizeManifestAddresses(manifest)
   const command = Object.hasOwn(manifest.commands, target.command)
     ? manifest.commands[target.command]
     : undefined
@@ -374,7 +376,9 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * public names. get, create and update all return a record built here, so
  * the three cannot drift, and none reads a field the contract leaves out.
  *
- * The read is batched across the item's properties: one `properties()` call,
+ * Resources reserving separate reads use individual supported getters, so a
+ * bulk property request cannot read those reserved values. Other resources
+ * batch across the item's properties with one `properties()` call,
  * from whose record each usable property is taken under the app's name for it, and
  * stored under its public key. An app's property record need not hold every
  * property it can report (a Finder container's has no `entireContents`), so a
@@ -424,29 +428,58 @@ function readOutputProperties(
     (key) => !rooted || key !== ROOT_KIND_PROPERTY
   )
   const native = (key: string): string => nativePropertyName(resource, key)
+  // Separate reads prohibit bulk property access; communication failure still
+  // fails the whole operation rather than becoming an omitted record field.
+  const separate = Object.values(resource?.properties ?? {}).some(
+    (property) => property.separateRead !== undefined
+  )
+  const propagate = separate
+    ? `if (e && ${JSON.stringify(Object.values(COMMUNICATION_FAILURE_ERROR_NUMBERS))}.indexOf(e.errorNumber) >= 0) { throw e; } `
+    : ''
   const readOnItsOwn = (key: string): string =>
     absentAsNull(resource, key)
-      ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
-      : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
+      ? `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) { ${propagate}if (e && e.errorNumber === ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}) { ${member('obj', key)} = null; } }`
+      : `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {${propagate}}`
+  const traversed = identityTraversed(manifest, source.key)
   return lines(
+    traversed
+      ? `var identity = typeof env !== "undefined" && env.identities ? env.identities.get(${itemLocal}) : undefined;`
+      : '',
+    traversed
+      ? `function verifyIdentity(record) { if (identity && (${itemLocal}[identity.property]() !== identity.id || (record && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== undefined && record[${literal(resolveIdentifierTargeting(resource)?.property ?? 'id')}] !== identity.id))) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: "Identity traversal changed while reading." }; } }`
+      : '',
+    traversed ? 'verifyIdentity();' : '',
     'var obj = {};',
-    'try {',
-    `var props = ${itemLocal}.properties();`,
-    ...keys.map((key) =>
-      absentAsNull(resource, key)
-        ? readOnItsOwn(key)
-        : `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
-    ),
-    '} catch (e) {',
-    ...keys.map(readOnItsOwn),
-    '}',
+    ...(separate
+      ? keys.map(readOnItsOwn)
+      : [
+          'try {',
+          `var props = ${itemLocal}.properties();`,
+          ...keys.map((key) =>
+            absentAsNull(resource, key)
+              ? readOnItsOwn(key)
+              : `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
+          ),
+          '} catch (e) {',
+          ...keys.map(readOnItsOwn),
+          '}',
+        ]),
+    traversed ? 'verifyIdentity(obj);' : '',
     rooted && kindExpression !== undefined
       ? `${member('obj', ROOT_KIND_PROPERTY)} = ${kindExpression};`
       : '',
-    ...containedKeys(manifest, source).map(
-      (key) =>
-        `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(member('obj', key), 'container', itemLocal)}; }`
-    ),
+    ...containedKeys(manifest, source).map((key) => {
+      const property = source.resource?.properties[key]
+      const container =
+        property === undefined ? undefined : outputPropertyContainer(manifest, property)
+      return `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${wrapContained(
+        member('obj', key),
+        'container',
+        container !== undefined && container !== source.key
+          ? identityContainer(`env.contexts.get(${itemLocal})`, container)
+          : itemLocal
+      )}; }`
+    }),
     ...keys
       .filter((key) => marksAbsentAsNull(source, key))
       .map(
@@ -454,6 +487,29 @@ function readOutputProperties(
           `if (${member('obj', key)} !== undefined) { ${member('obj', key)} = ${markAbsentAsNull(member('obj', key))}; }`
       )
   )
+}
+
+/**
+ * Whether an object of `resourceKey` can carry an expected identity from
+ * traversal addressing: the codec records one only when it finds an object
+ * through an identity lookup with containment traversal, which only format 1.1
+ * can declare. A record read verifies that identity only then, so reads of
+ * other resources, including every format 1.0 read, emit no check.
+ */
+function identityTraversed(manifest: AppManifest, resourceKey: string | undefined): boolean {
+  const addressing =
+    resourceKey === undefined ? undefined : referenceAddressing(manifest, resourceKey)
+  return (
+    addressing !== undefined &&
+    addressing.lookup !== 'byIndex' &&
+    addressing.lookup !== 'byRoot' &&
+    addressing.traversal !== undefined
+  )
+}
+
+/** Related identities use the nearest matching ancestor in the validated outside-in read context. */
+function identityContainer(context: string, resource: string): string {
+  return `(${context} || []).filter(function(entry) { return entry.resource === ${literal(resource)}; }).slice(-1)[0].item`
 }
 
 /**
@@ -505,9 +561,10 @@ function absentAsNull(resource: Resource | undefined, key: string): boolean {
 function wrapContained(
   valueExpression: string,
   how: 'container' | 'containerId',
-  containerExpression: string
+  containerExpression: string,
+  ancestorsExpression?: string
 ): string {
-  const held = `function held(e) { var m = {}; m[Symbol.for(${literal(NATIVE_CONTAINED_REFERENCE_KEY)})] = { value: e, ${how}: ${containerExpression} }; return m; }`
+  const held = `function held(e) { var m = {}; m[Symbol.for(${literal(NATIVE_CONTAINED_REFERENCE_KEY)})] = { value: e, ${how}: ${containerExpression}${ancestorsExpression === undefined ? '' : `, ancestors: ${ancestorsExpression}`} }; return m; }`
   return `(function (v) { ${held} return v === null ? null : Array.isArray(v) ? v.map(function (e) { return e === null ? null : held(e); }) : held(v); })(${valueExpression})`
 }
 
@@ -540,21 +597,21 @@ function itemReadKeys(
 }
 
 /**
- * The public keys a list body reads for each item: the list's output
- * properties ({@link resolveListOutputProperties}), less those the output
- * record leaves out (`omittedOutputProperties`). The identifier is never left
- * out, so it is always read.
+ * List reads use the same output eligibility as item reads, including separate
+ * authority. An undeclared identifier remains readable for legacy list targeting.
  */
 function listReadKeys(
   manifest: AppManifest,
   resourceKey: string | undefined,
   resource: Resource | undefined
 ): string[] {
-  const omitted: ReadonlyMap<string, unknown> =
-    resource === undefined || resourceKey === undefined
-      ? new Map()
-      : omittedOutputProperties(manifest, resourceKey, resource)
-  return resolveListOutputProperties(resource).filter((key) => !omitted.has(key))
+  if (resource === undefined || resourceKey === undefined) {
+    return resolveListOutputProperties(resource)
+  }
+  const included = new Set(itemReadKeys(manifest, resourceKey, resource))
+  return resolveListOutputProperties(resource).filter(
+    (key) => resource.properties[key] === undefined || included.has(key)
+  )
 }
 
 /** The record keys the native bodies read for one resource, by body. */
@@ -574,7 +631,7 @@ export interface NativeReadKeys {
  * They do while the resource's primary identifier is one of its usable
  * properties: a list also reads the identifier when it is not
  * ({@link resolveListOutputProperties}). Both leave out the same fields, the
- * ones the output record does not declare (`omittedOutputProperties`). A list
+ * ones the output record does not declare (`outputProperties`). A list
  * never reads a declared identifier its targeting matches by another
  * property, and a get's guarded read of it yields nothing, so that key is in
  * both sets yet in neither record.
@@ -774,6 +831,7 @@ export function referenceAddressing(
   manifest: AppManifest,
   resourceKey: string
 ): NativeAddressing | undefined {
+  manifest = normalizeManifestAddresses(manifest)
   return addressingWithin(manifest, resourceKey, new Set())
 }
 
@@ -794,7 +852,7 @@ function addressingWithin(
   if (resource === undefined || seen.has(resourceKey)) return undefined
   const get = resolvingCommand(manifest, resourceKey, 'get')
   if (get === undefined) return undefined
-  const parent = get[1].parent?.resource
+  const parent = referenceParent(get[1])
   if (isPositional(manifest, resourceKey)) {
     // Found by its position within its parent, which the manifest schema
     // requires the get to record and the app to find by its identifier.
@@ -824,6 +882,9 @@ function addressingWithin(
     collection: resolveCollectionAccessor(resource),
     lookup: lookup.lookup,
     property: lookup.property,
+    ...(get[1].identityTraversal === undefined
+      ? {}
+      : { traversal: nativeTraversal(manifest, get[1]) }),
   }
   if (parent === undefined) return addressing
   const container = addressingWithin(manifest, parent, new Set([...seen, resourceKey]))
@@ -838,10 +899,14 @@ function addressingWithin(
 }
 
 /**
- * The parent scope of a command on a nested resource, from the parent the
- * manifest records for it (`command.parent`).
+ * The holding object and input bindings of a nested command, reached through
+ * its canonical ancestor path or its single format 1.0 parent.
  */
 interface ParentScope {
+  /** Complete binding for format 1.1; format 1.0 retains its established body shape. */
+  readonly binding?: string
+  /** Every ancestor argument, in navigation order. */
+  readonly parameters?: readonly string[]
   /** The request parameter carrying the parent's identifier. */
   readonly parentIdParam: string
   /** The manifest key of the parent's resource, named when the parent is missing. */
@@ -925,6 +990,7 @@ function failIfMissing(local: string, missingResource?: string): string {
  * identifier from {@link PARENT_ID_LOCAL}.
  */
 function bindParent(parentScope: ParentScope): string {
+  if (parentScope.binding !== undefined) return parentScope.binding
   return lines(
     `var ${PARENT_LOCAL} = ${parentScope.parentTarget};`,
     failIfMissing(PARENT_LOCAL, parentScope.parentResource)
@@ -932,13 +998,13 @@ function bindParent(parentScope: ParentScope): string {
 }
 
 /**
- * The parent scope of a command, from the parent the manifest records for it
- * (`command.parent`), or `undefined` for a command with none, whose resource
+ * The ancestor scope a command records for its resource's operations,
+ * or `undefined` for a command with none, whose resource
  * is addressed at the application.
  *
- * The parent item is addressed in its resource's collection
- * ({@link resolveCollectionAccessor}), by that resource's identifier targeting
- * ({@link buildTargetExpression}), so a calendar is matched by name. Nothing
+ * Each ancestor is addressed in its resource's collection
+ * ({@link resolveCollectionAccessor}), by its declared identity or position.
+ * Identity selection uses {@link buildTargetExpression}, so a calendar is matched by name. Nothing
  * about the parent is inferred: not from a parameter's name or position, and
  * not from the hierarchy.
  *
@@ -947,6 +1013,48 @@ function bindParent(parentScope: ParentScope): string {
  *   reaching this is a macts defect.
  */
 function recordedParentScope(command: Command, manifest: AppManifest): ParentScope | undefined {
+  if (manifest.version === '1.1') {
+    const parents = command.parents ?? []
+    if (parents.length === 0) return undefined
+    const statements: string[] = []
+    let owner = 'app'
+    for (const [index, segment] of parents.entries()) {
+      const resource = manifest.resources[segment.resource]
+      const accessor =
+        resource === undefined ? segment.collection : resolveCollectionAccessor(resource)
+      const local = `ancestor${String(index)}`
+      const value = argumentValue(segment.parameter, findParameter(command, segment.parameter))
+      if (segment.by === 'index') {
+        const collection = member(owner, accessor)
+        statements.push(
+          `if (!Number.isSafeInteger(${value}) || ${value} < 0 || ${value} >= ${collection}.length) { throw { name: 'MactsCodecError', direction: 'decode', path: [], message: 'No item at this position.', outOfRangeResource: ${literal(segment.resource)} }; }`,
+          `var ${local} = ${collection}.at(${value});`
+        )
+      } else {
+        statements.push(
+          `var ${local} = ${buildNestedTargetExpression(resource, owner, accessor, value)};`
+        )
+      }
+      statements.push(failIfMissing(local, segment.resource))
+      const ancestors = parents
+        .slice(0, index)
+        .map((entry, at) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(at)} }`)
+      statements.push(
+        `if (typeof env !== 'undefined' && env.contexts) { env.contexts.set(${local}, [${ancestors.join(', ')}]); }`
+      )
+      owner = local
+    }
+    const last = parents.at(-1)
+    if (last === undefined) throw new InternalError('An explicit address requires ancestors.', {})
+    statements.push(`var ${PARENT_LOCAL} = ${owner};`)
+    return {
+      parentIdParam: last.parameter,
+      parentResource: last.resource,
+      parentTarget: owner,
+      binding: lines(...statements),
+      parameters: parents.map(({ parameter }) => parameter),
+    }
+  }
   const parent = command.parent
   if (parent === undefined) return undefined
   const resource = Object.hasOwn(manifest.resources, parent.resource)
@@ -974,6 +1082,7 @@ function recordedParentScope(command: Command, manifest: AppManifest): ParentSco
  * {@link PARENT_ID_LOCAL}, as the native value the app expects.
  */
 function readParentId(command: Command, parentScope: ParentScope): string {
+  if (parentScope.binding !== undefined) return ''
   return `var ${PARENT_ID_LOCAL} = ${argumentValue(
     parentScope.parentIdParam,
     findParameter(command, parentScope.parentIdParam)
@@ -1546,7 +1655,7 @@ function columnWindowReader(
 }
 
 /**
- * Statements that run `readAll()` until one attempt is consistent, at most
+ * Legacy lists run `readAll()` until one attempt is consistent, at most
  * twice, and classify a list whose two attempts both failed.
  *
  * A collection whose reads disagree during the first attempt is read again
@@ -1565,7 +1674,16 @@ function columnWindowReader(
  * attempts and are therefore reported as an unexpected value; that case is
  * accepted.
  */
-function listAttempts(): string {
+function listAttempts(retry: boolean): string {
+  // Explicit addresses expose an observed inconsistency immediately, without stabilization.
+  if (!retry) {
+    return lines(
+      'try { readAll(); } catch (e) {',
+      '  if (e instanceof Inconsistent) { if (e.changed) { collectionChanged(e.message); } unassemblable(e.message); }',
+      '  throw e;',
+      '}'
+    )
+  }
   return lines(
     'function attempt() {',
     '  try { readAll(); return null; } catch (e) {',
@@ -1643,7 +1761,8 @@ function pageReadOf(resource: Resource | undefined): PageRead {
  * Index assembly is only correct while every read describes the same items in
  * the same order. Every read is checked against the item count, and the
  * identifiers are read again after the properties and must not have changed
- * (see {@link attemptReader}). A collection that changes while it is read is
+ * (see {@link attemptReader}). Format 1.1 refuses the first observed
+ * inconsistency. A format 1.0 collection that changes while it is read is
  * read once more from the start, and if the second read also disagrees the
  * list fails, as a changed collection when the items changed and as an
  * unexpected value when they did not (see {@link listAttempts}): never
@@ -1732,15 +1851,42 @@ function buildListBody(
   // the codec with the row's identifier, already read and checked, so the
   // container costs no read of its own.
   const contained = new Set(containedKeys(manifest, source))
-  if (contained.size > 0 && runtimeIdProperty === undefined) {
+  const needsRowIdentity = [...contained].some((key) => {
+    const property = resource?.properties[key]
+    return property !== undefined && outputPropertyContainer(manifest, property) === source.key
+  })
+  if (needsRowIdentity && runtimeIdProperty === undefined) {
     throw new InternalError(
       'A list cannot return references with their container without the identifiers of its items.',
       {}
     )
   }
+  // Format 1.1 rows retain the normalized parent and its earlier validated context.
+  // Format 1.0 keeps its established marker shape.
+  const addressedParent =
+    manifest.version === '1.1' && source.key !== undefined
+      ? commandAddress(manifest, command, source.key).parents.at(-1)
+      : undefined
+  const ancestorContext =
+    addressedParent === undefined
+      ? undefined
+      : `(env.contexts.get(${PARENT_LOCAL}) || []).concat([{ resource: ${literal(addressedParent.resource)}, item: ${PARENT_LOCAL} }])`
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
-    const held = contained.has(p) ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`) : value
+    const property = resource?.properties[p]
+    const container =
+      property === undefined ? undefined : outputPropertyContainer(manifest, property)
+    const held = !contained.has(p)
+      ? value
+      : container === source.key
+        ? wrapContained(value, 'containerId', `${IDS_LOCAL}[i]`, ancestorContext)
+        : wrapContained(
+            value,
+            'container',
+            ancestorContext !== undefined && container !== undefined
+              ? identityContainer(ancestorContext, container)
+              : PARENT_LOCAL
+          )
     const marked = marksAbsentAsNull(source, p) ? markAbsentAsNull(held) : held
     return `if (${value} !== undefined) { ${member('obj', p)} = ${marked}; }`
   })
@@ -1800,7 +1946,7 @@ function buildListBody(
           columnReads,
           pageRead
         ),
-    listAttempts(),
+    listAttempts(manifest.version === '1.0'),
     'var result = [];',
     `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
     'var obj = {};',
@@ -1819,7 +1965,8 @@ function buildListBody(
   )
   return {
     body,
-    identifierArguments: parentScope === undefined ? [] : [parentScope.parentIdParam],
+    identifierArguments:
+      parentScope === undefined ? [] : (parentScope.parameters ?? [parentScope.parentIdParam]),
   }
 }
 
@@ -1874,12 +2021,115 @@ function bindSelectedItem(
   }
   const parentScope = recordedParentScope(command, manifest)
   return {
-    statements: bindTarget(command, resource, resourcePlural, parentScope, itemParameter),
+    statements: lines(
+      command.identityTraversal === undefined
+        ? bindTarget(command, resource, resourcePlural, parentScope, itemParameter)
+        : bindIdentityTraversal(
+            command,
+            resource,
+            resourcePlural,
+            parentScope,
+            itemParameter,
+            manifest
+          ),
+      // Format 1.0 reads record no ancestor context: their nested containers stay unsupported.
+      parentScope === undefined || manifest.version === '1.0'
+        ? ''
+        : `if (typeof env !== 'undefined' && env.contexts) { env.contexts.set(item, [${(command.parents ?? []).map((entry, index) => `{ resource: ${literal(entry.resource)}, item: ancestor${String(index)} }`).join(', ')}]); }`
+    ),
     identifierArguments: identifierArgumentsOf(parentScope, itemParameter),
     parentParameter: parentScope?.parentIdParam,
     itemParameter,
     kindLocal: undefined,
   }
+}
+
+/** Resolve semantic containment edges to the app accessors, as for singular ancestors. */
+function nativeTraversal(manifest: AppManifest, command: Command): string[] {
+  let children = Object.values(manifest.hierarchy.children).find(
+    ({ resource }) => resource === referenceParent(command)
+  )?.children
+  return (command.identityTraversal?.collections ?? []).map((edge) => {
+    const child = children?.[edge]
+    children = child?.children
+    const resource = child === undefined ? undefined : manifest.resources[child.resource]
+    if (resource === undefined)
+      throw new InternalError('Identity traversal has an undeclared collection.', {})
+    return resolveCollectionAccessor(resource)
+  })
+}
+
+/**
+ * Search only the declared identity scope. A positional match is provisional:
+ * record reads must still denote the sought identity after traversal and hydration.
+ */
+function bindIdentityTraversal(
+  command: Command,
+  resource: Resource | undefined,
+  collection: string,
+  parent: ParentScope | undefined,
+  parameter: string,
+  manifest: AppManifest
+): string {
+  if (parent === undefined || command.identityTraversal === undefined)
+    throw new InternalError('Identity traversal needs a parent.', {})
+  const property = resolveIdentifierTargeting(resource)?.property ?? 'id'
+  return lines(
+    readParentId(command, parent),
+    bindParent(parent),
+    `var sought = ${argumentValue(parameter, findParameter(command, parameter))};`,
+    'var matches = [];',
+    'function visit(owner, edges) { var elements = owner[edges[0]]; var count = elements.length; for (var i = 0; i < count; i++) { var candidate = elements.at(i);',
+    `if (!candidate.exists()) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed.' }; }`,
+    `if (edges.length > 1) { visit(candidate, edges.slice(1)); } else if (candidate[${literal(nativePropertyName(resource, property))}]() === sought) { matches.push([candidate, elements]); }`,
+    `} if (elements.length !== count) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed.' }; } }`,
+    `visit(parent, ${JSON.stringify([...nativeTraversal(manifest, command), collection])});`,
+    `if (matches.length > 1) { throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: 'encode', path: [], message: 'Identity matched multiple objects within its declared container.' }; }`,
+    `if (!matches[0]) { var missing = new Error('No such object.'); missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)}; throw missing; }`,
+    `if (matches[0][0][${literal(nativePropertyName(resource, property))}]() !== sought) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; }`,
+    // The match is re-anchored by identity within its own collection. A match that no longer
+    // exists there was present moments ago (closed, or moved to another Tab of the scope), so it
+    // is a retryable collection change; only a Session never found is missing.
+    `var item = ${lookupInCollection(resource, 'matches[0][1]', 'sought')};`,
+    `if (!item.exists()) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; }`,
+    `function verifySelectedIdentity(record) { if (item[${literal(nativePropertyName(resource, property))}]() !== sought || (record && record[${literal(property)}] !== undefined && record[${literal(property)}] !== sought)) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity traversal changed while reading.' }; } }`,
+    'verifySelectedIdentity();'
+  )
+}
+
+/** A format 1.1 read by identity within explicit parents; format 1.0 bodies never carry the check. */
+function explicitIdentityGet(
+  command: Command,
+  resource: Resource | undefined,
+  manifest: AppManifest
+): boolean {
+  return (
+    manifest.version !== '1.0' &&
+    command.identityTraversal === undefined &&
+    resource?.roots === undefined &&
+    resource?.positional === undefined &&
+    recordedParentScope(command, manifest) !== undefined
+  )
+}
+
+/**
+ * Defines `verifyExplicitIdentity`, called after the property reads: an item that no longer
+ * exists is a missing target, and one answering with another identity is a collection change.
+ */
+function verifyExplicitIdentity(
+  command: Command,
+  resource: Resource | undefined,
+  identifierParam: string
+): string {
+  const property = resolveIdentifierTargeting(resource)?.property ?? 'id'
+  const native = literal(nativePropertyName(resource, property))
+  return lines(
+    `function verifyExplicitIdentity(record) {`,
+    failIfMissing('item'),
+    `  var sought = ${argumentValue(identifierParam, findParameter(command, identifierParam))};`,
+    `  if (item[${native}]() !== sought || (record && record[${literal(property)}] !== undefined && record[${literal(property)}] !== sought)) { throw { name: ${literal(NATIVE_COLLECTION_CHANGED_ERROR_NAME)}, message: 'Identity changed while reading.' }; }`,
+    '}'
+  )
 }
 
 /**
@@ -1896,9 +2146,13 @@ function buildGetBody(
   manifest: AppManifest
 ): ResourceBody {
   const selected = bindSelectedItem(command, source.resource, resourcePlural, manifest)
+  const explicit = explicitIdentityGet(command, source.resource, manifest)
   const body = lines(
     selected.statements,
+    explicit ? verifyExplicitIdentity(command, source.resource, selected.itemParameter) : '',
     readOutputProperties(manifest, source, 'item', selected.kindLocal),
+    command.identityTraversal === undefined ? '' : 'verifySelectedIdentity(obj);',
+    explicit ? 'verifyExplicitIdentity(obj);' : '',
     'return obj;'
   )
   return { body, identifierArguments: selected.identifierArguments }
@@ -1919,7 +2173,7 @@ function buildItemCommandBody(
   manifest: AppManifest
 ): ResourceBody {
   const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
-  const lookupKeys = new Set([selected.itemParameter, selected.parentParameter])
+  const lookupKeys = new Set(selected.identifierArguments)
   const named = command.parameters.filter((p) => !lookupKeys.has(p.name))
   const call = member('app', command.name)
   const invocation =
@@ -2035,7 +2289,9 @@ function buildCreateBody(
       bindParent(parentScope),
       collectSuppliedParameters(
         'props',
-        command.parameters.filter((p) => p.name !== parentScope.parentIdParam),
+        command.parameters.filter(
+          (p) => !(parentScope.parameters ?? [parentScope.parentIdParam]).includes(p.name)
+        ),
         native
       ),
       `var item = ${itemClass}(props);`,
@@ -2043,7 +2299,7 @@ function buildCreateBody(
       readOutputProperties(manifest, source, 'item'),
       'return obj;'
     )
-    return { body, identifierArguments: [parentScope.parentIdParam] }
+    return { body, identifierArguments: parentScope.parameters ?? [parentScope.parentIdParam] }
   }
 
   // TODO(#81 follow-up): top-level `item.make()` has not been verified against a
@@ -2077,7 +2333,7 @@ function buildUpdateBody(
 ): ResourceBody {
   const { resource } = source
   const selected = bindSelectedItem(command, resource, resourcePlural, manifest)
-  const excluded = new Set([selected.itemParameter, selected.parentParameter])
+  const excluded = new Set(selected.identifierArguments)
   const writableFields = command.parameters.filter((p) => !excluded.has(p.name))
   // A fixed assignment is a property-backed convenience over the same target
   // as an update. It has no record result and propagates a failed write.
@@ -2162,6 +2418,7 @@ export function buildResolutionBody(
   cardinality: 'one' | 'many',
   options: Pick<NativeBodyOptions, 'containerReferences' | 'absentValueMarkers'> = {}
 ): string {
+  manifest = normalizeManifestAddresses(manifest)
   const resource = Object.hasOwn(manifest.resources, resourceKey)
     ? manifest.resources[resourceKey]
     : undefined
@@ -2204,5 +2461,5 @@ function identifierArgumentsOf(
 ): readonly string[] {
   return parentScope === undefined
     ? [identifierParam]
-    : [parentScope.parentIdParam, identifierParam]
+    : [...(parentScope.parameters ?? [parentScope.parentIdParam]), identifierParam]
 }

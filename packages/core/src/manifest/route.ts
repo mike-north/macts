@@ -13,6 +13,7 @@
  *
  * @packageDocumentation
  */
+import { normalizeManifestAddresses } from './normalize-addresses.js'
 
 import type { AppManifest } from './schemas/index.js'
 import type { Command } from './schemas/command.js'
@@ -183,6 +184,8 @@ function resolveResourceTypes(command: Command, manifest: AppManifest): string[]
  * unsupported contributes none, so every surface built from these routes (the
  * server router, the runtime's operation registry, the contract,
  * capabilities, derived permissions) omits them.
+ * The supplied command may be outside manifest.commands; its format 1.1 bindings
+ * are canonicalized without taking ownership of the source declaration.
  *
  * @param manifest - The app manifest.
  * @param commandKey - The command's key in `manifest.commands`.
@@ -191,6 +194,17 @@ function resolveResourceTypes(command: Command, manifest: AppManifest): string[]
  *   type for resource commands; none for a command marked unsupported.
  */
 export function resolveCommandRoutes(
+  manifest: AppManifest,
+  commandKey: string,
+  command: Command
+): ManifestRoute[] {
+  manifest = normalizeManifestAddresses({ ...manifest, commands: { [commandKey]: command } })
+  const canonical = manifest.commands[commandKey]
+  return canonical === undefined ? [] : routesForCommand(manifest, commandKey, canonical)
+}
+
+/** Both public entry points establish canonical commands before route construction. */
+function routesForCommand(
   manifest: AppManifest,
   commandKey: string,
   command: Command
@@ -241,9 +255,10 @@ export function resolveCommandRoutes(
  *   none for a command or a resource marked unsupported.
  */
 export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[] {
+  manifest = normalizeManifestAddresses(manifest)
   const routes: ManifestRoute[] = []
   for (const [commandKey, command] of Object.entries(manifest.commands)) {
-    routes.push(...resolveCommandRoutes(manifest, commandKey, command))
+    routes.push(...routesForCommand(manifest, commandKey, command))
   }
   return routes
 }
