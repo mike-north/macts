@@ -742,9 +742,11 @@ schema for request or response values; the descriptors are that contract.
 Each generated client package reports its `./contract` subpath in
 `api-report/contract.api.md`, using a second API Extractor config,
 `api-extractor.contract.json`, which the package's `api-extractor` scripts run
-after the root report. That config writes no declaration rollup (the
-subpath's types are the bundler's `dist/contract/index.d.ts`) and no doc
-model, so the API documentation still covers only the root entry.
+after the root report (`api-extractor.cli.json` does the same for the `./cli`
+subpath, in `api-report/cli.api.md`). That config writes no declaration
+rollup (the subpath's types are the bundler's `dist/contract/index.d.ts`). It
+writes its own doc model, `temp/contract.api.json`, so the API documentation
+in `docs/` covers the subpath as `@macts/<app>/contract`.
 
 Factories supply the `ClientRuntime`: local backed by `@macts/runtime`, remote
 backed by HTTP. No proxies are used and no untyped path walking occurs.

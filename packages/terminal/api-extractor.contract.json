@@ -6,7 +6,8 @@
     "reportFileName": "contract.api.md"
   },
   "docModel": {
-    "enabled": false
+    "enabled": true,
+    "apiJsonFilePath": "<projectFolder>/temp/contract.api.json"
   },
   "dtsRollup": {
     "enabled": false

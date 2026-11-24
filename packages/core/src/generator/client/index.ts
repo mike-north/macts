@@ -58,6 +58,13 @@ export interface GenerateClientPackageResult {
 const CONTRACT_API_EXTRACTOR_CONFIG = 'api-extractor.contract.json'
 
 /**
+ * The API Extractor config for the `./cli` subpath, the package's CLI plugin.
+ * Like the contract config, it gives that entry point its own API report and
+ * doc model.
+ */
+const CLI_API_EXTRACTOR_CONFIG = 'api-extractor.cli.json'
+
+/**
  * Config file paths that should be filtered out from the SDK and CLI generators,
  * since we generate unified versions of these.
  */
@@ -216,6 +223,11 @@ export function generateClientPackage(
     content: generateContractApiExtractorConfig(),
   })
 
+  files.push({
+    path: CLI_API_EXTRACTOR_CONFIG,
+    content: generateCliApiExtractorConfig(),
+  })
+
   files.push({ path: 'api-report/.gitkeep', content: '' })
 
   files.push({
@@ -275,8 +287,8 @@ function generatePackageJson(
     keywords: ['macts-sdk', 'macts-cli-plugin'],
     scripts: {
       build: 'tsup',
-      'api-extractor': `api-extractor run --local && api-extractor run --local --config ${CONTRACT_API_EXTRACTOR_CONFIG}`,
-      'api-extractor:ci': `api-extractor run && api-extractor run --config ${CONTRACT_API_EXTRACTOR_CONFIG}`,
+      'api-extractor': `api-extractor run --local && api-extractor run --local --config ${CONTRACT_API_EXTRACTOR_CONFIG} && api-extractor run --local --config ${CLI_API_EXTRACTOR_CONFIG}`,
+      'api-extractor:ci': `api-extractor run && api-extractor run --config ${CONTRACT_API_EXTRACTOR_CONFIG} && api-extractor run --config ${CLI_API_EXTRACTOR_CONFIG}`,
       lint: 'eslint src',
       test: 'vitest run',
       typecheck: 'tsc --noEmit',
@@ -360,24 +372,25 @@ function generateApiExtractorConfig(): string {
 }
 
 /**
- * The API Extractor config for the contract entry. It reports the
- * `./contract` declarations as `api-report/contract.api.md`. It neither rolls
- * up declarations (the subpath's `types` is tsup's `dist/contract/index.d.ts`)
- * nor writes a doc model, so the root entry's doc model stays the package's
- * only one. tsup's declaration output places imports above the module's
+ * The API Extractor config for one subpath entry point. It reports the
+ * entry's declarations as `api-report/<name>.api.md` and writes its doc model
+ * to `temp/<name>.api.json`, beside the root entry's and under its own name,
+ * so the API reference documents the entry point. It does not roll up
+ * declarations: the subpath's `types` is tsup's own declaration output.
+ * tsup's declaration output places imports above the module's
  * `@packageDocumentation` comment, which API Extractor reports as
- * `ae-misplaced-package-tag`; the report does not use package documentation,
- * so that message is silenced here.
+ * `ae-misplaced-package-tag`. That message is silenced here: a subpath's
+ * report and reference page carry no package description.
  */
-function generateContractApiExtractorConfig(): string {
+function generateSubpathApiExtractorConfig(entry: string, name: string): string {
   return JSON.stringify(
     {
       $schema:
         'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
       extends: '../../api-extractor.base.json',
-      mainEntryPointFilePath: '<projectFolder>/dist/contract/index.d.ts',
-      apiReport: { reportFileName: 'contract.api.md' },
-      docModel: { enabled: false },
+      mainEntryPointFilePath: `<projectFolder>/dist/${entry}`,
+      apiReport: { reportFileName: `${name}.api.md` },
+      docModel: { enabled: true, apiJsonFilePath: `<projectFolder>/temp/${name}.api.json` },
       dtsRollup: { enabled: false },
       messages: {
         extractorMessageReporting: {
@@ -388,4 +401,14 @@ function generateContractApiExtractorConfig(): string {
     null,
     2
   )
+}
+
+/** The API Extractor config for the contract entry (`./contract`). */
+function generateContractApiExtractorConfig(): string {
+  return generateSubpathApiExtractorConfig('contract/index.d.ts', 'contract')
+}
+
+/** The API Extractor config for the CLI plugin entry (`./cli`). */
+function generateCliApiExtractorConfig(): string {
+  return generateSubpathApiExtractorConfig('cli/index.d.ts', 'cli')
 }
