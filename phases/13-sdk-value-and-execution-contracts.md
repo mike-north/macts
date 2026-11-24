@@ -2908,8 +2908,14 @@ exists in that Tab (closed, or moved to another Tab) is a retryable
 searches another Window. Tab reorder, closure of an earlier Tab, or
 movement of a Session between Tabs of its Window does not change what a
 reference means between reads. If a Session closes or moves while a single read
-is in progress, that read fails closed, reporting either a missing target or a
-retryable `CollectionChangedError`, and never returns a different Session.
+is in progress, that read fails closed and never returns another Session's
+data. When a property read finds the Session missing, the read re-checks that
+the Session still exists with its identity. A Session that is gone, moved or
+replaced at that re-check fails as a missing target or a retryable
+`CollectionChangedError`, even if it is back where it began before the read
+ends. A Session that leaves and returns within a single property read passes
+the re-check, so its record can lack fields. That record still holds only the
+Session's own data, and the output check reports it as `UnexpectedValueError`.
 Movement to another Window makes the old reference missing. No persistence
 across restoration or relaunch is promised.
 

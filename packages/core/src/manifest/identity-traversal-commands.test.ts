@@ -8,9 +8,11 @@
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D10, "Multilevel addresses and identity scope")
  */
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { AppManifestSchema } from './schemas/app.js'
 import { findAddressIssues } from './address.js'
+import { parseManifestYaml } from './loader.js'
 import { panesManifest } from './test-support/panes-positional.js'
 import { generateConsolidatedPackages } from '../generator/orchestrate.js'
 import { buildNativeBody } from '../jxa/native-scripts.js'
@@ -135,6 +137,55 @@ function standIn(windows: Record<number, string[][]>) {
   return { app, sent, reads }
 }
 
+/** The shipped iTerm manifest, whose Session write is addressed like {@link writeCommand}. */
+function itermManifest(): AppManifest {
+  return parseManifestYaml(
+    readFileSync(new URL('../../../../manifests/iterm/app.yaml', import.meta.url), 'utf8')
+  )
+}
+
+/**
+ * A stand-in app whose Window `7` holds one Tab of Sessions `a` and `b`, where Session `b`
+ * closes once the search has found it: after its second identity read, which confirms the
+ * match, and before the write re-anchors it by identity in its Tab. A collection answers
+ * from its live membership, so a lookup made after the close finds no `b`. It records every
+ * write.
+ */
+function closingStandIn() {
+  const sent: Sent[] = []
+  const ids = ['a', 'b']
+  let identityReadsOfB = 0
+  const session = (id: string) => ({
+    exists: () => ids.includes(id),
+    id: () => {
+      if (!ids.includes(id)) {
+        throw Object.assign(new Error('No such object.'), { errorNumber: NO_SUCH_OBJECT })
+      }
+      if (id === 'b' && ++identityReadsOfB === 2) ids.splice(ids.indexOf('b'), 1)
+      return id
+    },
+  })
+  const sessions = {
+    get length() {
+      return ids.length
+    },
+    at: (index: number) => session(ids[index] ?? ''),
+    // A lookup by id is a live specifier: once no Session holds that id it does not exist,
+    // and reading it fails as "no such object".
+    byId: (id: string) => session(id),
+  }
+  const tab = { exists: () => true, sessions }
+  const window = { exists: () => true, tabs: { length: 1, at: () => tab } }
+  const app = {
+    windows: { byId: (id: number) => (id === 7 ? window : { exists: () => false }) },
+    write: (item: { id: () => string }, named?: unknown) => {
+      sent.push({ session: item.id(), named })
+      return null
+    },
+  }
+  return { app, sent }
+}
+
 /** The error a synchronous call threw, so its fields can be asserted. */
 function thrown(call: () => unknown): unknown {
   try {
@@ -197,6 +248,20 @@ describe('identity-traversal item commands', () => {
     ).toMatchObject({ direction: 'encode' })
     expect(sent).toEqual([])
   })
+
+  it.each([
+    ['the fixture', sessionManifest],
+    ['the shipped iTerm', itermManifest],
+  ] as const)(
+    'fails as a retryable collection change, and writes nothing, when the matched session leaves its tab after the search (%s manifest)',
+    (_label, manifestOf) => {
+      const { app, sent } = closingStandIn()
+      expect(
+        thrown(() => run(manifestOf(), app, { windowId: 7, sessionId: 'b', text: 'rm -rf build' }))
+      ).toMatchObject({ name: 'MactsCollectionChanged' })
+      expect(sent).toEqual([])
+    }
+  )
 
   it.each(['list', 'create', 'update', 'delete'] as const)(
     'still refuses identity traversal on a %s, which has its own selection shape',
