@@ -1,5 +1,11 @@
 # @macts/system-settings-server
 
+## 0.5.0
+
+### Patch Changes
+
+- @macts/system-settings@0.5.0
+
 ## 0.4.0
 
 ### Patch Changes

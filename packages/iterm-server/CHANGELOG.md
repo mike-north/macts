@@ -1,5 +1,12 @@
 # @macts/iterm-server
 
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies [0de5309]
+  - @macts/iterm@0.5.0
+
 ## 0.4.0
 
 ### Patch Changes

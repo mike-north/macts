@@ -1,5 +1,16 @@
 # @macts/mcp
 
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies [0de5309]
+- Updated dependencies [63807e5]
+- Updated dependencies [9ecf7ca]
+  - @macts/contracts@0.5.0
+  - @macts/core@0.5.0
+  - @macts/runtime@0.5.0
+
 ## 0.4.0
 
 ### Patch Changes

@@ -1,5 +1,33 @@
 # @macts/runtime
 
+## 0.5.0
+
+### Minor Changes
+
+- 0de5309: Read iTerm sessions by Window and Tab, and hydrate current-session references within their Window. Add versioned explicit nested addresses while reserving screen text for separate reads.
+
+  Format 1.0 capability discovery now names a command whose key differs from its verb (and that declares no `routeName`) by the operation and MCP tool the runtime actually serves, such as `notebook.notes.listNotes` and `macts__notebook__notes_list_notes`, instead of the nonexistent `notebook.notes.list`. No shipped manifest's discovery output changes, and format 1.0 calling sources and native bodies are otherwise unchanged.
+
+- 63807e5: Add the transfer store, `createTransferStore()`: a persistent record of file grants and download links under `<macts-home>/transfers/`, for reading files remotely.
+
+  A grant belongs to the caller it was issued to; anyone else presenting it gets `TransferError` with reason `unknown-transfer`, indistinguishable from a token that never existed. Grants are reusable until they expire, and each exchange issues a fresh, short-lived download link. Grants last 15 minutes and download links 5 minutes, and expired ones are swept automatically.
+
+  The limits for every kind of transfer, including uploads and temporary copies, are exported as named constants. Tokens are stored only as SHA-256 hashes and never appear in error messages. The store writes its directory and database readable by the owner only, and refuses to open a store created by a newer macts rather than downgrading it.
+
+- 9ecf7ca: Add uploads and temporary copies to the transfer store.
+
+  `createUpload()`, `receiveUpload()` and `consumeUpload()` let a remote caller send a file's bytes for an operation to write. An upload belongs to the caller that created it; anyone else presenting its id gets `TransferError` with reason `unknown-transfer`, indistinguishable from an id that never existed. An upload is usable only once completely received (`incomplete` otherwise) and is single-use: a second consume fails, whatever the first one's outcome, and the staged bytes are deleted after the consuming call whether it succeeded or failed. An oversized receive (`too-large`) or an interrupted one leaves no partial file; an interrupted upload can be received again. Uploads are limited to 100 MiB each, 16 outstanding per caller and 512 MiB outstanding per caller; going over the count fails with `RateLimitedError` saying when to retry. Uploads last 15 minutes.
+
+  `allocateTemporaryCopy()` mints a fresh, owner-only file for a local read, at a path the store chooses itself, and returns it with a `release()`. The store only ever deletes regular files it named, so cleanup can never reach outside the store. Temporary copies last 60 minutes.
+
+  The sweep now also removes expired uploads and temporary copies with their files. Error messages never contain upload ids or staged file paths.
+
+### Patch Changes
+
+- Updated dependencies [0de5309]
+  - @macts/contracts@0.5.0
+  - @macts/core@0.5.0
+
 ## 0.4.0
 
 ### Patch Changes
