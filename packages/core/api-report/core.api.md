@@ -955,7 +955,7 @@ export const CANONICAL_IDENTIFIER_KEY = "id";
 export interface Capability {
     readonly app: string;
     readonly appBundleId: string;
-    readonly cliSnippet: string;
+    readonly cliSnippet: string | undefined;
     readonly description: string;
     readonly inputSchema: JsonSchema;
     readonly keywords: readonly string[];

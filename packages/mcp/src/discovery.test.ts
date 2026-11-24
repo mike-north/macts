@@ -94,6 +94,16 @@ describe('createDiscoveryTool', () => {
     expect(cap.permission).toBe('notebook:notes:delete')
   })
 
+  it('reports a null call for an operation the CLI has no command for', async () => {
+    // The generated CLI registers no command for a resource delete, so
+    // discovery names no CLI call rather than one that does not exist.
+    const inspected = await discover({ capability: 'notebook.notes.delete' })
+    expect((inspected['capability'] as { call: unknown }).call).toBeNull()
+    const searched = await discover({ intent: 'delete a note' })
+    const results = searched['results'] as { name: string; call: unknown }[]
+    expect(results.find(({ name }) => name === 'notebook.notes.delete')?.call).toBeNull()
+  })
+
   it('returns found=false for an unknown capability name', async () => {
     const result = await discover({ capability: 'notebook.notes.frobnicate' })
     expect(result['found']).toBe(false)

@@ -83,7 +83,8 @@ export class CapabilitiesSearchCommand extends Command {
               risk: g.capability.risk,
               permission: g.capability.permission ?? null,
               description: g.capability.description,
-              call: g.capability.cliSnippet,
+              // null when the CLI has no command for this operation.
+              call: g.capability.cliSnippet ?? null,
               governance: g.decision.disposition,
               score: g.score,
             })),
@@ -98,7 +99,9 @@ export class CapabilitiesSearchCommand extends Command {
         const warn = decision.disposition === 'warn' ? ' [needs approval]' : ''
         this.context.stdout.write(`${capability.name}  (${capability.risk})${warn}\n`)
         this.context.stdout.write(`  ${capability.description}\n`)
-        this.context.stdout.write(`  call: ${capability.cliSnippet}\n\n`)
+        this.context.stdout.write(
+          `  call: ${capability.cliSnippet ?? `(no CLI command; MCP tool ${capability.mcpToolName})`}\n\n`
+        )
       }
       return 0
     } catch (error) {

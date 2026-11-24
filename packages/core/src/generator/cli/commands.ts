@@ -23,6 +23,7 @@ import { usableProperties } from '../../manifest/unsupported.js'
 import { omittedOutputResult, outputProperties } from '../../manifest/output-references.js'
 import { itemSelectionNote } from '../positional-docs.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
+import { identityGetMethodName } from './command-tree.js'
 import {
   commandMethodParameters,
   firstMatchNote,
@@ -385,12 +386,7 @@ export function generateGetCommand(
     throw new Error(`Resource not found: ${hierarchyPath.resourceName}`)
   }
 
-  const methodName =
-    override === undefined
-      ? 'get'
-      : (override.routeName ??
-        Object.entries(ctx.manifest.commands).find(([, command]) => command === override)?.[0] ??
-        override.name)
+  const methodName = override === undefined ? 'get' : identityGetMethodName(ctx.manifest, override)
   const appName = ctx.getAppNameLower()
   const sdkImportPath = buildSdkImportPath(hierarchyPath.path.length)
   const outputImportPath = buildOutputImportPath(hierarchyPath.path.length)

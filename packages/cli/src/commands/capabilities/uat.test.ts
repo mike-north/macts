@@ -178,6 +178,21 @@ describe('macts capabilities (UAT)', () => {
     expect(parsed.data.inputSchema.type).toBe('object')
   })
 
+  it('inspect names no CLI call for an operation the CLI has no command for', async () => {
+    // The generated Calendar CLI registers no command for an event delete.
+    const json = await runCli(['capabilities', 'inspect', 'calendar.events.delete', '--json'])
+    expect(json.code).toBe(0)
+    const parsed = JSON.parse(json.stdout) as { data: { call: unknown; mcpTool: string } }
+    expect(parsed.data.call).toBeNull()
+    expect(parsed.data.mcpTool).toBe('macts__calendar__events_delete')
+
+    const human = await runCli(['capabilities', 'inspect', 'calendar.events.delete'])
+    expect(human.code).toBe(0)
+    expect(human.stdout).toContain(
+      'Call:        (no CLI command; MCP tool macts__calendar__events_delete)'
+    )
+  })
+
   it('inspect fails with a non-zero exit for an unknown capability', async () => {
     const { stderr, code } = await runCli(['capabilities', 'inspect', 'calendar.events.frobnicate'])
     expect(code).toBe(1)

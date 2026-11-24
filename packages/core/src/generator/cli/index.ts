@@ -6,7 +6,6 @@
  * @packageDocumentation
  */
 import { addressNormalization } from '../../manifest/normalize-addresses.js'
-import { callableResourceCommand } from '../../manifest/callable-commands.js'
 
 import { join } from 'node:path'
 import type { AppManifest } from '../../manifest/index.js'
@@ -15,9 +14,8 @@ import {
   createCliGeneratorContext,
   type CliGeneratorOptions,
   type CliGeneratorContext,
-  type HierarchyPath,
 } from './context.js'
-import { placeCommand } from './placement.js'
+import { cliCommandTree, cliPathCollisions, type CliTreeCommand } from './command-tree.js'
 import {
   generateListCommand,
   generateCreateCommand,
@@ -54,89 +52,19 @@ export function generateCliPlugin(
   const refusals = generationRefusals(manifest, normalized.issues)
   if (refusals.length > 0) return { files: [], errors: refusals }
   const ctx = createCliGeneratorContext(manifest, options)
+  const tree = cliCommandTree(manifest)
+  const collisions = cliPathCollisions(ctx.getAppNameLower(), tree)
+  if (collisions.length > 0) return { files: [], errors: collisions }
   const files: { path: string; content: string }[] = []
   const errors: string[] = []
 
   try {
+    // One command file per command of the CLI's command tree
+    // (`./command-tree.ts`), which also decides where each one sits.
     const commands: GeneratedCommand[] = []
-
-    // Generate commands for each hierarchy path
-    const standardOps = new Set(['list', 'get', 'create', 'update', 'delete'])
-    const keyOf = new Map(Object.entries(manifest.commands).map(([key, command]) => [command, key]))
-    for (const hierarchyPath of ctx.getHierarchyPaths()) {
-      // Only emit a CRUD subcommand when the generated SDK actually exposes the
-      // matching method — i.e. when the manifest declares a backing command for
-      // that operation. The SDK keys each method's route by the command key, and
-      // omits methods that have no backing command, so emitting a CLI command
-      // that calls a non-existent SDK method would not type-check.
-      //
-      // An operation that cannot be called (a required input admits no value)
-      // gets no CLI command either: a command that always fails would only
-      // mislead.
-      const resourceCommands = ctx.getResourceCommands(hierarchyPath.resourceName)
-      const callable = (command: (typeof resourceCommands)[number]): boolean =>
-        callableResourceCommand(manifest, hierarchyPath.resourceName, keyOf.get(command) ?? '') !==
-        undefined
-      const available = (c: (typeof resourceCommands)[number]): boolean =>
-        ctx.isOperationAvailable(c, hierarchyPath.resourceName)
-      // The command backing a CRUD operation, when it can be called.
-      const backing = (op: string): (typeof resourceCommands)[number] | undefined => {
-        const chosen = resourceCommands.find((c) => c.name === op)
-        return chosen !== undefined && callable(chosen) && available(chosen) ? chosen : undefined
-      }
-      // Each command sits where its address places it (`./placement.ts`), and
-      // is generated only from the hierarchy entry its address reaches.
-      const placed = (command: (typeof resourceCommands)[number]): HierarchyPath | undefined =>
-        placeCommand(manifest, command, hierarchyPath)
-
-      // List command
-      const list = backing('list')
-      const listAt = list === undefined ? undefined : placed(list)
-      if (listAt !== undefined) {
-        commands.push(generateListCommand(listAt, ctx))
-      }
-
-      // Create command (only when a backing create command exists and the
-      // resource is writable)
-      const create = backing('create')
-      const createAt = create === undefined ? undefined : placed(create)
-      if (createAt !== undefined) {
-        const createCmd = generateCreateCommand(createAt, ctx)
-        if (createCmd) {
-          commands.push(createCmd)
-        }
-      }
-
-      // Get command
-      const get = backing('get')
-      const getAt = get === undefined ? undefined : placed(get)
-      if (getAt !== undefined) {
-        commands.push(generateGetCommand(getAt, ctx))
-      }
-
-      // Resource-level commands (like "show" for events)
-      // Skip standard CRUD commands since they're already generated above
-      for (const cmd of resourceCommands) {
-        const at = placed(cmd)
-        if (at === undefined) continue
-        // A separate identity get is a declared read operation on every surface.
-        if (
-          cmd.name === 'get' &&
-          callable(cmd) &&
-          cmd !== resourceCommands.find((command) => command.name === 'get') &&
-          available(cmd)
-        ) {
-          commands.push(generateGetCommand(at, ctx, cmd))
-        }
-        if (standardOps.has(cmd.name) || !callable(cmd) || !available(cmd)) continue
-        commands.push(generateResourceCommand(cmd, at, ctx))
-      }
-    }
-
-    // Generate application-level commands
-    for (const cmd of ctx.getAppCommands()) {
-      if (!ctx.isOperationAvailable(cmd, undefined)) continue
-      commands.push(generateAppCommand(cmd, ctx))
+    for (const entry of tree) {
+      const generated = generateTreeCommand(entry, ctx)
+      if (generated !== null) commands.push(generated)
     }
 
     // Add command files
@@ -212,6 +140,32 @@ export function generateCliPlugin(
   }
 
   return { files, errors }
+}
+
+/**
+ * The command file for one command of the CLI's command tree, or `null` when
+ * its generator declines it (a create at an entry that is not writable, which
+ * the tree never places).
+ */
+function generateTreeCommand(
+  entry: CliTreeCommand,
+  ctx: CliGeneratorContext
+): GeneratedCommand | null {
+  if (entry.kind === 'app') return generateAppCommand(entry.command, ctx)
+  const at = entry.at
+  if (at === undefined) throw new Error(`Resource command "${entry.commandKey}" has no CLI path`)
+  switch (entry.kind) {
+    case 'list':
+      return generateListCommand(at, ctx)
+    case 'create':
+      return generateCreateCommand(at, ctx)
+    case 'get':
+      return generateGetCommand(at, ctx)
+    case 'identity-get':
+      return generateGetCommand(at, ctx, entry.command)
+    case 'resource':
+      return generateResourceCommand(entry.command, at, ctx)
+  }
 }
 
 function generatePluginFile(commands: GeneratedCommand[], ctx: CliGeneratorContext): string {

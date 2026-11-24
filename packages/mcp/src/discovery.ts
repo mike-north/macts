@@ -138,7 +138,8 @@ export function createDiscoveryTool(options: DiscoveryToolOptions): McpHostTool 
             risk: found.risk,
             permission: found.permission ?? null,
             inputSchema: found.inputSchema,
-            call: found.cliSnippet,
+            // null when the CLI has no command for this operation.
+            call: found.cliSnippet ?? null,
           },
         })
       }
@@ -187,7 +188,7 @@ export function createDiscoveryTool(options: DiscoveryToolOptions): McpHostTool 
           risk: cap.risk,
           permission: cap.permission ?? null,
           description: cap.description,
-          call: cap.cliSnippet,
+          call: cap.cliSnippet ?? null,
           governance: decision.disposition,
         })),
       })

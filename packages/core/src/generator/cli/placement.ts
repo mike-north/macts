@@ -64,10 +64,13 @@ export function commandCliSegments(
 /**
  * The hierarchy path a CLI command is generated at, for a resource command
  * reached through the hierarchy entry `entry`: the entry itself, moved to the
- * segments {@link commandCliSegments} places the command under. Only the
- * parent parameters of collections that remain on the path are kept, since a
- * traversed collection is never selected. `undefined` when the command is not
- * placed from this entry.
+ * segments {@link commandCliSegments} places the command under. `undefined`
+ * when the command is not placed from this entry.
+ *
+ * A moved entry keeps the entry's `parentParams`. Only a format 1.1 command
+ * that declares its ancestors is ever moved, and such a command's selection
+ * flags come from its declared address, never from hierarchy parent
+ * parameters.
  *
  * @param manifest - An address-normalized manifest.
  */
@@ -79,13 +82,5 @@ export function placeCommand(
   const segments = commandCliSegments(manifest, command, entry.path)
   if (segments === undefined) return undefined
   if (segments === entry.path) return entry
-  const path = [...segments]
-  return {
-    ...entry,
-    path,
-    parentParams: entry.parentParams.filter(({ paramPath }) => {
-      const reached = paramPath.split('/')
-      return reached.every((segment, index) => segment === path[index])
-    }),
-  }
+  return { ...entry, path: [...segments] }
 }

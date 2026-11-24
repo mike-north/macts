@@ -99,21 +99,7 @@ export function createCliGeneratorContext(
   // A command marked unsupported has no CLI command.
   const commandMap = new Map(usableCommands(manifest))
 
-  // Build hierarchy paths
-  const hierarchyPaths: HierarchyPath[] = []
-  buildHierarchyPaths(manifest, manifest.hierarchy.children, [], [], hierarchyPaths)
-  // A singleton root's objects are in no collection, so no hierarchy entry
-  // names the resource; it is reached at its public segment, where its list
-  // and its get by kind are generated as for any resource.
-  for (const [resourceName, resource] of resourceMap) {
-    if (resource.roots === undefined) continue
-    hierarchyPaths.push({
-      path: [resourceNamespace(resource)],
-      resourceName,
-      canCreate: false,
-      parentParams: [],
-    })
-  }
+  const hierarchyPaths = cliHierarchyPaths(manifest)
 
   return {
     manifest,
@@ -136,15 +122,7 @@ export function createCliGeneratorContext(
     },
 
     getResourceCommands(resourceName: string): Command[] {
-      if (isUnsupportedResourceKey(manifest, resourceName)) return []
-      return Array.from(commandMap.values()).filter((cmd) => {
-        if (cmd.scope !== 'resource') return false
-        if (!cmd.resourceType) return true
-        if (Array.isArray(cmd.resourceType)) {
-          return cmd.resourceType.includes(resourceName)
-        }
-        return cmd.resourceType === resourceName
-      })
+      return cliResourceCommands(manifest, resourceName)
     },
 
     getAppCommands(): Command[] {
@@ -171,6 +149,49 @@ export function createCliGeneratorContext(
       return omittedInputs(manifest, cmd, resourceName)
     },
   }
+}
+
+/**
+ * The hierarchy entries CLI resource commands are generated from, in
+ * depth-first, insertion order: every hierarchy entry of a usable resource
+ * (see {@link buildHierarchyPaths}), followed by one entry per singleton root
+ * resource, at its public segment.
+ */
+export function cliHierarchyPaths(manifest: AppManifest): HierarchyPath[] {
+  const hierarchyPaths: HierarchyPath[] = []
+  buildHierarchyPaths(manifest, manifest.hierarchy.children, [], [], hierarchyPaths)
+  // A singleton root's objects are in no collection, so no hierarchy entry
+  // names the resource; it is reached at its public segment, where its list
+  // and its get by kind are generated as for any resource.
+  for (const [resourceName, resource] of usableResources(manifest)) {
+    if (resource.roots === undefined) continue
+    hierarchyPaths.push({
+      path: [resourceNamespace(resource)],
+      resourceName,
+      canCreate: false,
+      parentParams: [],
+    })
+  }
+  return hierarchyPaths
+}
+
+/**
+ * The usable resource-scoped commands that act on `resourceName`, in manifest
+ * order: none for a resource marked unsupported, and never a command marked
+ * unsupported. A command that names no resource type acts on every resource.
+ */
+export function cliResourceCommands(manifest: AppManifest, resourceName: string): Command[] {
+  if (isUnsupportedResourceKey(manifest, resourceName)) return []
+  return usableCommands(manifest)
+    .map(([, cmd]) => cmd)
+    .filter((cmd) => {
+      if (cmd.scope !== 'resource') return false
+      if (!cmd.resourceType) return true
+      if (Array.isArray(cmd.resourceType)) {
+        return cmd.resourceType.includes(resourceName)
+      }
+      return cmd.resourceType === resourceName
+    })
 }
 
 /**
