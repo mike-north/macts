@@ -2,14 +2,216 @@
 
 [Home](./index.md) &gt; [@macts/safari](./safari.md) &gt; [SafariClient](./safari.safariclient.md)
 
-## SafariClient interface
+## SafariClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Safari client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface SafariClient extends ClientBrand<SafariResources>
+declare class SafariClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[SafariResources](./safari.safariresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new SafariClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./safari.safariclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `SafariClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./safari.safariclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./safari.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[addReadingListItem(andPreviewText, withTitle, \_\_mactsOptions)](./safari.safariclient.addreadinglistitem.md)
+
+</td><td>
+
+</td><td>
+
+Add a new Reading List item with the given URL. Allows a custom title and preview text to be specified.
+
+</td></tr>
+<tr><td>
+
+[dispatchMessageToExtension(\_\_mactsOptions)](./safari.safariclient.dispatchmessagetoextension.md)
+
+</td><td>
+
+</td><td>
+
+Dispatch a message to a Safari Extension.
+
+</td></tr>
+<tr><td>
+
+[doJavaScript(\_in, \_\_mactsOptions)](./safari.safariclient.dojavascript.md)
+
+</td><td>
+
+</td><td>
+
+Applies a string of JavaScript code to a document.
+
+</td></tr>
+<tr><td>
+
+[emailContents(\_of, \_\_mactsOptions)](./safari.safariclient.emailcontents.md)
+
+</td><td>
+
+</td><td>
+
+Emails the contents of a tab.
+
+</td></tr>
+<tr><td>
+
+[searchTheWeb(\_for, \_in, \_\_mactsOptions)](./safari.safariclient.searchtheweb.md)
+
+</td><td>
+
+</td><td>
+
+Searches the web using Safari's current search provider.
+
+</td></tr>
+<tr><td>
+
+[showBookmarks(\_\_mactsOptions)](./safari.safariclient.showbookmarks.md)
+
+</td><td>
+
+</td><td>
+
+Shows Safari's bookmarks.
+
+</td></tr>
+<tr><td>
+
+[showCreditCardSettings(\_\_mactsOptions)](./safari.safariclient.showcreditcardsettings.md)
+
+</td><td>
+
+</td><td>
+
+Show Safari Credit Card Settings.
+
+</td></tr>
+<tr><td>
+
+[showExtensionsPreferences(\_\_mactsOptions)](./safari.safariclient.showextensionspreferences.md)
+
+</td><td>
+
+</td><td>
+
+Show Safari Extensions preferences.
+
+</td></tr>
+<tr><td>
+
+[showPrivacyReport(\_\_mactsOptions)](./safari.safariclient.showprivacyreport.md)
+
+</td><td>
+
+</td><td>
+
+Show Safari's Privacy Report
+
+</td></tr>
+<tr><td>
+
+[syncAllPlistToDisk(\_\_mactsOptions)](./safari.safariclient.syncallplisttodisk.md)
+
+</td><td>
+
+</td><td>
+
+Make sure that all in-memory structures are in-sync with their on-disk counterparts.
+
+</td></tr>
+</tbody></table>

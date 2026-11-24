@@ -54,7 +54,7 @@ the album name of the track. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -88,7 +88,7 @@ the rating kind of the album rating for this track. Nullable. No evidence that t
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -165,7 +165,7 @@ freeform notes about the track. Nullable. No evidence that the app always sets i
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -227,7 +227,7 @@ the artist/source of the track. Nullable. No evidence that the app always sets i
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -242,7 +242,7 @@ the total number of discs in the source album. Nullable. No evidence that the ap
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -338,7 +338,7 @@ the episode ID of the track. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -400,7 +400,7 @@ the grouping (piece) of the track. Generally used to denote movements within a c
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -479,7 +479,7 @@ the modification date of the content of this track. Nullable. No evidence that t
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -543,7 +543,7 @@ the name of the person who purchased this track. Nullable. No evidence that the 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -594,7 +594,7 @@ the release date of this track. Nullable. No evidence that the app always sets i
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -609,7 +609,7 @@ the sample rate of the track (in Hz). Nullable. No evidence that the app always 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -656,7 +656,7 @@ the size of the track (in bytes). Nullable. No evidence that the app always sets
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -778,7 +778,7 @@ the length of the track in MM:SS format. Nullable. No evidence that the app alwa
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -793,7 +793,7 @@ the total number of tracks on the source album. Nullable. No evidence that the a
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -823,7 +823,7 @@ is this track unplayed? Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -838,7 +838,7 @@ relative volume adjustment of the track (-100% to 100%). Nullable. No evidence t
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

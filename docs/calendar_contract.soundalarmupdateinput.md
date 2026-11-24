@@ -84,7 +84,7 @@ _(Optional)_ An absolute alarm date. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

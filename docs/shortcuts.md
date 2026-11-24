@@ -129,7 +129,7 @@ Input for creating a Shortcut.
 </td></tr>
 <tr><td>
 
-[ShortcutsClient](./shortcuts.shortcutsclient.md)
+[ShortcutsClient](./shortcuts.shortcutsclient-interface.md)
 
 </td><td>
 

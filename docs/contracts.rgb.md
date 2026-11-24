@@ -4,7 +4,7 @@
 
 ## Rgb variable
 
-Helpers that build and convert [Rgb](./contracts.rgb.md) colors. The value shares its name with the type, so they are found exactly where the type is used.
+Helpers that build and convert [Rgb](./contracts.rgb-interface.md) colors. The value shares its name with the type, so they are found exactly where the type is used.
 
 **Signature:**
 

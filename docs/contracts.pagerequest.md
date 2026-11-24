@@ -62,7 +62,7 @@ _(Optional)_ The `nextCursor` of the previous page, sent with the same other inp
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

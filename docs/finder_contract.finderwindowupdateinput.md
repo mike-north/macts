@@ -69,7 +69,7 @@ _(Optional)_ Is the window's path bar visible? Cannot be reset: null is rejected
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

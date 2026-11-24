@@ -163,7 +163,7 @@ Whether a page break is forced before the paragraph. Nullable. No evidence that 
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

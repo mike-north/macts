@@ -159,7 +159,7 @@ _(Optional)_ If rule matches, mark message as flagged
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

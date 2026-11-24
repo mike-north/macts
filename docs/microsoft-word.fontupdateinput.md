@@ -69,7 +69,7 @@ _(Optional)_ Whether the font is bold. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 

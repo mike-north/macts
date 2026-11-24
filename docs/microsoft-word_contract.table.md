@@ -71,7 +71,7 @@ Whether the table has borders. Nullable. No evidence that the app always sets it
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -88,7 +88,7 @@ The number of columns in the table. Nullable. No evidence that the app always se
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

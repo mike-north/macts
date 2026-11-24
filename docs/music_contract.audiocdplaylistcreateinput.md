@@ -84,7 +84,7 @@ _(Optional)_ the composer of the CD
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -99,7 +99,7 @@ _(Optional)_ the total number of discs in this CD’s album
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -129,7 +129,7 @@ _(Optional)_ the genre of the CD
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

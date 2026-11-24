@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -54,7 +54,7 @@ _(Optional)_ The aNSIBlackColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -69,7 +69,7 @@ _(Optional)_ The aNSIBlueColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -84,7 +84,7 @@ _(Optional)_ The aNSIBrightBlackColor property. Cannot be reset: null is rejecte
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -99,7 +99,7 @@ _(Optional)_ The aNSIBrightBlueColor property. Cannot be reset: null is rejected
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -114,7 +114,7 @@ _(Optional)_ The aNSIBrightCyanColor property. Cannot be reset: null is rejected
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -129,7 +129,7 @@ _(Optional)_ The aNSIBrightGreenColor property. Cannot be reset: null is rejecte
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -144,7 +144,7 @@ _(Optional)_ The aNSIBrightMagentaColor property. Cannot be reset: null is rejec
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -159,7 +159,7 @@ _(Optional)_ The aNSIBrightRedColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -174,7 +174,7 @@ _(Optional)_ The aNSIBrightWhiteColor property. Cannot be reset: null is rejecte
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -189,7 +189,7 @@ _(Optional)_ The aNSIBrightYellowColor property. Cannot be reset: null is reject
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -204,7 +204,7 @@ _(Optional)_ The aNSICyanColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -219,7 +219,7 @@ _(Optional)_ The aNSIGreenColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -234,7 +234,7 @@ _(Optional)_ The aNSIMagentaColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -249,7 +249,7 @@ _(Optional)_ The aNSIRedColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -264,7 +264,7 @@ _(Optional)_ The aNSIWhiteColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -294,7 +294,7 @@ _(Optional)_ ENQ Answerback string. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -324,7 +324,7 @@ _(Optional)_ The backgroundImage property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -354,7 +354,7 @@ _(Optional)_ The colorPreset property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -384,7 +384,7 @@ _(Optional)_ The currently visible contents of the session. Cannot be reset: nul
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -399,7 +399,7 @@ _(Optional)_ The cursorColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -414,7 +414,7 @@ _(Optional)_ The cursorTextColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -474,7 +474,7 @@ _(Optional)_ The name property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -489,7 +489,7 @@ _(Optional)_ The rows property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -504,7 +504,7 @@ _(Optional)_ The selectedTextColor property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -534,7 +534,7 @@ _(Optional)_ The transparency property. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 

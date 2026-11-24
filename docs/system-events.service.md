@@ -75,7 +75,7 @@ the unique identifier for the service. Never null: the primary identifier.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

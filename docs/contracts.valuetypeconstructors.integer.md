@@ -4,7 +4,7 @@
 
 ## ValueTypeConstructors.integer() method
 
-An [Integer](./contracts.integer.md) within [INTEGER_LIMITS](./contracts.integer_limits.md)<!-- -->, carried as decimal text (`{"integer": "42"}`<!-- -->).
+An [Integer](./contracts.integer-type.md) within [INTEGER_LIMITS](./contracts.integer_limits.md)<!-- -->, carried as decimal text (`{"integer": "42"}`<!-- -->).
 
 **Signature:**
 
@@ -44,7 +44,7 @@ _(Optional)_
 
 **Returns:**
 
-[ValueType](./contracts.valuetype.md)<!-- -->&lt;[Integer](./contracts.integer.md)<!-- -->&gt;
+[ValueType](./contracts.valuetype.md)<!-- -->&lt;[Integer](./contracts.integer-type.md)<!-- -->&gt;
 
 ## Remarks
 

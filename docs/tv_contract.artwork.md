@@ -105,7 +105,7 @@ the data format for this piece of artwork. Nullable. No evidence that the app al
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -120,7 +120,7 @@ Unique identifier for this artwork. Nullable. No evidence that the app always se
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

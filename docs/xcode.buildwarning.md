@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -54,7 +54,7 @@ The ending column number in the file where the issue occurred. Nullable. No evid
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -99,7 +99,7 @@ The text of the issue. Never null: the primary identifier.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -114,7 +114,7 @@ The starting column number in the file where the issue occurred. Nullable. No ev
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

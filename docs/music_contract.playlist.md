@@ -71,7 +71,7 @@ is this playlist disliked? Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -103,7 +103,7 @@ is this playlist favorited? Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -120,7 +120,7 @@ the id of the item. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -169,7 +169,7 @@ the id of the item as a hexadecimal string. This id does not change over time. N
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

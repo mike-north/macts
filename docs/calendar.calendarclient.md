@@ -2,14 +2,173 @@
 
 [Home](./index.md) &gt; [@macts/calendar](./calendar.md) &gt; [CalendarClient](./calendar.calendarclient.md)
 
-## CalendarClient interface
+## CalendarClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Calendar client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface CalendarClient extends ClientBrand<CalendarResources>
+declare class CalendarClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[CalendarResources](./calendar.calendarresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new CalendarClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./calendar.calendarclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `CalendarClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[calendars](./calendar.calendarclient.calendars.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[CalendarResourceClient](./calendar.calendarresourceclient.md)
+
+</td><td>
+
+A calendar containing events
+
+</td></tr>
+<tr><td>
+
+[events](./calendar.calendarclient.events.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[EventResourceClient](./calendar.eventresourceclient.md)
+
+</td><td>
+
+A calendar event
+
+</td></tr>
+<tr><td>
+
+[http](./calendar.calendarclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./calendar.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[reloadCalendars(\_\_mactsOptions)](./calendar.calendarclient.reloadcalendars.md)
+
+</td><td>
+
+</td><td>
+
+Tell the application to reload all calendar files contents
+
+</td></tr>
+<tr><td>
+
+[switchView(to, \_\_mactsOptions)](./calendar.calendarclient.switchview.md)
+
+</td><td>
+
+</td><td>
+
+Show calendar on the given view
+
+</td></tr>
+<tr><td>
+
+[viewCalendar(at, \_\_mactsOptions)](./calendar.calendarclient.viewcalendar.md)
+
+</td><td>
+
+</td><td>
+
+Show calendar on the given date
+
+</td></tr>
+</tbody></table>

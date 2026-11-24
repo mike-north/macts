@@ -4,7 +4,7 @@
 
 ## Integer variable
 
-Helpers that produce [Integer](./contracts.integer.md) values. The value shares its name with the type, so the conversions are found exactly where a type error names `Integer`<!-- -->.
+Helpers that produce [Integer](./contracts.integer-type.md) values. The value shares its name with the type, so the conversions are found exactly where a type error names `Integer`<!-- -->.
 
 **Signature:**
 

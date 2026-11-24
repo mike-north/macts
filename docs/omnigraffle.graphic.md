@@ -221,7 +221,7 @@ Origin of the graphic (position of the upper-left corner of the bounding rectang
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -266,7 +266,7 @@ Does this graphic draw its shadow immediately beneath itself? Nullable. No evide
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -341,7 +341,7 @@ Type of cap at ends of the stroke. Nullable. No evidence that the app always set
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -371,7 +371,7 @@ Type of join between segments of the stroke. Nullable. No evidence that the app 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

@@ -102,7 +102,7 @@ Input for updating a Document. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[TextEditClient](./textedit.texteditclient.md)
+[TextEditClient](./textedit.texteditclient-interface.md)
 
 </td><td>
 

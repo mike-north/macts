@@ -192,7 +192,7 @@ Input for updating a File. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[FinderClient](./finder.finderclient.md)
+[FinderClient](./finder.finderclient-interface.md)
 
 </td><td>
 

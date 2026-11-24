@@ -135,7 +135,7 @@ Indicates whether the message is flagged or not. Nullable. No evidence that the 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -152,7 +152,7 @@ The flag on the message, or -1 if the message is not flagged. Nullable. No evide
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -201,7 +201,7 @@ The unique message ID string. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

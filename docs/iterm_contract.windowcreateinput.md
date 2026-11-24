@@ -129,7 +129,7 @@ _(Optional)_ If the window is a hotkey window, this gives the name of the profil
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

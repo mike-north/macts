@@ -99,7 +99,7 @@ _(Optional)_ is the album for this track favorited?
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -159,7 +159,7 @@ _(Optional)_ is the playback position for this track remembered?
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -249,7 +249,7 @@ _(Optional)_ the description of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -264,7 +264,7 @@ _(Optional)_ the total number of discs in the source album
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -324,7 +324,7 @@ _(Optional)_ the episode ID of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -489,7 +489,7 @@ _(Optional)_ the movement name of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -504,7 +504,7 @@ _(Optional)_ the total number of movements in the work
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -534,7 +534,7 @@ _(Optional)_ the name of the item
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -564,7 +564,7 @@ _(Optional)_ the date and time this track was last played
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -579,7 +579,7 @@ _(Optional)_ the rating of this track (0 to 100)
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -624,7 +624,7 @@ _(Optional)_ is this track included when shuffling?
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -759,7 +759,7 @@ _(Optional)_ the start time of the track in seconds
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -774,7 +774,7 @@ _(Optional)_ the total number of tracks on the source album
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -804,7 +804,7 @@ _(Optional)_ is this track unplayed?
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -834,7 +834,7 @@ _(Optional)_ the work name of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

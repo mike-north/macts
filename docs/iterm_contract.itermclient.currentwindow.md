@@ -44,6 +44,6 @@ _(Optional)_
 
 **Returns:**
 
-Promise&lt;[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Window](./iterm_contract.window.md)<!-- -->, [Integer](./contracts.integer.md)<!-- -->, 'Window'&gt; \| null&gt;
+Promise&lt;[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Window](./iterm_contract.window.md)<!-- -->, [Integer](./contracts.integer-type.md)<!-- -->, 'Window'&gt; \| null&gt;
 
 Nullable. No evidence that the app always returns a value.

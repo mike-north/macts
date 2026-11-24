@@ -2,14 +2,117 @@
 
 [Home](./index.md) &gt; [@macts/screen-sharing](./screen-sharing.md) &gt; [ScreenSharingClient](./screen-sharing.screensharingclient.md)
 
-## ScreenSharingClient interface
+## ScreenSharingClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+ScreenSharing client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface ScreenSharingClient extends ClientBrand<ScreenSharingResources>
+declare class ScreenSharingClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[ScreenSharingResources](./screen-sharing.screensharingresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new ScreenSharingClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./screen-sharing.screensharingclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `ScreenSharingClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./screen-sharing.screensharingclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./screen-sharing.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[getURL(url, \_\_mactsOptions)](./screen-sharing.screensharingclient.geturl.md)
+
+</td><td>
+
+</td><td>
+
+Open a vnc URL
+
+</td></tr>
+</tbody></table>

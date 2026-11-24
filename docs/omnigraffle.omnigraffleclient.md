@@ -2,14 +2,279 @@
 
 [Home](./index.md) &gt; [@macts/omnigraffle](./omnigraffle.md) &gt; [OmniGraffleClient](./omnigraffle.omnigraffleclient.md)
 
-## OmniGraffleClient interface
+## OmniGraffleClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+OmniGraffle client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface OmniGraffleClient extends ClientBrand<OmniGraffleResources>
+declare class OmniGraffleClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[OmniGraffleResources](./omnigraffle.omnigraffleresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new OmniGraffleClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./omnigraffle.omnigraffleclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `OmniGraffleClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[canvases](./omnigraffle.omnigraffleclient.canvases.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[CanvasResourceClient](./omnigraffle.canvasresourceclient.md)
+
+</td><td>
+
+A drawing page/canvas in OmniGraffle
+
+</td></tr>
+<tr><td>
+
+[graphics](./omnigraffle.omnigraffleclient.graphics.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[GraphicResourceClient](./omnigraffle.graphicresourceclient.md)
+
+</td><td>
+
+Base class for visual elements in OmniGraffle
+
+</td></tr>
+<tr><td>
+
+[http](./omnigraffle.omnigraffleclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./omnigraffle.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[layers](./omnigraffle.omnigraffleclient.layers.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[LayerResourceClient](./omnigraffle.layerresourceclient.md)
+
+</td><td>
+
+A drawing layer in OmniGraffle
+
+</td></tr>
+<tr><td>
+
+[lines](./omnigraffle.omnigraffleclient.lines.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[LineResourceClient](./omnigraffle.lineresourceclient.md)
+
+</td><td>
+
+A line/connector in OmniGraffle
+
+</td></tr>
+<tr><td>
+
+[shapes](./omnigraffle.omnigraffleclient.shapes.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ShapeResourceClient](./omnigraffle.shaperesourceclient.md)
+
+</td><td>
+
+A shape graphic in OmniGraffle
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[\_export(as, scope, to, \_\_mactsOptions)](./omnigraffle.omnigraffleclient._export.md)
+
+</td><td>
+
+</td><td>
+
+Export documents
+
+</td></tr>
+<tr><td>
+
+[assemble(subgraph, \_\_mactsOptions)](./omnigraffle.omnigraffleclient.assemble.md)
+
+</td><td>
+
+</td><td>
+
+Group graphics
+
+</td></tr>
+<tr><td>
+
+[connect(from, to, \_\_mactsOptions)](./omnigraffle.omnigraffleclient.connect.md)
+
+</td><td>
+
+</td><td>
+
+Draw a line between graphics
+
+</td></tr>
+<tr><td>
+
+[evaluateJavascript(script, \_\_mactsOptions)](./omnigraffle.omnigraffleclient.evaluatejavascript.md)
+
+</td><td>
+
+</td><td>
+
+Evaluate JavaScript and return the result
+
+</td></tr>
+<tr><td>
+
+[flip(over, \_\_mactsOptions)](./omnigraffle.omnigraffleclient.flip.md)
+
+</td><td>
+
+</td><td>
+
+Flip graphics
+
+</td></tr>
+<tr><td>
+
+[layout(\_\_mactsOptions)](./omnigraffle.omnigraffleclient.layout.md)
+
+</td><td>
+
+</td><td>
+
+Layout graphics using the document's Layout Info
+
+</td></tr>
+<tr><td>
+
+[pageAdjust(\_\_mactsOptions)](./omnigraffle.omnigraffleclient.pageadjust.md)
+
+</td><td>
+
+</td><td>
+
+Change the number of pages to fit the current graphics
+
+</td></tr>
+<tr><td>
+
+[slide(by, \_\_mactsOptions)](./omnigraffle.omnigraffleclient.slide.md)
+
+</td><td>
+
+</td><td>
+
+Slide graphics by a vector amount
+
+</td></tr>
+</tbody></table>

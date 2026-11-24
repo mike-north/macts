@@ -138,7 +138,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[GoogleChromeClient](./google-chrome.googlechromeclient.md)
+[GoogleChromeClient](./google-chrome.googlechromeclient-interface.md)
 
 </td><td>
 

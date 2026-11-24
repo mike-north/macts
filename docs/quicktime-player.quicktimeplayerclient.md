@@ -2,14 +2,271 @@
 
 [Home](./index.md) &gt; [@macts/quicktime-player](./quicktime-player.md) &gt; [QuickTimePlayerClient](./quicktime-player.quicktimeplayerclient.md)
 
-## QuickTimePlayerClient interface
+## QuickTimePlayerClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+QuickTimePlayer client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface QuickTimePlayerClient extends ClientBrand<QuickTimePlayerResources>
+declare class QuickTimePlayerClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[QuickTimePlayerResources](./quicktime-player.quicktimeplayerresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new QuickTimePlayerClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./quicktime-player.quicktimeplayerclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `QuickTimePlayerClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./quicktime-player.quicktimeplayerclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./quicktime-player.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[\_export(\_in, usingSettingsPreset, \_\_mactsOptions)](./quicktime-player.quicktimeplayerclient._export.md)
+
+</td><td>
+
+</td><td>
+
+Export a movie to another file
+
+</td></tr>
+<tr><td>
+
+[newAudioRecording(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.newaudiorecording.md)
+
+</td><td>
+
+</td><td>
+
+Create a new audio recording document.
+
+</td></tr>
+<tr><td>
+
+[newMovieRecording(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.newmovierecording.md)
+
+</td><td>
+
+</td><td>
+
+Create a new movie recording document.
+
+</td></tr>
+<tr><td>
+
+[newScreenRecording(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.newscreenrecording.md)
+
+</td><td>
+
+</td><td>
+
+Create a new screen recording document.
+
+</td></tr>
+<tr><td>
+
+[openURL(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.openurl.md)
+
+</td><td>
+
+</td><td>
+
+Open a URL.
+
+</td></tr>
+<tr><td>
+
+[pause(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.pause.md)
+
+</td><td>
+
+</td><td>
+
+Pause the recording.
+
+</td></tr>
+<tr><td>
+
+[play(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.play.md)
+
+</td><td>
+
+</td><td>
+
+Play the movie.
+
+</td></tr>
+<tr><td>
+
+[present(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.present.md)
+
+</td><td>
+
+</td><td>
+
+Present the document full screen.
+
+</td></tr>
+<tr><td>
+
+[resume(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.resume.md)
+
+</td><td>
+
+</td><td>
+
+Resume the recording.
+
+</td></tr>
+<tr><td>
+
+[showRemoteHud(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.showremotehud.md)
+
+</td><td>
+
+</td><td>
+
+Show the document's Remote HUD
+
+</td></tr>
+<tr><td>
+
+[start(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.start.md)
+
+</td><td>
+
+</td><td>
+
+Start the movie recording.
+
+</td></tr>
+<tr><td>
+
+[stepBackward(by, \_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.stepbackward.md)
+
+</td><td>
+
+</td><td>
+
+Step the movie backward the specified number of steps (default is 1).
+
+</td></tr>
+<tr><td>
+
+[stepForward(by, \_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.stepforward.md)
+
+</td><td>
+
+</td><td>
+
+Step the movie forward the specified number of steps (default is 1).
+
+</td></tr>
+<tr><td>
+
+[stop(\_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.stop.md)
+
+</td><td>
+
+</td><td>
+
+Stop the movie or recording.
+
+</td></tr>
+<tr><td>
+
+[trim(from, to, \_\_mactsOptions)](./quicktime-player.quicktimeplayerclient.trim.md)
+
+</td><td>
+
+</td><td>
+
+Trim the movie.
+
+</td></tr>
+</tbody></table>

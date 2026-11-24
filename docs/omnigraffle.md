@@ -282,7 +282,7 @@ Input for updating a Master. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[OmniGraffleClient](./omnigraffle.omnigraffleclient.md)
+[OmniGraffleClient](./omnigraffle.omnigraffleclient-interface.md)
 
 </td><td>
 

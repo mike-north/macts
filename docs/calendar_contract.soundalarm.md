@@ -84,7 +84,7 @@ An absolute alarm date. Nullable. Observed missing in 9 of 9 items (Calendar 27.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

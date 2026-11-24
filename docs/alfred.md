@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AlfredClient](./alfred.alfredclient.md)
+[AlfredClient](./alfred.alfredclient-interface.md)
 
 </td><td>
 

@@ -297,7 +297,7 @@ The effective status of the project. Nullable. No evidence that the app always s
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -423,7 +423,7 @@ The note of the project. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -440,7 +440,7 @@ The number of available direct children of this project. Nullable. No evidence t
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -457,7 +457,7 @@ The number of completed direct children of this project. Nullable. No evidence t
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

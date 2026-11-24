@@ -131,7 +131,7 @@ The iCalendar (RFC 2445) string describing the event recurrence, if defined. Nul
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

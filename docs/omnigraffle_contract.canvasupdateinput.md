@@ -114,7 +114,7 @@ _(Optional)_ Spacing between graphics in a column. Cannot be reset: null is reje
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -189,7 +189,7 @@ _(Optional)_ Spacing between graphics in a row. Cannot be reset: null is rejecte
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

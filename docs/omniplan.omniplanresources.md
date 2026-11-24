@@ -47,4 +47,4 @@ type OmniPlanResources = Readonly<{
 }>
 ```
 
-**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [Project](./omniplan.project.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [Task](./omniplan.task.md)<!-- -->, [Integer](./contracts.integer.md)<!-- -->, [Milestone](./omniplan.milestone.md)<!-- -->, [Resource](./omniplan.resource.md)<!-- -->, [Assignment](./omniplan.assignment.md)<!-- -->, [Dependency](./omniplan.dependency.md)<!-- -->, [Violation](./omniplan.violation.md)<!-- -->, [Scenario](./omniplan.scenario.md)
+**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [Project](./omniplan.project.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [Task](./omniplan.task.md)<!-- -->, [Integer](./contracts.integer-type.md)<!-- -->, [Milestone](./omniplan.milestone.md)<!-- -->, [Resource](./omniplan.resource.md)<!-- -->, [Assignment](./omniplan.assignment.md)<!-- -->, [Dependency](./omniplan.dependency.md)<!-- -->, [Violation](./omniplan.violation.md)<!-- -->, [Scenario](./omniplan.scenario.md)

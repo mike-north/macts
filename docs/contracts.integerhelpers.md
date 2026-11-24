@@ -4,7 +4,7 @@
 
 ## IntegerHelpers interface
 
-Validation and explicit conversion into [Integer](./contracts.integer.md)<!-- -->.
+Validation and explicit conversion into [Integer](./contracts.integer-type.md)<!-- -->.
 
 **Signature:**
 
@@ -60,7 +60,7 @@ Drop the fractional part of `value` (round toward zero: `2.9` → `2`<!-- -->, `
 
 </td><td>
 
-Return `value` as an [Integer](./contracts.integer.md)<!-- -->, or throw if it is not one.
+Return `value` as an [Integer](./contracts.integer-type.md)<!-- -->, or throw if it is not one.
 
 </td></tr>
 </tbody></table>

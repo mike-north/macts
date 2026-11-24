@@ -146,7 +146,7 @@ Whether the end date is locked or not. Nullable. No evidence that the app always
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -193,7 +193,7 @@ Notes. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -225,7 +225,7 @@ The hierarchical or WBS number of this task. Nullable. No evidence that the app 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

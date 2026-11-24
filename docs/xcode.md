@@ -381,7 +381,7 @@ Input for updating a WorkspaceDocument. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[XcodeClient](./xcode.xcodeclient.md)
+[XcodeClient](./xcode.xcodeclient-interface.md)
 
 </td><td>
 

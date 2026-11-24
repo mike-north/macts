@@ -84,7 +84,7 @@ _(Optional)_ The list of email addresses configured for an account
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -114,7 +114,7 @@ _(Optional)_ Indicates whether the messages in the junk messages mailboxes will 
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -144,7 +144,7 @@ _(Optional)_ Does nothing at all (deprecated)
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -264,7 +264,7 @@ _(Optional)_ Password for this account. Can be set, but not read via scripting
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

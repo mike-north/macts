@@ -243,7 +243,7 @@ Does the process have a scripting terminology, i.e., can it be scripted? Nullabl
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -277,7 +277,7 @@ the name of the process. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -311,7 +311,7 @@ the short name of the file from which the process was launched. Nullable. No evi
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -328,7 +328,7 @@ the size of the partition with which the process was launched. Nullable. No evid
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

@@ -120,7 +120,7 @@ The name of the file on disk. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -197,7 +197,7 @@ The name (title) of the media item. Nullable. No evidence that the app always se
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -214,7 +214,7 @@ The selected media item file size. Nullable. No evidence that the app always set
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

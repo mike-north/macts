@@ -165,7 +165,7 @@ If the window is a hotkey window, this gives the name of the profile that create
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -180,7 +180,7 @@ The unique identifier of the session. Never null: the primary identifier.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

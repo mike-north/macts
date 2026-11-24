@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -54,7 +54,7 @@ The aNSIBlackColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -69,7 +69,7 @@ The aNSIBlueColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -84,7 +84,7 @@ The aNSIBrightBlackColor property. Nullable. No evidence that the app always set
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -99,7 +99,7 @@ The aNSIBrightBlueColor property. Nullable. No evidence that the app always sets
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -114,7 +114,7 @@ The aNSIBrightCyanColor property. Nullable. No evidence that the app always sets
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -129,7 +129,7 @@ The aNSIBrightGreenColor property. Nullable. No evidence that the app always set
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -144,7 +144,7 @@ The aNSIBrightMagentaColor property. Nullable. No evidence that the app always s
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -159,7 +159,7 @@ The aNSIBrightRedColor property. Nullable. No evidence that the app always sets 
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -174,7 +174,7 @@ The aNSIBrightWhiteColor property. Nullable. No evidence that the app always set
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -189,7 +189,7 @@ The aNSIBrightYellowColor property. Nullable. No evidence that the app always se
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -204,7 +204,7 @@ The aNSICyanColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -219,7 +219,7 @@ The aNSIGreenColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -234,7 +234,7 @@ The aNSIMagentaColor property. Nullable. No evidence that the app always sets it
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -249,7 +249,7 @@ The aNSIRedColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -264,7 +264,7 @@ The aNSIWhiteColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -294,7 +294,7 @@ ENQ Answerback string. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -324,7 +324,7 @@ The backgroundImage property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -354,7 +354,7 @@ The colorPreset property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -369,7 +369,7 @@ The columns property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -384,7 +384,7 @@ The cursorColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -399,7 +399,7 @@ The cursorTextColor property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -493,7 +493,7 @@ The session's profile name. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -508,7 +508,7 @@ The rows property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -523,7 +523,7 @@ The selectedTextColor property. Nullable. No evidence that the app always sets i
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -570,7 +570,7 @@ The tty property. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 

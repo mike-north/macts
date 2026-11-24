@@ -2,14 +2,370 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [FinderClient](./finder.finderclient.md)
 
-## FinderClient interface
+## FinderClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Finder client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface FinderClient extends ClientBrand<FinderResources>
+declare class FinderClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[FinderResources](./finder.finderresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new FinderClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./finder.finderclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `FinderClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./finder.finderclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./finder.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[activate(\_\_mactsOptions)](./finder.finderclient.activate.md)
+
+</td><td>
+
+</td><td>
+
+Activate the specified window (or the Finder)
+
+</td></tr>
+<tr><td>
+
+[cleanUp(by, \_\_mactsOptions)](./finder.finderclient.cleanup.md)
+
+</td><td>
+
+</td><td>
+
+Arrange items in window nicely (only applies to open windows in icon view that are not kept arranged)
+
+</td></tr>
+<tr><td>
+
+[close(\_\_mactsOptions)](./finder.finderclient.close.md)
+
+</td><td>
+
+</td><td>
+
+Close an object
+
+</td></tr>
+<tr><td>
+
+[copy(\_\_mactsOptions)](./finder.finderclient.copy.md)
+
+</td><td>
+
+</td><td>
+
+(NOT AVAILABLE YET) Copy the selected items to the clipboard (the Finder must be the front application)
+
+</td></tr>
+<tr><td>
+
+[count(each, \_\_mactsOptions)](./finder.finderclient.count.md)
+
+</td><td>
+
+</td><td>
+
+Return the number of elements of a particular class within an object
+
+</td></tr>
+<tr><td>
+
+[dataSize(as, \_\_mactsOptions)](./finder.finderclient.datasize.md)
+
+</td><td>
+
+</td><td>
+
+Return the size in bytes of an object
+
+</td></tr>
+<tr><td>
+
+[duplicate(to, replacing, routingSuppressed, exactCopy, \_\_mactsOptions)](./finder.finderclient.duplicate.md)
+
+</td><td>
+
+</td><td>
+
+Duplicate one or more object(s)
+
+</td></tr>
+<tr><td>
+
+[eject(\_\_mactsOptions)](./finder.finderclient.eject.md)
+
+</td><td>
+
+</td><td>
+
+Eject the specified disk(s)
+
+</td></tr>
+<tr><td>
+
+[empty(security, \_\_mactsOptions)](./finder.finderclient.empty.md)
+
+</td><td>
+
+</td><td>
+
+Empty the trash
+
+</td></tr>
+<tr><td>
+
+[erase(\_\_mactsOptions)](./finder.finderclient.erase.md)
+
+</td><td>
+
+</td><td>
+
+(NOT AVAILABLE) Erase the specified disk(s)
+
+</td></tr>
+<tr><td>
+
+[exists(\_\_mactsOptions)](./finder.finderclient.exists.md)
+
+</td><td>
+
+</td><td>
+
+Verify if an object exists
+
+</td></tr>
+<tr><td>
+
+[make(\_new, at, to, withProperties, \_\_mactsOptions)](./finder.finderclient.make.md)
+
+</td><td>
+
+</td><td>
+
+Make a new element
+
+</td></tr>
+<tr><td>
+
+[move(to, replacing, positionedAt, routingSuppressed, \_\_mactsOptions)](./finder.finderclient.move.md)
+
+</td><td>
+
+</td><td>
+
+Move object(s) to a new location
+
+</td></tr>
+<tr><td>
+
+[open(using, withProperties, \_\_mactsOptions)](./finder.finderclient.open.md)
+
+</td><td>
+
+</td><td>
+
+Open the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[openVirtualLocation(\_\_mactsOptions)](./finder.finderclient.openvirtuallocation.md)
+
+</td><td>
+
+</td><td>
+
+Private event to open a virtual location
+
+</td></tr>
+<tr><td>
+
+[print(withProperties, \_\_mactsOptions)](./finder.finderclient.print.md)
+
+</td><td>
+
+</td><td>
+
+Print the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[quit(\_\_mactsOptions)](./finder.finderclient.quit.md)
+
+</td><td>
+
+</td><td>
+
+Quit the Finder
+
+</td></tr>
+<tr><td>
+
+[restart(\_\_mactsOptions)](./finder.finderclient.restart.md)
+
+</td><td>
+
+</td><td>
+
+Restart the computer
+
+</td></tr>
+<tr><td>
+
+[reveal(\_\_mactsOptions)](./finder.finderclient.reveal.md)
+
+</td><td>
+
+</td><td>
+
+Bring the specified object(s) into view
+
+</td></tr>
+<tr><td>
+
+[select(\_\_mactsOptions)](./finder.finderclient.select.md)
+
+</td><td>
+
+</td><td>
+
+Select the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[shutDown(\_\_mactsOptions)](./finder.finderclient.shutdown.md)
+
+</td><td>
+
+</td><td>
+
+Shut Down the computer
+
+</td></tr>
+<tr><td>
+
+[sleep(\_\_mactsOptions)](./finder.finderclient.sleep.md)
+
+</td><td>
+
+</td><td>
+
+Put the computer to sleep
+
+</td></tr>
+<tr><td>
+
+[sort(by, \_\_mactsOptions)](./finder.finderclient.sort.md)
+
+</td><td>
+
+</td><td>
+
+Return the specified object(s) in a sorted list
+
+</td></tr>
+<tr><td>
+
+[update(necessity, registeringApplications, \_\_mactsOptions)](./finder.finderclient.update.md)
+
+</td><td>
+
+</td><td>
+
+Update the display of the specified object(s) to match their on-disk representation
+
+</td></tr>
+</tbody></table>

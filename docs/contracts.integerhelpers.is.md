@@ -42,4 +42,4 @@ unknown
 
 **Returns:**
 
-value is [Integer](./contracts.integer.md)
+value is [Integer](./contracts.integer-type.md)

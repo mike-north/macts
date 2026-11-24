@@ -165,7 +165,7 @@ Input for creating a Note.
 </td></tr>
 <tr><td>
 
-[NotesClient](./notes.notesclient.md)
+[NotesClient](./notes.notesclient-interface.md)
 
 </td><td>
 

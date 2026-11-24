@@ -2,14 +2,329 @@
 
 [Home](./index.md) &gt; [@macts/omnifocus](./omnifocus.md) &gt; [OmniFocusClient](./omnifocus.omnifocusclient.md)
 
-## OmniFocusClient interface
+## OmniFocusClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+OmniFocus client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface OmniFocusClient extends ClientBrand<OmniFocusResources>
+declare class OmniFocusClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[OmniFocusResources](./omnifocus.omnifocusresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new OmniFocusClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./omnifocus.omnifocusclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `OmniFocusClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[folders](./omnifocus.omnifocusclient.folders.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[FolderResourceClient](./omnifocus.folderresourceclient.md)
+
+</td><td>
+
+A group of projects and sub-folders representing an area of responsibility
+
+</td></tr>
+<tr><td>
+
+[http](./omnifocus.omnifocusclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./omnifocus.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[inboxTasks](./omnifocus.omnifocusclient.inboxtasks.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[InboxTaskResourceClient](./omnifocus.inboxtaskresourceclient.md)
+
+</td><td>
+
+A task that is in the document's inbox
+
+</td></tr>
+<tr><td>
+
+[perspectives](./omnifocus.omnifocusclient.perspectives.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[PerspectiveResourceClient](./omnifocus.perspectiveresourceclient.md)
+
+</td><td>
+
+A saved view or filter configuration
+
+</td></tr>
+<tr><td>
+
+[projects](./omnifocus.omnifocusclient.projects.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ProjectResourceClient](./omnifocus.projectresourceclient.md)
+
+</td><td>
+
+A project in OmniFocus
+
+</td></tr>
+<tr><td>
+
+[tags](./omnifocus.omnifocusclient.tags.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[TagResourceClient](./omnifocus.tagresourceclient.md)
+
+</td><td>
+
+A tag for organizing and filtering tasks
+
+</td></tr>
+<tr><td>
+
+[tasks](./omnifocus.omnifocusclient.tasks.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[TaskResourceClient](./omnifocus.taskresourceclient.md)
+
+</td><td>
+
+A task within OmniFocus
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[archive(\_in, compression, \_\_mactsOptions)](./omnifocus.omnifocusclient.archive.md)
+
+</td><td>
+
+</td><td>
+
+Write a backup archive of the document
+
+</td></tr>
+<tr><td>
+
+[compact(\_\_mactsOptions)](./omnifocus.omnifocusclient.compact.md)
+
+</td><td>
+
+</td><td>
+
+Hides completed tasks and processes any inbox items
+
+</td></tr>
+<tr><td>
+
+[complete(text, \_\_mactsOptions)](./omnifocus.omnifocusclient.complete.md)
+
+</td><td>
+
+</td><td>
+
+Generate a list of completions given a string
+
+</td></tr>
+<tr><td>
+
+[importInto(file, \_\_mactsOptions)](./omnifocus.omnifocusclient.importinto.md)
+
+</td><td>
+
+</td><td>
+
+Imports a file into an existing OmniFocus document
+
+</td></tr>
+<tr><td>
+
+[markComplete(targets, \_\_mactsOptions)](./omnifocus.omnifocusclient.markcomplete.md)
+
+</td><td>
+
+</td><td>
+
+Mark one or more projects or tasks complete
+
+</td></tr>
+<tr><td>
+
+[markDropped(targets, \_\_mactsOptions)](./omnifocus.omnifocusclient.markdropped.md)
+
+</td><td>
+
+</td><td>
+
+Mark one or more projects or tasks as dropped
+
+</td></tr>
+<tr><td>
+
+[markIncomplete(targets, \_\_mactsOptions)](./omnifocus.omnifocusclient.markincomplete.md)
+
+</td><td>
+
+</td><td>
+
+Mark one or more projects or tasks incomplete
+
+</td></tr>
+<tr><td>
+
+[parseTasksInto(text, into, \_\_mactsOptions)](./omnifocus.omnifocusclient.parsetasksinto.md)
+
+</td><td>
+
+</td><td>
+
+Converts a textual representation of tasks into tasks
+
+</td></tr>
+<tr><td>
+
+[redo(\_\_mactsOptions)](./omnifocus.omnifocusclient.redo.md)
+
+</td><td>
+
+</td><td>
+
+Redo the last undone command
+
+</td></tr>
+<tr><td>
+
+[synchronize(\_\_mactsOptions)](./omnifocus.omnifocusclient.synchronize.md)
+
+</td><td>
+
+</td><td>
+
+Synchronizes with the shared OmniFocus sync database
+
+</td></tr>
+<tr><td>
+
+[undo(\_\_mactsOptions)](./omnifocus.omnifocusclient.undo.md)
+
+</td><td>
+
+</td><td>
+
+Undo the last command
+
+</td></tr>
+</tbody></table>

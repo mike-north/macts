@@ -2,14 +2,454 @@
 
 [Home](./index.md) &gt; [@macts/iterm](./iterm.md) &gt; [iTermClient](./iterm.itermclient.md)
 
-## iTermClient interface
+## iTermClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+iTerm client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface iTermClient extends ClientBrand<iTermResources>
+declare class iTermClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[iTermResources](./iterm.itermresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new iTermClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./iterm.itermclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `iTermClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./iterm.itermclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./iterm.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[sessions](./iterm.itermclient.sessions.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[SessionResourceClient](./iterm.sessionresourceclient.md)
+
+</td><td>
+
+A terminal session
+
+</td></tr>
+<tr><td>
+
+[tabs](./iterm.itermclient.tabs.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[TabResourceClient](./iterm.tabresourceclient.md)
+
+</td><td>
+
+A terminal tab
+
+</td></tr>
+<tr><td>
+
+[windows](./iterm.itermclient.windows.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[WindowResourceClient](./iterm.windowresourceclient.md)
+
+</td><td>
+
+A window.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[close(\_\_mactsOptions)](./iterm.itermclient.close.md)
+
+</td><td>
+
+</td><td>
+
+Close a document.
+
+</td></tr>
+<tr><td>
+
+[count(each, \_\_mactsOptions)](./iterm.itermclient.count.md)
+
+</td><td>
+
+</td><td>
+
+Return the number of elements of a particular class within an object.
+
+</td></tr>
+<tr><td>
+
+[createHotkeyWindowWithProfile(\_\_mactsOptions)](./iterm.itermclient.createhotkeywindowwithprofile.md)
+
+</td><td>
+
+</td><td>
+
+Create a hotkey window
+
+</td></tr>
+<tr><td>
+
+[createTab(withProfile, command, \_\_mactsOptions)](./iterm.itermclient.createtab.md)
+
+</td><td>
+
+</td><td>
+
+Create a new tab
+
+</td></tr>
+<tr><td>
+
+[createTabWithDefaultProfile(command, \_\_mactsOptions)](./iterm.itermclient.createtabwithdefaultprofile.md)
+
+</td><td>
+
+</td><td>
+
+Create a new tab with the default profile
+
+</td></tr>
+<tr><td>
+
+[createWindowWithDefaultProfile(command, \_\_mactsOptions)](./iterm.itermclient.createwindowwithdefaultprofile.md)
+
+</td><td>
+
+</td><td>
+
+Create a new window with the default profile
+
+</td></tr>
+<tr><td>
+
+[createWindowWithProfile(command, \_\_mactsOptions)](./iterm.itermclient.createwindowwithprofile.md)
+
+</td><td>
+
+</td><td>
+
+Create a new window
+
+</td></tr>
+<tr><td>
+
+[currentWindow(\_\_mactsOptions)](./iterm.itermclient.currentwindow.md)
+
+</td><td>
+
+</td><td>
+
+Get a reference to the currently selected window.
+
+</td></tr>
+<tr><td>
+
+[duplicate(to, withProperties, \_\_mactsOptions)](./iterm.itermclient.duplicate.md)
+
+</td><td>
+
+</td><td>
+
+Copy object(s) and put the copies at a new location.
+
+</td></tr>
+<tr><td>
+
+[exists(\_\_mactsOptions)](./iterm.itermclient.exists.md)
+
+</td><td>
+
+</td><td>
+
+Verify if an object exists.
+
+</td></tr>
+<tr><td>
+
+[hideHotkeyWindow(\_\_mactsOptions)](./iterm.itermclient.hidehotkeywindow.md)
+
+</td><td>
+
+</td><td>
+
+Hides a hotkey window. Only to be called on windows that are hotkey windows.
+
+</td></tr>
+<tr><td>
+
+[invokeAPIExpression(\_\_mactsOptions)](./iterm.itermclient.invokeapiexpression.md)
+
+</td><td>
+
+</td><td>
+
+Invokes an expression, such as a registered function.
+
+</td></tr>
+<tr><td>
+
+[launchAPIScriptNamed(\_arguments, \_\_mactsOptions)](./iterm.itermclient.launchapiscriptnamed.md)
+
+</td><td>
+
+</td><td>
+
+Launch API script by name
+
+</td></tr>
+<tr><td>
+
+[make(\_new, at, withData, withProperties, \_\_mactsOptions)](./iterm.itermclient.make.md)
+
+</td><td>
+
+</td><td>
+
+Make a new object.
+
+</td></tr>
+<tr><td>
+
+[move(to, \_\_mactsOptions)](./iterm.itermclient.move.md)
+
+</td><td>
+
+</td><td>
+
+Move object(s) to a new location.
+
+</td></tr>
+<tr><td>
+
+[requestCookie(andKeyForAppNamed, \_\_mactsOptions)](./iterm.itermclient.requestcookie.md)
+
+</td><td>
+
+</td><td>
+
+Request a Python API cookie
+
+</td></tr>
+<tr><td>
+
+[revealHotkeyWindow(\_\_mactsOptions)](./iterm.itermclient.revealhotkeywindow.md)
+
+</td><td>
+
+</td><td>
+
+Reveals a hotkey window. Only to be called on windows that are hotkey windows.
+
+</td></tr>
+<tr><td>
+
+[select(\_\_mactsOptions)](./iterm.itermclient.select.md)
+
+</td><td>
+
+</td><td>
+
+Make receiver visible and selected.
+
+</td></tr>
+<tr><td>
+
+[setVariable(named, to, \_\_mactsOptions)](./iterm.itermclient.setvariable.md)
+
+</td><td>
+
+</td><td>
+
+Sets the value of a session variable
+
+</td></tr>
+<tr><td>
+
+[splitHorizontally(withProfile, command, \_\_mactsOptions)](./iterm.itermclient.splithorizontally.md)
+
+</td><td>
+
+</td><td>
+
+Split a session horizontally.
+
+</td></tr>
+<tr><td>
+
+[splitHorizontallyWithDefaultProfile(command, \_\_mactsOptions)](./iterm.itermclient.splithorizontallywithdefaultprofile.md)
+
+</td><td>
+
+</td><td>
+
+Split a session horizontally, using the default profile for the new session
+
+</td></tr>
+<tr><td>
+
+[splitHorizontallyWithSameProfile(command, \_\_mactsOptions)](./iterm.itermclient.splithorizontallywithsameprofile.md)
+
+</td><td>
+
+</td><td>
+
+Split a session horizontally, using the original session's profile for the new session
+
+</td></tr>
+<tr><td>
+
+[splitVertically(withProfile, command, \_\_mactsOptions)](./iterm.itermclient.splitvertically.md)
+
+</td><td>
+
+</td><td>
+
+Split a session vertically.
+
+</td></tr>
+<tr><td>
+
+[splitVerticallyWithDefaultProfile(command, \_\_mactsOptions)](./iterm.itermclient.splitverticallywithdefaultprofile.md)
+
+</td><td>
+
+</td><td>
+
+Split a session vertically, using the default profile for the new session
+
+</td></tr>
+<tr><td>
+
+[splitVerticallyWithSameProfile(command, \_\_mactsOptions)](./iterm.itermclient.splitverticallywithsameprofile.md)
+
+</td><td>
+
+</td><td>
+
+Split a session vertically, using the original session's profile for the new session
+
+</td></tr>
+<tr><td>
+
+[toggleHotkeyWindow(\_\_mactsOptions)](./iterm.itermclient.togglehotkeywindow.md)
+
+</td><td>
+
+</td><td>
+
+Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.
+
+</td></tr>
+<tr><td>
+
+[variable(named, \_\_mactsOptions)](./iterm.itermclient.variable.md)
+
+</td><td>
+
+</td><td>
+
+Returns the value of a session variable with the given name
+
+</td></tr>
+</tbody></table>

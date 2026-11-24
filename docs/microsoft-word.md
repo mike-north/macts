@@ -237,7 +237,7 @@ Input for updating a Font. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[MicrosoftWordClient](./microsoft-word.microsoftwordclient.md)
+[MicrosoftWordClient](./microsoft-word.microsoftwordclient-interface.md)
 
 </td><td>
 

@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 

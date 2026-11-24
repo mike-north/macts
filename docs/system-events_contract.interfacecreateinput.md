@@ -69,7 +69,7 @@ _(Optional)_ the duplex setting half \| full \| full with flow control
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -84,7 +84,7 @@ _(Optional)_ the packet size
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

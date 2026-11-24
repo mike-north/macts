@@ -246,7 +246,7 @@ the miniplayer window
 </td></tr>
 <tr><td>
 
-[MusicClient](./music.musicclient.md)
+[MusicClient](./music.musicclient-interface.md)
 
 </td><td>
 

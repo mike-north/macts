@@ -54,7 +54,7 @@ _(Optional)_ the album name of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -159,7 +159,7 @@ _(Optional)_ the artist/source of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -174,7 +174,7 @@ _(Optional)_ the total number of discs in the source album
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -219,7 +219,7 @@ _(Optional)_ the episode ID of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -309,7 +309,7 @@ _(Optional)_ the media kind of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -339,7 +339,7 @@ _(Optional)_ the date and time this track was last played
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -354,7 +354,7 @@ _(Optional)_ the rating of this track (0 to 100)
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -384,7 +384,7 @@ _(Optional)_ the show name of the track
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -489,7 +489,7 @@ _(Optional)_ the start time of the track in seconds
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -504,7 +504,7 @@ _(Optional)_ the total number of tracks on the source album
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -534,7 +534,7 @@ _(Optional)_ is this track unplayed?
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -549,7 +549,7 @@ _(Optional)_ relative volume adjustment of the track (-100% to 100%)
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

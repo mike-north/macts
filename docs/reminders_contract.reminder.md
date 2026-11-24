@@ -197,7 +197,7 @@ The name of the reminder. Never null: observed in all 60 items (Reminders 7.0, m
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

@@ -75,7 +75,7 @@ the free space on the source if it has a fixed size. Nullable. No evidence that 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

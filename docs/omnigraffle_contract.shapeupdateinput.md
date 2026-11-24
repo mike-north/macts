@@ -54,7 +54,7 @@ _(Optional)_ Autosizing behavior of the shape around the text. Cannot be reset: 
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -84,7 +84,7 @@ _(Optional)_ The type of fill for this shape. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -114,7 +114,7 @@ _(Optional)_ Angle of a linear gradient fill. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -174,7 +174,7 @@ _(Optional)_ Rotation of the graphic in degrees. Cannot be reset: null is reject
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -234,7 +234,7 @@ _(Optional)_ Placement of the text inside the shape. Cannot be reset: null is re
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

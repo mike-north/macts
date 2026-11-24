@@ -58,7 +58,7 @@ Indicates whether or not the shortcut accepts input data. Nullable. No evidence 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -75,7 +75,7 @@ The number of actions in the shortcut. Nullable. No evidence that the app always
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 

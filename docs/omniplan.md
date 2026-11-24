@@ -228,7 +228,7 @@ Input for updating a Milestone. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[OmniPlanClient](./omniplan.omniplanclient.md)
+[OmniPlanClient](./omniplan.omniplanclient-interface.md)
 
 </td><td>
 

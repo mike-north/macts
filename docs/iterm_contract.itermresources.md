@@ -33,4 +33,4 @@ type iTermResources = Readonly<{
 }>
 ```
 
-**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [Window](./iterm_contract.window.md)<!-- -->, [Integer](./contracts.integer.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [Tab](./iterm_contract.tab.md)<!-- -->, [Session](./iterm_contract.session.md)
+**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [Window](./iterm_contract.window.md)<!-- -->, [Integer](./contracts.integer-type.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [Tab](./iterm_contract.tab.md)<!-- -->, [Session](./iterm_contract.session.md)

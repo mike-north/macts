@@ -144,7 +144,7 @@ _(Optional)_ When the project must be finished. Cannot be reset: null is rejecte
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

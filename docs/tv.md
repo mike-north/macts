@@ -246,7 +246,7 @@ playable video source
 </td></tr>
 <tr><td>
 
-[TVClient](./tv.tvclient.md)
+[TVClient](./tv.tvclient-interface.md)
 
 </td><td>
 

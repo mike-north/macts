@@ -4,7 +4,7 @@
 
 ## IntegerHelpers.validate() method
 
-Return `value` as an [Integer](./contracts.integer.md)<!-- -->, or throw if it is not one.
+Return `value` as an [Integer](./contracts.integer-type.md)<!-- -->, or throw if it is not one.
 
 **Signature:**
 
@@ -42,7 +42,7 @@ number
 
 **Returns:**
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 ## Exceptions
 

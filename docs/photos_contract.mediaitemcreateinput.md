@@ -129,7 +129,7 @@ _(Optional)_ The name (title) of the media item
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

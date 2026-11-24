@@ -192,7 +192,7 @@ A set of media items that represents a Moment
 </td></tr>
 <tr><td>
 
-[PhotosClient](./photos.photosclient.md)
+[PhotosClient](./photos.photosclient-interface.md)
 
 </td><td>
 

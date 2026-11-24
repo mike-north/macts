@@ -56,7 +56,7 @@ Does nothing at all (deprecated). Nullable. No evidence that the app always sets
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

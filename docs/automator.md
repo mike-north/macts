@@ -111,7 +111,7 @@ A single step in a workflow
 </td></tr>
 <tr><td>
 
-[AutomatorClient](./automator.automatorclient.md)
+[AutomatorClient](./automator.automatorclient-interface.md)
 
 </td><td>
 

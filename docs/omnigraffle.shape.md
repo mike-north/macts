@@ -69,7 +69,7 @@ The type of fill for this shape. Nullable. No evidence that the app always sets 
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -99,7 +99,7 @@ Angle of a linear gradient fill. Nullable. No evidence that the app always sets 
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -161,7 +161,7 @@ Rotation of the graphic in degrees. Nullable. No evidence that the app always se
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -206,7 +206,7 @@ Placement of the text inside the shape. Nullable. No evidence that the app alway
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

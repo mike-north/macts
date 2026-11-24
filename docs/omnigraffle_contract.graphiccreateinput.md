@@ -204,7 +204,7 @@ _(Optional)_ Origin of the graphic (position of the upper-left corner of the bou
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -249,7 +249,7 @@ _(Optional)_ Does this graphic draw its shadow immediately beneath itself?
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -324,7 +324,7 @@ _(Optional)_ Type of cap at ends of the stroke
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -354,7 +354,7 @@ _(Optional)_ Type of join between segments of the stroke
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

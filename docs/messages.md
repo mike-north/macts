@@ -102,7 +102,7 @@ An SMS or iMessage chat.
 </td></tr>
 <tr><td>
 
-[MessagesClient](./messages.messagesclient.md)
+[MessagesClient](./messages.messagesclient-interface.md)
 
 </td><td>
 

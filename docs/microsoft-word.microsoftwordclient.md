@@ -2,14 +2,233 @@
 
 [Home](./index.md) &gt; [@macts/microsoft-word](./microsoft-word.md) &gt; [MicrosoftWordClient](./microsoft-word.microsoftwordclient.md)
 
-## MicrosoftWordClient interface
+## MicrosoftWordClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+MicrosoftWord client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources>
+declare class MicrosoftWordClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[MicrosoftWordResources](./microsoft-word.microsoftwordresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new MicrosoftWordClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./microsoft-word.microsoftwordclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `MicrosoftWordClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[documents](./microsoft-word.microsoftwordclient.documents.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[DocumentResourceClient](./microsoft-word.documentresourceclient.md)
+
+</td><td>
+
+A Microsoft Word document
+
+</td></tr>
+<tr><td>
+
+[http](./microsoft-word.microsoftwordclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./microsoft-word.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[copyObject(\_\_mactsOptions)](./microsoft-word.microsoftwordclient.copyobject.md)
+
+</td><td>
+
+</td><td>
+
+Copy the selected content to the clipboard
+
+</td></tr>
+<tr><td>
+
+[createNewDocument(attachedTemplate, \_\_mactsOptions)](./microsoft-word.microsoftwordclient.createnewdocument.md)
+
+</td><td>
+
+</td><td>
+
+Create a new document
+
+</td></tr>
+<tr><td>
+
+[cutObject(\_\_mactsOptions)](./microsoft-word.microsoftwordclient.cutobject.md)
+
+</td><td>
+
+</td><td>
+
+Cut the selected content to the clipboard
+
+</td></tr>
+<tr><td>
+
+[find(findText, matchCase, matchWholeWord, \_\_mactsOptions)](./microsoft-word.microsoftwordclient.find.md)
+
+</td><td>
+
+</td><td>
+
+Find text in the document
+
+</td></tr>
+<tr><td>
+
+[insertText(text, at, \_\_mactsOptions)](./microsoft-word.microsoftwordclient.inserttext.md)
+
+</td><td>
+
+</td><td>
+
+Insert text at the specified location
+
+</td></tr>
+<tr><td>
+
+[pasteObject(\_\_mactsOptions)](./microsoft-word.microsoftwordclient.pasteobject.md)
+
+</td><td>
+
+</td><td>
+
+Paste content from the clipboard
+
+</td></tr>
+<tr><td>
+
+[redo(\_\_mactsOptions)](./microsoft-word.microsoftwordclient.redo.md)
+
+</td><td>
+
+</td><td>
+
+Redo the last undone action
+
+</td></tr>
+<tr><td>
+
+[replace(findText, replaceWith, replaceAll, \_\_mactsOptions)](./microsoft-word.microsoftwordclient.replace.md)
+
+</td><td>
+
+</td><td>
+
+Replace text in the document
+
+</td></tr>
+<tr><td>
+
+[selectAll(\_\_mactsOptions)](./microsoft-word.microsoftwordclient.selectall.md)
+
+</td><td>
+
+</td><td>
+
+Select all content in the document
+
+</td></tr>
+<tr><td>
+
+[undo(\_\_mactsOptions)](./microsoft-word.microsoftwordclient.undo.md)
+
+</td><td>
+
+</td><td>
+
+Undo the last action
+
+</td></tr>
+</tbody></table>

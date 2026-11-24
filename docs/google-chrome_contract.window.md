@@ -56,7 +56,7 @@ Returns the currently selected tab, as a reference that carries this window as i
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -135,7 +135,7 @@ The unique identifier of the window, within one browser session: ids start over 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

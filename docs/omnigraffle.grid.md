@@ -69,7 +69,7 @@ Does the grid have 'major' lines? Nullable. No evidence that the app always sets
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -84,7 +84,7 @@ The number of minor grid lines for each major line. Nullable. No evidence that t
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 
@@ -99,7 +99,7 @@ Color of the grid. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md) \| null
+[Rgb](./contracts.rgb-interface.md) \| null
 
 </td><td>
 

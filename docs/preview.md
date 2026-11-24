@@ -102,7 +102,7 @@ Input for updating a Document. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[PreviewClient](./preview.previewclient.md)
+[PreviewClient](./preview.previewclient-interface.md)
 
 </td><td>
 

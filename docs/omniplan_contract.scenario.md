@@ -188,7 +188,7 @@ The cost of the entire project. Nullable. No evidence that the app always sets i
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

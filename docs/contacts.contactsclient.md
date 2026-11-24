@@ -2,14 +2,235 @@
 
 [Home](./index.md) &gt; [@macts/contacts](./contacts.md) &gt; [ContactsClient](./contacts.contactsclient.md)
 
-## ContactsClient interface
+## ContactsClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Contacts client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface ContactsClient extends ClientBrand<ContactsResources>
+declare class ContactsClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[ContactsResources](./contacts.contactsresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new ContactsClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./contacts.contactsclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `ContactsClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[addresses](./contacts.contactsclient.addresses.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[AddressResourceClient](./contacts.addressresourceclient.md)
+
+</td><td>
+
+Address for the given record.
+
+</td></tr>
+<tr><td>
+
+[emails](./contacts.contactsclient.emails.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[EmailResourceClient](./contacts.emailresourceclient.md)
+
+</td><td>
+
+Email address for a person.
+
+</td></tr>
+<tr><td>
+
+[groups](./contacts.contactsclient.groups.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[GroupResourceClient](./contacts.groupresourceclient.md)
+
+</td><td>
+
+A Group Record in the address book database
+
+</td></tr>
+<tr><td>
+
+[http](./contacts.contactsclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./contacts.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[people](./contacts.contactsclient.people.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[PersonResourceClient](./contacts.personresourceclient.md)
+
+</td><td>
+
+A person in the address book database.
+
+</td></tr>
+<tr><td>
+
+[phones](./contacts.contactsclient.phones.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[PhoneResourceClient](./contacts.phoneresourceclient.md)
+
+</td><td>
+
+Phone number for a person.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[add(to, \_\_mactsOptions)](./contacts.contactsclient.add.md)
+
+</td><td>
+
+</td><td>
+
+Add a child object.
+
+</td></tr>
+<tr><td>
+
+[make(\_new, at, withData, withProperties, \_\_mactsOptions)](./contacts.contactsclient.make.md)
+
+</td><td>
+
+</td><td>
+
+Create a new object.
+
+</td></tr>
+<tr><td>
+
+[remove(from, \_\_mactsOptions)](./contacts.contactsclient.remove.md)
+
+</td><td>
+
+</td><td>
+
+Remove a child object.
+
+</td></tr>
+<tr><td>
+
+[save(\_\_mactsOptions)](./contacts.contactsclient.save.md)
+
+</td><td>
+
+</td><td>
+
+Save all Contacts changes. Also see the unsaved property for the application class.
+
+</td></tr>
+</tbody></table>

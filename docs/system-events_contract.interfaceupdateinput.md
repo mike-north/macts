@@ -69,7 +69,7 @@ _(Optional)_ the duplex setting half \| full \| full with flow control. Cannot b
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -84,7 +84,7 @@ _(Optional)_ the packet size. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

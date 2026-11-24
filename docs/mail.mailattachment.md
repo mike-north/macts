@@ -58,7 +58,7 @@ Indicates whether the attachment has been downloaded. Nullable. No evidence that
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

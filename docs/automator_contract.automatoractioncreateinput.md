@@ -84,7 +84,7 @@ _(Optional)_ Shall the action ignore its input when it is run?
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

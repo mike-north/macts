@@ -84,7 +84,7 @@ _(Optional)_ displays a preview of the item in list view. Cannot be reset: null 
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

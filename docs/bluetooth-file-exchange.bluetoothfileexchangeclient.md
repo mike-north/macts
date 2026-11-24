@@ -2,14 +2,128 @@
 
 [Home](./index.md) &gt; [@macts/bluetooth-file-exchange](./bluetooth-file-exchange.md) &gt; [BluetoothFileExchangeClient](./bluetooth-file-exchange.bluetoothfileexchangeclient.md)
 
-## BluetoothFileExchangeClient interface
+## BluetoothFileExchangeClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+BluetoothFileExchange client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface BluetoothFileExchangeClient extends ClientBrand<BluetoothFileExchangeResources>
+declare class BluetoothFileExchangeClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[BluetoothFileExchangeResources](./bluetooth-file-exchange.bluetoothfileexchangeresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new BluetoothFileExchangeClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./bluetooth-file-exchange.bluetoothfileexchangeclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `BluetoothFileExchangeClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./bluetooth-file-exchange.bluetoothfileexchangeclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./bluetooth-file-exchange.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[browse(device, \_\_mactsOptions)](./bluetooth-file-exchange.bluetoothfileexchangeclient.browse.md)
+
+</td><td>
+
+</td><td>
+
+Browse a device
+
+</td></tr>
+<tr><td>
+
+[send(file, toDevice, \_\_mactsOptions)](./bluetooth-file-exchange.bluetoothfileexchangeclient.send.md)
+
+</td><td>
+
+</td><td>
+
+Send a file to a bluetooth device
+
+</td></tr>
+</tbody></table>

@@ -118,7 +118,7 @@ The list of email addresses configured for an account. Nullable. No evidence tha
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -148,7 +148,7 @@ Indicates whether the messages in the junk messages mailboxes will be deleted on
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -178,7 +178,7 @@ Does nothing at all (deprecated). Nullable. No evidence that the app always sets
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -315,7 +315,7 @@ Password for this account. Can be set, but not read via scripting. Nullable. No 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

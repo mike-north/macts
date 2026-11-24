@@ -66,7 +66,7 @@ The Bluetooth File Exchange application
 </td></tr>
 <tr><td>
 
-[BluetoothFileExchangeClient](./bluetooth-file-exchange.bluetoothfileexchangeclient.md)
+[BluetoothFileExchangeClient](./bluetooth-file-exchange.bluetoothfileexchangeclient-interface.md)
 
 </td><td>
 

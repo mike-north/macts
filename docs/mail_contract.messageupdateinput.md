@@ -84,7 +84,7 @@ _(Optional)_ Indicates whether the message is flagged or not. Cannot be reset: n
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

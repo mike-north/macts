@@ -4,7 +4,7 @@
 
 ## ValueTypeConstructors.rgb() method
 
-An [Rgb](./contracts.rgb.md) color, whose channels are integers in `0..65535` on the wire.
+An [Rgb](./contracts.rgb-interface.md) color, whose channels are integers in `0..65535` on the wire.
 
 **Signature:**
 
@@ -44,4 +44,4 @@ _(Optional)_
 
 **Returns:**
 
-[ValueType](./contracts.valuetype.md)<!-- -->&lt;[Rgb](./contracts.rgb.md)<!-- -->&gt;
+[ValueType](./contracts.valuetype.md)<!-- -->&lt;[Rgb](./contracts.rgb-interface.md)<!-- -->&gt;

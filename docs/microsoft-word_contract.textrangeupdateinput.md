@@ -69,7 +69,7 @@ _(Optional)_ The text in the range. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -129,7 +129,7 @@ _(Optional)_ Whether the text is formatted as italic. Cannot be reset: null is r
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

@@ -54,7 +54,7 @@ _(Optional)_ The current session in a tab. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

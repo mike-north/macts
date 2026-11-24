@@ -69,7 +69,7 @@ _(Optional)_ Does the grid have 'major' lines? Cannot be reset: null is rejected
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -84,7 +84,7 @@ _(Optional)_ The number of minor grid lines for each major line. Cannot be reset
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -99,7 +99,7 @@ _(Optional)_ Color of the grid. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 

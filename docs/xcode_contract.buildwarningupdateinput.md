@@ -39,7 +39,7 @@ Description
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -54,7 +54,7 @@ _(Optional)_ The ending column number in the file where the issue occurred. Cann
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -99,7 +99,7 @@ _(Optional)_ The text of the issue. Cannot be reset: null is rejected.
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -114,7 +114,7 @@ _(Optional)_ The starting column number in the file where the issue occurred. Ca
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

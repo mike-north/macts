@@ -103,7 +103,7 @@ Is the window's path bar visible? Nullable. No evidence that the app always sets
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

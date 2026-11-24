@@ -93,7 +93,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[iTermClient](./iterm.itermclient.md)
+[iTermClient](./iterm.itermclient-interface.md)
 
 </td><td>
 

@@ -2,14 +2,157 @@
 
 [Home](./index.md) &gt; [@macts/xcode](./xcode.md) &gt; [XcodeClient](./xcode.xcodeclient.md)
 
-## XcodeClient interface
+## XcodeClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Xcode client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface XcodeClient extends ClientBrand<XcodeResources>
+declare class XcodeClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[XcodeResources](./xcode.xcoderesources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new XcodeClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./xcode.xcodeclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `XcodeClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./xcode.xcodeclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./xcode.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[projects](./xcode.xcodeclient.projects.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ProjectResourceClient](./xcode.projectresourceclient.md)
+
+</td><td>
+
+An Xcode project. Projects represent project files on disk and are always open in the context of a workspace document
+
+</td></tr>
+<tr><td>
+
+[runDestinations](./xcode.xcodeclient.rundestinations.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[RunDestinationResourceClient](./xcode.rundestinationresourceclient.md)
+
+</td><td>
+
+An object which specifies parameters such as the device and architecture for which to perform a scheme action
+
+</td></tr>
+<tr><td>
+
+[schemes](./xcode.xcodeclient.schemes.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[SchemeResourceClient](./xcode.schemeresourceclient.md)
+
+</td><td>
+
+A set of parameters for building, testing, launching or distributing the products of a workspace
+
+</td></tr>
+<tr><td>
+
+[workspaceDocuments](./xcode.xcodeclient.workspacedocuments.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[WorkspaceDocumentResourceClient](./xcode.workspacedocumentresourceclient.md)
+
+</td><td>
+
+A document that represents a workspace on disk. Workspaces are the top-level container for almost all objects and commands in Xcode
+
+</td></tr>
+</tbody></table>
