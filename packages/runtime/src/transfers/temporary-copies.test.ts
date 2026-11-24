@@ -56,12 +56,12 @@ vi.mock('node:fs/promises', async (importOriginal) => {
   const refused = new Set<string>()
   return {
     ...real,
-    lstat: async (file: Parameters<typeof real.lstat>[0], ...rest: unknown[]) => {
+    lstat: (file: Parameters<typeof real.lstat>[0], ...rest: unknown[]) => {
       const code = failingLstats.get(String(file))
       if (code !== undefined && refused.has(String(file))) {
-        throw Object.assign(new Error(`${code}: lstat failed`), { code })
+        return Promise.reject(Object.assign(new Error(`${code}: lstat failed`), { code }))
       }
-      return (real.lstat as (...args: unknown[]) => unknown)(file, ...rest)
+      return (real.lstat as (...args: unknown[]) => Promise<unknown>)(file, ...rest)
     },
     unlink: async (file: Parameters<typeof real.unlink>[0]) => {
       const refusal = refusedUnlinks.get(String(file))
