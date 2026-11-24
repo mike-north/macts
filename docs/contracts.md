@@ -277,7 +277,7 @@ The field of a resource's table entry ([ReferenceRegistry](./contracts.reference
 </td></tr>
 <tr><td>
 
-[resourcePlanTable(resources)](./contracts.resourceplantable.md)
+[resourcePlanTable(resources)](./contracts.resourceplantable-2.md)
 
 </td><td>
 

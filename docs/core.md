@@ -250,7 +250,7 @@ This is the deterministic core: given the same operation name it always returns 
 </td></tr>
 <tr><td>
 
-[coarsePermission(app, resource, operation)](./core.coarsepermission.md)
+[coarsePermission(app, resource, operation)](./core.coarsepermission-2.md)
 
 </td><td>
 
@@ -259,7 +259,7 @@ Create a coarse permission string.
 </td></tr>
 <tr><td>
 
-[commandAddress(manifest, command, resourceKey)](./core.commandaddress.md)
+[commandAddress(manifest, command, resourceKey)](./core.commandaddress-2.md)
 
 </td><td>
 
@@ -677,7 +677,7 @@ Every place a manifest's text names the automation mechanism, in document order.
 </td></tr>
 <tr><td>
 
-[finePermission(app, resource, operation)](./core.finepermission.md)
+[finePermission(app, resource, operation)](./core.finepermission-2.md)
 
 </td><td>
 
@@ -1111,7 +1111,7 @@ Why a command cannot be offered, when it must name one item (a resource-scoped c
 </td></tr>
 <tr><td>
 
-[knownItemSelectionGap(manifest, commandKey)](./core.knownitemselectiongap.md)
+[knownItemSelectionGap(manifest, commandKey)](./core.knownitemselectiongap-2.md)
 
 </td><td>
 
@@ -1847,7 +1847,7 @@ Validate that all command permissions are included in the permissions mapping.
 </td></tr>
 <tr><td>
 
-[wildcardPermission(app, resource, operation)](./core.wildcardpermission.md)
+[wildcardPermission(app, resource, operation)](./core.wildcardpermission-2.md)
 
 </td><td>
 
