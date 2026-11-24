@@ -138,6 +138,7 @@ describe('the real generator', () => {
       `/.gitignore ${GENERATED}`,
       `/.macts-generated.json ${GENERATED}`,
       `/LICENSE ${GENERATED}`,
+      `/api-extractor.cli.json ${GENERATED}`,
       `/api-extractor.contract.json ${GENERATED}`,
       `/api-extractor.json ${GENERATED}`,
       `/api-report/.gitkeep ${GENERATED}`,

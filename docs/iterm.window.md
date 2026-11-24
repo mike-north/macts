@@ -82,7 +82,37 @@ Whether the window has a close box. Nullable. No evidence that the app always se
 </td></tr>
 <tr><td>
 
-[frame](./iterm.window.frame.md)
+[currentSession](./iterm.window.currentsession.md)
+
+</td><td>
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Session](./iterm.session.md)<!-- -->, string, 'Session'&gt; \| null
+
+</td><td>
+
+The current session in a window. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[currentTab](./iterm.window.currenttab.md)
+
+</td><td>
+
+</td><td>
+
+[IndexSelectorReference](./contracts.indexselectorreference.md)<!-- -->&lt;[Tab](./iterm.tab.md)<!-- -->, 'Tab'&gt; \| null
+
+</td><td>
+
+The currently selected tab. Returned as an index selector: the tab at its zero-based position within this window, since a tab has no id. The position drifts when tabs open, close or move, so the reference resolves to whichever tab holds it then. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[frame?](./iterm.window.frame.md)
 
 </td><td>
 
@@ -92,7 +122,7 @@ Whether the window has a close box. Nullable. No evidence that the app always se
 
 </td><td>
 
-The bounding rectangle, relative to the lower left corner of the screen. Nullable. No evidence that the app always sets it.
+_(Optional)_ Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -135,7 +165,7 @@ If the window is a hotkey window, this gives the name of the profile that create
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -150,7 +180,7 @@ The unique identifier of the session. Never null: the primary identifier.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -223,7 +253,7 @@ The full title of the window. Nullable. No evidence that the app always sets it.
 </td></tr>
 <tr><td>
 
-[origin](./iterm.window.origin.md)
+[origin?](./iterm.window.origin.md)
 
 </td><td>
 
@@ -233,12 +263,12 @@ The full title of the window. Nullable. No evidence that the app always sets it.
 
 </td><td>
 
-The position of the window, relative to the lower left corner of the screen. Nullable. No evidence that the app always sets it.
+_(Optional)_ Deprecated compatibility position relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
 
-[position](./iterm.window.position.md)
+[position?](./iterm.window.position.md)
 
 </td><td>
 
@@ -248,7 +278,7 @@ The position of the window, relative to the lower left corner of the screen. Nul
 
 </td><td>
 
-The position of the window, relative to the upper left corner of the screen. Nullable. No evidence that the app always sets it.
+_(Optional)_ Deprecated compatibility position relative to the upper left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>
@@ -270,7 +300,7 @@ Whether the window can be resized. Nullable. No evidence that the app always set
 </td></tr>
 <tr><td>
 
-[size](./iterm.window.size.md)
+[size?](./iterm.window.size.md)
 
 </td><td>
 
@@ -280,7 +310,7 @@ Whether the window can be resized. Nullable. No evidence that the app always set
 
 </td><td>
 
-The width and height of the window. Nullable. No evidence that the app always sets it.
+_(Optional)_ Deprecated compatibility width and height of the window. Use bounds instead. Omitted when iTerm cannot report it. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>

@@ -2,14 +2,172 @@
 
 [Home](./index.md) &gt; [@macts/spotify](./spotify.md) &gt; [SpotifyClient](./spotify.spotifyclient.md)
 
-## SpotifyClient interface
+## SpotifyClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Spotify client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface SpotifyClient extends ClientBrand<SpotifyResources>
+declare class SpotifyClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[SpotifyResources](./spotify.spotifyresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new SpotifyClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./spotify.spotifyclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `SpotifyClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./spotify.spotifyclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./spotify.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[nextTrack(\_\_mactsOptions)](./spotify.spotifyclient.nexttrack.md)
+
+</td><td>
+
+</td><td>
+
+Skip to the next track.
+
+</td></tr>
+<tr><td>
+
+[pause(\_\_mactsOptions)](./spotify.spotifyclient.pause.md)
+
+</td><td>
+
+</td><td>
+
+Pause playback.
+
+</td></tr>
+<tr><td>
+
+[play(\_\_mactsOptions)](./spotify.spotifyclient.play.md)
+
+</td><td>
+
+</td><td>
+
+Resume playback.
+
+</td></tr>
+<tr><td>
+
+[playpause(\_\_mactsOptions)](./spotify.spotifyclient.playpause.md)
+
+</td><td>
+
+</td><td>
+
+Toggle play/pause.
+
+</td></tr>
+<tr><td>
+
+[playTrack(inContext, \_\_mactsOptions)](./spotify.spotifyclient.playtrack.md)
+
+</td><td>
+
+</td><td>
+
+Start playback of a track in the given context.
+
+</td></tr>
+<tr><td>
+
+[previousTrack(\_\_mactsOptions)](./spotify.spotifyclient.previoustrack.md)
+
+</td><td>
+
+</td><td>
+
+Skip to the previous track.
+
+</td></tr>
+</tbody></table>

@@ -876,7 +876,7 @@ The system domain in the file system
 </td></tr>
 <tr><td>
 
-[SystemEventsClient](./system-events.systemeventsclient.md)
+[SystemEventsClient](./system-events.systemeventsclient-interface.md)
 
 </td><td>
 

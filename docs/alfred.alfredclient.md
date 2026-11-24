@@ -2,14 +2,205 @@
 
 [Home](./index.md) &gt; [@macts/alfred](./alfred.md) &gt; [AlfredClient](./alfred.alfredclient.md)
 
-## AlfredClient interface
+## AlfredClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Alfred client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface AlfredClient extends ClientBrand<AlfredResources>
+declare class AlfredClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[AlfredResources](./alfred.alfredresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new AlfredClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./alfred.alfredclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `AlfredClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./alfred.alfredclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./alfred.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[action(items, asType, \_\_mactsOptions)](./alfred.alfredclient.action.md)
+
+</td><td>
+
+</td><td>
+
+Show Alfred actions for the given file
+
+</td></tr>
+<tr><td>
+
+[browse(path, \_\_mactsOptions)](./alfred.alfredclient.browse.md)
+
+</td><td>
+
+</td><td>
+
+Show Alfred file system navigation for given path
+
+</td></tr>
+<tr><td>
+
+[reloadWorkflow(workflow, \_\_mactsOptions)](./alfred.alfredclient.reloadworkflow.md)
+
+</td><td>
+
+</td><td>
+
+Reload Workflow with given UID (folder name) or Bundle ID
+
+</td></tr>
+<tr><td>
+
+[removeConfiguration(variable, inWorkflow, \_\_mactsOptions)](./alfred.alfredclient.removeconfiguration.md)
+
+</td><td>
+
+</td><td>
+
+Revert workflow configuration value to default, or delete environment variable
+
+</td></tr>
+<tr><td>
+
+[revealWorkflow(workflow, configuration, details, \_\_mactsOptions)](./alfred.alfredclient.revealworkflow.md)
+
+</td><td>
+
+</td><td>
+
+Reveal Workflow with given UID (folder name) or Bundle ID
+
+</td></tr>
+<tr><td>
+
+[runTrigger(trigger, inWorkflow, withArgument, \_\_mactsOptions)](./alfred.alfredclient.runtrigger.md)
+
+</td><td>
+
+</td><td>
+
+Run Alfred workflow trigger
+
+</td></tr>
+<tr><td>
+
+[search(query, \_\_mactsOptions)](./alfred.alfredclient.search.md)
+
+</td><td>
+
+</td><td>
+
+Show Alfred with the given text
+
+</td></tr>
+<tr><td>
+
+[setConfiguration(variable, toValue, inWorkflow, exportable, \_\_mactsOptions)](./alfred.alfredclient.setconfiguration.md)
+
+</td><td>
+
+</td><td>
+
+Modify workflow configuration value, or set environment variable
+
+</td></tr>
+<tr><td>
+
+[setTheme(theme, \_\_mactsOptions)](./alfred.alfredclient.settheme.md)
+
+</td><td>
+
+</td><td>
+
+Change theme in Alfred
+
+</td></tr>
+</tbody></table>

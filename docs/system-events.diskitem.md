@@ -207,7 +207,7 @@ the file system path of the disk item. Nullable. No evidence that the app always
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -241,7 +241,7 @@ the POSIX file system path of the disk item. Never null: the primary identifier.
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

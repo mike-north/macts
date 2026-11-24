@@ -277,7 +277,7 @@ The field of a resource's table entry ([ReferenceRegistry](./contracts.reference
 </td></tr>
 <tr><td>
 
-[resourcePlanTable(resources)](./contracts.resourceplantable.md)
+[resourcePlanTable(resources)](./contracts.resourceplantable-2.md)
 
 </td><td>
 
@@ -519,7 +519,7 @@ One object denoted by its zero-based position within its container, bound to the
 
 </td><td>
 
-Validation and explicit conversion into [Integer](./contracts.integer.md)<!-- -->.
+Validation and explicit conversion into [Integer](./contracts.integer-type.md)<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -731,7 +731,7 @@ The value plans of one resource in a [ResourcePlanTable](./contracts.resourcepla
 </td></tr>
 <tr><td>
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 </td><td>
 
@@ -753,7 +753,7 @@ A color with 8-bit channels, as produced by [RgbHelpers.to8Bit()](./contracts.rg
 
 </td><td>
 
-Construction and conversion of [Rgb](./contracts.rgb.md) colors.
+Construction and conversion of [Rgb](./contracts.rgb-interface.md) colors.
 
 </td></tr>
 <tr><td>
@@ -955,7 +955,7 @@ Inclusive bounds of the SDK integer domain: the safe integers.
 
 </td><td>
 
-Helpers that produce [Integer](./contracts.integer.md) values. The value shares its name with the type, so the conversions are found exactly where a type error names `Integer`<!-- -->.
+Helpers that produce [Integer](./contracts.integer-type.md) values. The value shares its name with the type, so the conversions are found exactly where a type error names `Integer`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -1009,7 +1009,7 @@ Largest value of a 16-bit color channel. The smallest is `0`<!-- -->.
 
 </td><td>
 
-Helpers that build and convert [Rgb](./contracts.rgb.md) colors. The value shares its name with the type, so they are found exactly where the type is used.
+Helpers that build and convert [Rgb](./contracts.rgb-interface.md) colors. The value shares its name with the type, so they are found exactly where the type is used.
 
 </td></tr>
 <tr><td>
@@ -1288,7 +1288,7 @@ The SDK type of a value type.
 </td></tr>
 <tr><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

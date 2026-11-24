@@ -76,7 +76,7 @@ _(Optional)_ How returned records are shaped.
 
 string
 
-A function body run as `(app, args, page)`<!-- -->.
+A function body run as `(app, args, page, env)`<!-- -->.
 
 ## Exceptions
 

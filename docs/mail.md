@@ -255,7 +255,7 @@ Input for updating a Mailbox. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[MailClient](./mail.mailclient.md)
+[MailClient](./mail.mailclient-interface.md)
 
 </td><td>
 

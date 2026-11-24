@@ -114,7 +114,7 @@ Spacing between graphics in a column. Nullable. No evidence that the app always 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -206,7 +206,7 @@ Spacing between graphics in a row. Nullable. No evidence that the app always set
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

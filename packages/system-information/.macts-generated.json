@@ -4,6 +4,7 @@
     ".gitattributes",
     ".gitignore",
     "LICENSE",
+    "api-extractor.cli.json",
     "api-extractor.contract.json",
     "api-extractor.json",
     "api-report/.gitkeep",

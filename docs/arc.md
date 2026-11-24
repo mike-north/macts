@@ -57,7 +57,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[ArcClient](./arc.arcclient.md)
+[ArcClient](./arc.arcclient-interface.md)
 
 </td><td>
 

@@ -4,10 +4,10 @@
 
 ## Window.frame property
 
-The bounding rectangle, relative to the lower left corner of the screen. Nullable. No evidence that the app always sets it.
+Deprecated compatibility rectangle relative to the lower left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-frame: Rectangle | null
+frame?: Rectangle | null;
 ```

@@ -93,7 +93,7 @@ Input for updating a Document. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[SafariClient](./safari.safariclient.md)
+[SafariClient](./safari.safariclient-interface.md)
 
 </td><td>
 

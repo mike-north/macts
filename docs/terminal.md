@@ -147,7 +147,7 @@ Input for updating a Tab. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[TerminalClient](./terminal.terminalclient.md)
+[TerminalClient](./terminal.terminalclient-interface.md)
 
 </td><td>
 

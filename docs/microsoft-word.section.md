@@ -56,7 +56,7 @@ Whether the section is protected for forms. Nullable. No evidence that the app a
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

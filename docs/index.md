@@ -24,6 +24,20 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/alfred/cli](./alfred_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/alfred/contract](./alfred_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/api](./api.md)
 
 </td><td>
@@ -38,7 +52,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/arc/cli](./arc_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/arc/contract](./arc_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/automator](./automator.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/automator/cli](./automator_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/automator/contract](./automator_contract.md)
 
 </td><td>
 
@@ -52,7 +94,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/bluetooth-file-exchange/cli](./bluetooth-file-exchange_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/bluetooth-file-exchange/contract](./bluetooth-file-exchange_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/calendar](./calendar.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/calendar/cli](./calendar_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/calendar/contract](./calendar_contract.md)
 
 </td><td>
 
@@ -66,6 +136,20 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/console/cli](./console_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/console/contract](./console_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/contacts](./contacts.md)
 
 </td><td>
@@ -73,7 +157,28 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/contacts/cli](./contacts_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/contacts/contract](./contacts_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/contracts](./contracts.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/contracts/client](./contracts_client.md)
 
 </td><td>
 
@@ -94,7 +199,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/finder/cli](./finder_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/finder/contract](./finder_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/google-chrome](./google-chrome.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/google-chrome/cli](./google-chrome_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/google-chrome/contract](./google-chrome_contract.md)
 
 </td><td>
 
@@ -108,7 +241,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/iterm/cli](./iterm_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/iterm/contract](./iterm_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/mail](./mail.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/mail/cli](./mail_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/mail/contract](./mail_contract.md)
 
 </td><td>
 
@@ -122,7 +283,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/messages/cli](./messages_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/messages/contract](./messages_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/microsoft-edge](./microsoft-edge.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/microsoft-edge/cli](./microsoft-edge_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/microsoft-edge/contract](./microsoft-edge_contract.md)
 
 </td><td>
 
@@ -136,7 +325,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/microsoft-word/cli](./microsoft-word_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/microsoft-word/contract](./microsoft-word_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/music](./music.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/music/cli](./music_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/music/contract](./music_contract.md)
 
 </td><td>
 
@@ -150,7 +367,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/notes/cli](./notes_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/notes/contract](./notes_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/omnifocus](./omnifocus.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omnifocus/cli](./omnifocus_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omnifocus/contract](./omnifocus_contract.md)
 
 </td><td>
 
@@ -164,7 +409,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/omnigraffle/cli](./omnigraffle_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omnigraffle/contract](./omnigraffle_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/omniplan](./omniplan.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omniplan/cli](./omniplan_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omniplan/contract](./omniplan_contract.md)
 
 </td><td>
 
@@ -178,7 +451,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/photos/cli](./photos_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/photos/contract](./photos_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/preview](./preview.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/preview/cli](./preview_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/preview/contract](./preview_contract.md)
 
 </td><td>
 
@@ -192,7 +493,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/quicktime-player/cli](./quicktime-player_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/quicktime-player/contract](./quicktime-player_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/reminders](./reminders.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/reminders/cli](./reminders_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/reminders/contract](./reminders_contract.md)
 
 </td><td>
 
@@ -213,7 +542,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/safari/cli](./safari_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/safari/contract](./safari_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/screen-sharing](./screen-sharing.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/screen-sharing/cli](./screen-sharing_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/screen-sharing/contract](./screen-sharing_contract.md)
 
 </td><td>
 
@@ -227,7 +584,28 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/script-editor/cli](./script-editor_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/script-editor/contract](./script-editor_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/sdk](./sdk.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/sdk/local](./sdk_local.md)
 
 </td><td>
 
@@ -241,7 +619,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/shortcuts/cli](./shortcuts_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/shortcuts/contract](./shortcuts_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/spotify](./spotify.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/spotify/cli](./spotify_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/spotify/contract](./spotify_contract.md)
 
 </td><td>
 
@@ -255,7 +661,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/system-events/cli](./system-events_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/system-events/contract](./system-events_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/system-information](./system-information.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/system-information/cli](./system-information_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/system-information/contract](./system-information_contract.md)
 
 </td><td>
 
@@ -269,7 +703,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/system-settings/cli](./system-settings_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/system-settings/contract](./system-settings_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/terminal](./terminal.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/terminal/cli](./terminal_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/terminal/contract](./terminal_contract.md)
 
 </td><td>
 
@@ -283,6 +745,20 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/textedit/cli](./textedit_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/textedit/contract](./textedit_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/tv](./tv.md)
 
 </td><td>
@@ -290,7 +766,35 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/tv/cli](./tv_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/tv/contract](./tv_contract.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/xcode](./xcode.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/xcode/cli](./xcode_cli.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/xcode/contract](./xcode_contract.md)
 
 </td><td>
 

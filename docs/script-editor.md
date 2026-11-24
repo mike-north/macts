@@ -102,7 +102,7 @@ Input for updating a Document. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[ScriptEditorClient](./script-editor.scripteditorclient.md)
+[ScriptEditorClient](./script-editor.scripteditorclient-interface.md)
 
 </td><td>
 

@@ -2,14 +2,382 @@
 
 [Home](./index.md) &gt; [@macts/google-chrome](./google-chrome.md) &gt; [GoogleChromeClient](./google-chrome.googlechromeclient.md)
 
-## GoogleChromeClient interface
+## GoogleChromeClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+GoogleChrome client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface GoogleChromeClient extends ClientBrand<GoogleChromeResources>
+declare class GoogleChromeClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[GoogleChromeResources](./google-chrome.googlechromeresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new GoogleChromeClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./google-chrome.googlechromeclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `GoogleChromeClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./google-chrome.googlechromeclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./google-chrome.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[tabs](./google-chrome.googlechromeclient.tabs.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[TabResourceClient](./google-chrome.tabresourceclient.md)
+
+</td><td>
+
+A tab.
+
+</td></tr>
+<tr><td>
+
+[windows](./google-chrome.googlechromeclient.windows.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[WindowResourceClient](./google-chrome.windowresourceclient.md)
+
+</td><td>
+
+A window.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[close(\_\_mactsOptions)](./google-chrome.googlechromeclient.close.md)
+
+</td><td>
+
+</td><td>
+
+Close a window.
+
+</td></tr>
+<tr><td>
+
+[copySelection(\_\_mactsOptions)](./google-chrome.googlechromeclient.copyselection.md)
+
+</td><td>
+
+</td><td>
+
+Copy text.
+
+</td></tr>
+<tr><td>
+
+[count(each, \_\_mactsOptions)](./google-chrome.googlechromeclient.count.md)
+
+</td><td>
+
+</td><td>
+
+Return the number of elements of a particular class within an object.
+
+</td></tr>
+<tr><td>
+
+[cutSelection(\_\_mactsOptions)](./google-chrome.googlechromeclient.cutselection.md)
+
+</td><td>
+
+</td><td>
+
+Cut selected text (If Possible).
+
+</td></tr>
+<tr><td>
+
+[duplicate(to, withProperties, \_\_mactsOptions)](./google-chrome.googlechromeclient.duplicate.md)
+
+</td><td>
+
+</td><td>
+
+Copy object(s) and put the copies at a new location.
+
+</td></tr>
+<tr><td>
+
+[execute(javascript, \_\_mactsOptions)](./google-chrome.googlechromeclient.execute.md)
+
+</td><td>
+
+</td><td>
+
+Execute a piece of javascript.
+
+</td></tr>
+<tr><td>
+
+[exists(\_\_mactsOptions)](./google-chrome.googlechromeclient.exists.md)
+
+</td><td>
+
+</td><td>
+
+Verify if an object exists.
+
+</td></tr>
+<tr><td>
+
+[goBack(\_\_mactsOptions)](./google-chrome.googlechromeclient.goback.md)
+
+</td><td>
+
+</td><td>
+
+Go Back (If Possible).
+
+</td></tr>
+<tr><td>
+
+[goForward(\_\_mactsOptions)](./google-chrome.googlechromeclient.goforward.md)
+
+</td><td>
+
+</td><td>
+
+Go Forward (If Possible).
+
+</td></tr>
+<tr><td>
+
+[make(\_new, at, withData, withProperties, \_\_mactsOptions)](./google-chrome.googlechromeclient.make.md)
+
+</td><td>
+
+</td><td>
+
+Make a new object.
+
+</td></tr>
+<tr><td>
+
+[move(to, \_\_mactsOptions)](./google-chrome.googlechromeclient.move.md)
+
+</td><td>
+
+</td><td>
+
+Move object(s) to a new location.
+
+</td></tr>
+<tr><td>
+
+[open(\_\_mactsOptions)](./google-chrome.googlechromeclient.open.md)
+
+</td><td>
+
+</td><td>
+
+Open a document.
+
+</td></tr>
+<tr><td>
+
+[pasteSelection(\_\_mactsOptions)](./google-chrome.googlechromeclient.pasteselection.md)
+
+</td><td>
+
+</td><td>
+
+Paste text (If Possible).
+
+</td></tr>
+<tr><td>
+
+[print(\_\_mactsOptions)](./google-chrome.googlechromeclient.print.md)
+
+</td><td>
+
+</td><td>
+
+Print an object.
+
+</td></tr>
+<tr><td>
+
+[quit(\_\_mactsOptions)](./google-chrome.googlechromeclient.quit.md)
+
+</td><td>
+
+</td><td>
+
+Quit the application.
+
+</td></tr>
+<tr><td>
+
+[redo(\_\_mactsOptions)](./google-chrome.googlechromeclient.redo.md)
+
+</td><td>
+
+</td><td>
+
+Redo the last change.
+
+</td></tr>
+<tr><td>
+
+[reload(\_\_mactsOptions)](./google-chrome.googlechromeclient.reload.md)
+
+</td><td>
+
+</td><td>
+
+Reload a tab.
+
+</td></tr>
+<tr><td>
+
+[save(\_in, as, \_\_mactsOptions)](./google-chrome.googlechromeclient.save.md)
+
+</td><td>
+
+</td><td>
+
+Save an object.
+
+</td></tr>
+<tr><td>
+
+[selectAll(\_\_mactsOptions)](./google-chrome.googlechromeclient.selectall.md)
+
+</td><td>
+
+</td><td>
+
+Select all.
+
+</td></tr>
+<tr><td>
+
+[stop(\_\_mactsOptions)](./google-chrome.googlechromeclient.stop.md)
+
+</td><td>
+
+</td><td>
+
+Stop the current tab from loading.
+
+</td></tr>
+<tr><td>
+
+[undo(\_\_mactsOptions)](./google-chrome.googlechromeclient.undo.md)
+
+</td><td>
+
+</td><td>
+
+Undo the last change.
+
+</td></tr>
+<tr><td>
+
+[viewSource(\_\_mactsOptions)](./google-chrome.googlechromeclient.viewsource.md)
+
+</td><td>
+
+</td><td>
+
+View the HTML source of the tab.
+
+</td></tr>
+</tbody></table>

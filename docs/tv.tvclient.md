@@ -2,14 +2,466 @@
 
 [Home](./index.md) &gt; [@macts/tv](./tv.md) &gt; [TVClient](./tv.tvclient.md)
 
-## TVClient interface
+## TVClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+TV client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface TVClient extends ClientBrand<TVResources>
+declare class TVClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[TVResources](./tv.tvresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new TVClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./tv.tvclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `TVClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[browserWindows](./tv.tvclient.browserwindows.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[BrowserWindowResourceClient](./tv.browserwindowresourceclient.md)
+
+</td><td>
+
+the main window
+
+</td></tr>
+<tr><td>
+
+[fileTracks](./tv.tvclient.filetracks.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[FileTrackResourceClient](./tv.filetrackresourceclient.md)
+
+</td><td>
+
+a track representing a video file
+
+</td></tr>
+<tr><td>
+
+[http](./tv.tvclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./tv.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[playlists](./tv.tvclient.playlists.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[PlaylistResourceClient](./tv.playlistresourceclient.md)
+
+</td><td>
+
+a list of tracks/streams
+
+</td></tr>
+<tr><td>
+
+[playlistWindows](./tv.tvclient.playlistwindows.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[PlaylistWindowResourceClient](./tv.playlistwindowresourceclient.md)
+
+</td><td>
+
+a sub-window showing a single playlist
+
+</td></tr>
+<tr><td>
+
+[sources](./tv.tvclient.sources.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[SourceResourceClient](./tv.sourceresourceclient.md)
+
+</td><td>
+
+a media source (library, CD, device, etc.)
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[add(to, \_\_mactsOptions)](./tv.tvclient.add.md)
+
+</td><td>
+
+</td><td>
+
+add one or more files to a playlist
+
+</td></tr>
+<tr><td>
+
+[backTrack(\_\_mactsOptions)](./tv.tvclient.backtrack.md)
+
+</td><td>
+
+</td><td>
+
+reposition to beginning of current track or go to previous track if already at start of current track
+
+</td></tr>
+<tr><td>
+
+[close(\_\_mactsOptions)](./tv.tvclient.close.md)
+
+</td><td>
+
+</td><td>
+
+Close an object
+
+</td></tr>
+<tr><td>
+
+[convert(\_\_mactsOptions)](./tv.tvclient.convert.md)
+
+</td><td>
+
+</td><td>
+
+convert one or more files or tracks
+
+</td></tr>
+<tr><td>
+
+[count(each, \_\_mactsOptions)](./tv.tvclient.count.md)
+
+</td><td>
+
+</td><td>
+
+Return the number of elements of a particular class within an object
+
+</td></tr>
+<tr><td>
+
+[download(\_\_mactsOptions)](./tv.tvclient.download.md)
+
+</td><td>
+
+</td><td>
+
+download a cloud track or playlist
+
+</td></tr>
+<tr><td>
+
+[duplicate(to, \_\_mactsOptions)](./tv.tvclient.duplicate.md)
+
+</td><td>
+
+</td><td>
+
+Duplicate one or more object(s)
+
+</td></tr>
+<tr><td>
+
+[exists(\_\_mactsOptions)](./tv.tvclient.exists.md)
+
+</td><td>
+
+</td><td>
+
+Verify if an object exists
+
+</td></tr>
+<tr><td>
+
+[fastForward(\_\_mactsOptions)](./tv.tvclient.fastforward.md)
+
+</td><td>
+
+</td><td>
+
+skip forward in a playing track
+
+</td></tr>
+<tr><td>
+
+[make(\_new, at, withProperties, \_\_mactsOptions)](./tv.tvclient.make.md)
+
+</td><td>
+
+</td><td>
+
+Make a new element
+
+</td></tr>
+<tr><td>
+
+[nextTrack(\_\_mactsOptions)](./tv.tvclient.nexttrack.md)
+
+</td><td>
+
+</td><td>
+
+advance to the next track in the current playlist
+
+</td></tr>
+<tr><td>
+
+[open(\_\_mactsOptions)](./tv.tvclient.open.md)
+
+</td><td>
+
+</td><td>
+
+Open the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[openLocation(\_\_mactsOptions)](./tv.tvclient.openlocation.md)
+
+</td><td>
+
+</td><td>
+
+Opens an iTunes Store or stream URL
+
+</td></tr>
+<tr><td>
+
+[pause(\_\_mactsOptions)](./tv.tvclient.pause.md)
+
+</td><td>
+
+</td><td>
+
+pause playback
+
+</td></tr>
+<tr><td>
+
+[play(once, \_\_mactsOptions)](./tv.tvclient.play.md)
+
+</td><td>
+
+</td><td>
+
+play the current track or the specified track or file.
+
+</td></tr>
+<tr><td>
+
+[playpause(\_\_mactsOptions)](./tv.tvclient.playpause.md)
+
+</td><td>
+
+</td><td>
+
+toggle the playing/paused state of the current track
+
+</td></tr>
+<tr><td>
+
+[previousTrack(\_\_mactsOptions)](./tv.tvclient.previoustrack.md)
+
+</td><td>
+
+</td><td>
+
+return to the previous track in the current playlist
+
+</td></tr>
+<tr><td>
+
+[quit(\_\_mactsOptions)](./tv.tvclient.quit.md)
+
+</td><td>
+
+</td><td>
+
+Quit the application
+
+</td></tr>
+<tr><td>
+
+[resume(\_\_mactsOptions)](./tv.tvclient.resume.md)
+
+</td><td>
+
+</td><td>
+
+disable fast forward/rewind and resume playback, if playing.
+
+</td></tr>
+<tr><td>
+
+[reveal(\_\_mactsOptions)](./tv.tvclient.reveal.md)
+
+</td><td>
+
+</td><td>
+
+reveal and select a track or playlist
+
+</td></tr>
+<tr><td>
+
+[rewind(\_\_mactsOptions)](./tv.tvclient.rewind.md)
+
+</td><td>
+
+</td><td>
+
+skip backwards in a playing track
+
+</td></tr>
+<tr><td>
+
+[run(\_\_mactsOptions)](./tv.tvclient.run.md)
+
+</td><td>
+
+</td><td>
+
+Run the application
+
+</td></tr>
+<tr><td>
+
+[save(\_\_mactsOptions)](./tv.tvclient.save.md)
+
+</td><td>
+
+</td><td>
+
+Save the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[select(\_\_mactsOptions)](./tv.tvclient.select.md)
+
+</td><td>
+
+</td><td>
+
+select the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[stop(\_\_mactsOptions)](./tv.tvclient.stop.md)
+
+</td><td>
+
+</td><td>
+
+stop playback
+
+</td></tr>
+</tbody></table>

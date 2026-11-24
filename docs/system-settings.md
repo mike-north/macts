@@ -84,7 +84,7 @@ A settings pane.
 </td></tr>
 <tr><td>
 
-[SystemSettingsClient](./system-settings.systemsettingsclient.md)
+[SystemSettingsClient](./system-settings.systemsettingsclient-interface.md)
 
 </td><td>
 

@@ -42,7 +42,7 @@ number
 
 **Returns:**
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 ## Exceptions
 

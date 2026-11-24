@@ -42,6 +42,33 @@ iTerm client for HTTP-based macOS automation.
 Error class for iTerm API errors.
 
 </td></tr>
+<tr><td>
+
+[SessionResourceClient](./iterm.sessionresourceclient.md)
+
+</td><td>
+
+Client for a terminal session.
+
+</td></tr>
+<tr><td>
+
+[TabResourceClient](./iterm.tabresourceclient.md)
+
+</td><td>
+
+Client for a terminal tab.
+
+</td></tr>
+<tr><td>
+
+[WindowResourceClient](./iterm.windowresourceclient.md)
+
+</td><td>
+
+Client for a window..
+
+</td></tr>
 </tbody></table>
 
 ## Interfaces
@@ -66,7 +93,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[iTermClient](./iterm.itermclient.md)
+[iTermClient](./iterm.itermclient-interface.md)
 
 </td><td>
 

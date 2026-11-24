@@ -4,7 +4,7 @@
 
 ## DocumentUpdateInput.language property
 
-The scripting language (AppleScript or JavaScript). Cannot be reset: null is rejected.
+The name of the scripting language the document is written in, such as JavaScript. Cannot be reset: null is rejected.
 
 **Signature:**
 

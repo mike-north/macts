@@ -66,7 +66,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[SpotifyClient](./spotify.spotifyclient.md)
+[SpotifyClient](./spotify.spotifyclient-interface.md)
 
 </td><td>
 

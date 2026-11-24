@@ -101,8 +101,8 @@ describe('generate:check', () => {
     const pkg = JSON.parse(await readFile(join(REPO_ROOT, 'package.json'), 'utf-8')) as {
       scripts: Record<string, string>
     }
-    expect(pkg.scripts['generate:check']).toBe(
-      'node scripts/regenerate.mjs && node scripts/check-clean-tree.mjs packages'
+    expect(pkg.scripts['generate:check']).toMatch(
+      /^node scripts\/regenerate\.mjs && .* && node scripts\/check-clean-tree\.mjs packages docs$/
     )
   })
 })

@@ -7,6 +7,7 @@ src/** linguist-generated=true
 /.gitignore linguist-generated=true
 /.macts-generated.json linguist-generated=true
 /LICENSE linguist-generated=true
+/api-extractor.cli.json linguist-generated=true
 /api-extractor.contract.json linguist-generated=true
 /api-extractor.json linguist-generated=true
 /api-report/.gitkeep linguist-generated=true

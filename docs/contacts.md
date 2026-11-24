@@ -165,7 +165,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[ContactsClient](./contacts.contactsclient.md)
+[ContactsClient](./contacts.contactsclient-interface.md)
 
 </td><td>
 

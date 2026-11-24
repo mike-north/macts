@@ -33,13 +33,28 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[currentSession](./iterm.tab.currentsession.md)
+
+</td><td>
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Session](./iterm.session.md)<!-- -->, string, 'Session'&gt; \| null
+
+</td><td>
+
+The current session in a tab. Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
 [index](./iterm.tab.index.md)
 
 </td><td>
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

@@ -4,26 +4,43 @@
 
 ## CommandUnsupportedSchema variable
 
-The marker on a command the running app cannot carry out: addressing what the command reads failed in a live, read-only observation (a collection a get command looks an item up in, say, that the app does not have at the application).
+The marker on a command no caller can have the app carry out, as its evidence shows: addressing what the command reads failed in a live, read-only observation (a collection a get command looks an item up in, say, that the app does not have at the application), or the app's dictionary documents the command as a handler the app itself sends to a user's script.
 
-The manifest keeps such a command, so the record of what macts expected stays complete and the omission stays auditable; the command has no route, and every generated surface (the operations behind routes, the contract, SDKs, tools, the CLI, capabilities and derived permissions) leaves it out. The marker is curated from the observation: no probe writes or changes it.
+The manifest keeps such a command, so the record of what the dictionary declares and what macts expected stays complete and the omission stays auditable; the command has no route, and every generated surface (the operations behind routes, the contract, SDKs, tools, the CLI, capabilities and derived permissions) leaves it out. The marker is curated from the evidence: no probe writes or changes it.
 
 **Signature:**
 
 ```typescript
 CommandUnsupportedSchema: z.ZodObject<
   {
-    evidence: z.ZodObject<
-      {
-        source: z.ZodLiteral<'live'>
-        observedAt: z.ZodISODateTime
-        bundleId: z.ZodString
-        appVersion: z.ZodString
-        osVersion: z.ZodString
-        expression: z.ZodString
-        errorNumber: z.ZodNumber
-      },
-      z.core.$strict
+    evidence: z.ZodDiscriminatedUnion<
+      [
+        z.ZodObject<
+          {
+            source: z.ZodLiteral<'live'>
+            observedAt: z.ZodISODateTime
+            bundleId: z.ZodString
+            appVersion: z.ZodString
+            osVersion: z.ZodString
+            expression: z.ZodString
+            errorNumber: z.ZodNumber
+          },
+          z.core.$strict
+        >,
+        z.ZodObject<
+          {
+            source: z.ZodLiteral<'dictionary'>
+            bundleId: z.ZodString
+            appVersion: z.ZodString
+            osVersion: z.ZodString
+            term: z.ZodString
+            finding: z.ZodLiteral<'handler'>
+            statement: z.ZodString
+          },
+          z.core.$strict
+        >,
+      ],
+      'source'
     >
   },
   z.core.$strict

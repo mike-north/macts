@@ -159,7 +159,7 @@ If rule matches, mark message as flagged. Nullable. No evidence that the app alw
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -253,7 +253,7 @@ string \| null
 
 </td><td>
 
-If rule matches, run this compiled AppleScript file. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
+If rule matches, run this compiled script file. Set to empty string to disable this action. Nullable. No evidence that the app always sets it.
 
 </td></tr>
 <tr><td>

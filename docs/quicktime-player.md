@@ -93,7 +93,7 @@ Input for updating a Document. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[QuickTimePlayerClient](./quicktime-player.quicktimeplayerclient.md)
+[QuickTimePlayerClient](./quicktime-player.quicktimeplayerclient-interface.md)
 
 </td><td>
 

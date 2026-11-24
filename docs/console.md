@@ -66,7 +66,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[ConsoleClient](./console.consoleclient.md)
+[ConsoleClient](./console.consoleclient-interface.md)
 
 </td><td>
 

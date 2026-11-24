@@ -2,14 +2,168 @@
 
 [Home](./index.md) &gt; [@macts/terminal](./terminal.md) &gt; [TerminalClient](./terminal.terminalclient.md)
 
-## TerminalClient interface
+## TerminalClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Terminal client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface TerminalClient extends ClientBrand<TerminalResources>
+declare class TerminalClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[TerminalResources](./terminal.terminalresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new TerminalClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./terminal.terminalclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `TerminalClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./terminal.terminalclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./terminal.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[settingsSets](./terminal.terminalclient.settingssets.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[SettingsSetResourceClient](./terminal.settingssetresourceclient.md)
+
+</td><td>
+
+A Terminal settings set (profile)
+
+</td></tr>
+<tr><td>
+
+[tabs](./terminal.terminalclient.tabs.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[TabResourceClient](./terminal.tabresourceclient.md)
+
+</td><td>
+
+A Terminal tab
+
+</td></tr>
+<tr><td>
+
+[windows](./terminal.terminalclient.windows.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[WindowResourceClient](./terminal.windowresourceclient.md)
+
+</td><td>
+
+A Terminal window
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[doScript(command, \_in, \_\_mactsOptions)](./terminal.terminalclient.doscript.md)
+
+</td><td>
+
+</td><td>
+
+Execute a shell command in a Terminal window or tab
+
+</td></tr>
+</tbody></table>

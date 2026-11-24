@@ -156,7 +156,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[MicrosoftEdgeClient](./microsoft-edge.microsoftedgeclient.md)
+[MicrosoftEdgeClient](./microsoft-edge.microsoftedgeclient-interface.md)
 
 </td><td>
 

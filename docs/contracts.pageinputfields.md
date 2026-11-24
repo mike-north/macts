@@ -58,7 +58,7 @@ The continuation from the previous page.
 
 </td><td>
 
-[OptionalField](./contracts.optionalfield.md)<!-- -->&lt;[Integer](./contracts.integer.md)<!-- -->&gt;
+[OptionalField](./contracts.optionalfield.md)<!-- -->&lt;[Integer](./contracts.integer-type.md)<!-- -->&gt;
 
 </td><td>
 

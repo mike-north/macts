@@ -105,7 +105,7 @@ A reference to one object of `resource` by its zero-based position within its co
 
 </td><td>
 
-An [Integer](./contracts.integer.md) within [INTEGER_LIMITS](./contracts.integer_limits.md)<!-- -->, carried as decimal text (`{"integer": "42"}`<!-- -->).
+An [Integer](./contracts.integer-type.md) within [INTEGER_LIMITS](./contracts.integer_limits.md)<!-- -->, carried as decimal text (`{"integer": "42"}`<!-- -->).
 
 </td></tr>
 <tr><td>
@@ -204,7 +204,7 @@ A deferred collection of `resource` objects, in either form: an [IdentityCollect
 
 </td><td>
 
-An [Rgb](./contracts.rgb.md) color, whose channels are integers in `0..65535` on the wire.
+An [Rgb](./contracts.rgb-interface.md) color, whose channels are integers in `0..65535` on the wire.
 
 </td></tr>
 <tr><td>

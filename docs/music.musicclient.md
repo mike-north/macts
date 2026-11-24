@@ -2,14 +2,454 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [MusicClient](./music.musicclient.md)
 
-## MusicClient interface
+## MusicClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Music client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface MusicClient extends ClientBrand<MusicResources>
+declare class MusicClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[MusicResources](./music.musicresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new MusicClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./music.musicclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `MusicClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[fileTracks](./music.musicclient.filetracks.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[FileTrackResourceClient](./music.filetrackresourceclient.md)
+
+</td><td>
+
+a track representing an audio file (MP3, AIFF, etc.)
+
+</td></tr>
+<tr><td>
+
+[http](./music.musicclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./music.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[playlists](./music.musicclient.playlists.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[PlaylistResourceClient](./music.playlistresourceclient.md)
+
+</td><td>
+
+a list of tracks/streams
+
+</td></tr>
+<tr><td>
+
+[tracks](./music.musicclient.tracks.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[TrackResourceClient](./music.trackresourceclient.md)
+
+</td><td>
+
+playable audio source
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[\_export(as, to, \_\_mactsOptions)](./music.musicclient._export.md)
+
+</td><td>
+
+</td><td>
+
+export a source or playlist
+
+</td></tr>
+<tr><td>
+
+[add(to, \_\_mactsOptions)](./music.musicclient.add.md)
+
+</td><td>
+
+</td><td>
+
+add one or more files to a playlist
+
+</td></tr>
+<tr><td>
+
+[backTrack(\_\_mactsOptions)](./music.musicclient.backtrack.md)
+
+</td><td>
+
+</td><td>
+
+reposition to beginning of current track or go to previous track if already at start of current track
+
+</td></tr>
+<tr><td>
+
+[close(\_\_mactsOptions)](./music.musicclient.close.md)
+
+</td><td>
+
+</td><td>
+
+Close an object
+
+</td></tr>
+<tr><td>
+
+[convert(\_\_mactsOptions)](./music.musicclient.convert.md)
+
+</td><td>
+
+</td><td>
+
+convert one or more files or tracks
+
+</td></tr>
+<tr><td>
+
+[count(each, \_\_mactsOptions)](./music.musicclient.count.md)
+
+</td><td>
+
+</td><td>
+
+Return the number of elements of a particular class within an object
+
+</td></tr>
+<tr><td>
+
+[download(\_\_mactsOptions)](./music.musicclient.download.md)
+
+</td><td>
+
+</td><td>
+
+download a cloud track or playlist
+
+</td></tr>
+<tr><td>
+
+[duplicate(to, \_\_mactsOptions)](./music.musicclient.duplicate.md)
+
+</td><td>
+
+</td><td>
+
+Duplicate one or more object(s)
+
+</td></tr>
+<tr><td>
+
+[exists(\_\_mactsOptions)](./music.musicclient.exists.md)
+
+</td><td>
+
+</td><td>
+
+Verify if an object exists
+
+</td></tr>
+<tr><td>
+
+[fastForward(\_\_mactsOptions)](./music.musicclient.fastforward.md)
+
+</td><td>
+
+</td><td>
+
+skip forward in a playing track
+
+</td></tr>
+<tr><td>
+
+[make(\_new, at, withProperties, \_\_mactsOptions)](./music.musicclient.make.md)
+
+</td><td>
+
+</td><td>
+
+Make a new element
+
+</td></tr>
+<tr><td>
+
+[nextTrack(\_\_mactsOptions)](./music.musicclient.nexttrack.md)
+
+</td><td>
+
+</td><td>
+
+advance to the next track in the current playlist
+
+</td></tr>
+<tr><td>
+
+[open(\_\_mactsOptions)](./music.musicclient.open.md)
+
+</td><td>
+
+</td><td>
+
+Open the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[openLocation(\_\_mactsOptions)](./music.musicclient.openlocation.md)
+
+</td><td>
+
+</td><td>
+
+Opens an iTunes Store or audio stream URL
+
+</td></tr>
+<tr><td>
+
+[pause(\_\_mactsOptions)](./music.musicclient.pause.md)
+
+</td><td>
+
+</td><td>
+
+pause playback
+
+</td></tr>
+<tr><td>
+
+[play(once, \_\_mactsOptions)](./music.musicclient.play.md)
+
+</td><td>
+
+</td><td>
+
+play the current track or the specified track or file.
+
+</td></tr>
+<tr><td>
+
+[playpause(\_\_mactsOptions)](./music.musicclient.playpause.md)
+
+</td><td>
+
+</td><td>
+
+toggle the playing/paused state of the current track
+
+</td></tr>
+<tr><td>
+
+[previousTrack(\_\_mactsOptions)](./music.musicclient.previoustrack.md)
+
+</td><td>
+
+</td><td>
+
+return to the previous track in the current playlist
+
+</td></tr>
+<tr><td>
+
+[print(printDialog, withProperties, kind, theme, \_\_mactsOptions)](./music.musicclient.print.md)
+
+</td><td>
+
+</td><td>
+
+Print the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[quit(\_\_mactsOptions)](./music.musicclient.quit.md)
+
+</td><td>
+
+</td><td>
+
+Quit the application
+
+</td></tr>
+<tr><td>
+
+[resume(\_\_mactsOptions)](./music.musicclient.resume.md)
+
+</td><td>
+
+</td><td>
+
+disable fast forward/rewind and resume playback, if playing.
+
+</td></tr>
+<tr><td>
+
+[reveal(\_\_mactsOptions)](./music.musicclient.reveal.md)
+
+</td><td>
+
+</td><td>
+
+reveal and select a track or playlist
+
+</td></tr>
+<tr><td>
+
+[rewind(\_\_mactsOptions)](./music.musicclient.rewind.md)
+
+</td><td>
+
+</td><td>
+
+skip backwards in a playing track
+
+</td></tr>
+<tr><td>
+
+[run(\_\_mactsOptions)](./music.musicclient.run.md)
+
+</td><td>
+
+</td><td>
+
+Run the application
+
+</td></tr>
+<tr><td>
+
+[save(\_\_mactsOptions)](./music.musicclient.save.md)
+
+</td><td>
+
+</td><td>
+
+Save the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[select(\_\_mactsOptions)](./music.musicclient.select.md)
+
+</td><td>
+
+</td><td>
+
+select the specified object(s)
+
+</td></tr>
+<tr><td>
+
+[stop(\_\_mactsOptions)](./music.musicclient.stop.md)
+
+</td><td>
+
+</td><td>
+
+stop playback
+
+</td></tr>
+</tbody></table>

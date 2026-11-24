@@ -66,7 +66,7 @@ Machine-readable description of a single capability.
 </td></tr>
 <tr><td>
 
-[ScreenSharingClient](./screen-sharing.screensharingclient.md)
+[ScreenSharingClient](./screen-sharing.screensharingclient-interface.md)
 
 </td><td>
 

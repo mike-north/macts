@@ -17,8 +17,6 @@ SessionSchema: z.ZodObject<
     columns: z.ZodNumber
     rows: z.ZodNumber
     tty: z.ZodString
-    contents: z.ZodString
-    text: z.ZodString
     colorPreset: z.ZodString
     backgroundColor: z.ZodObject<
       {

@@ -109,7 +109,7 @@ the number of free bytes left on the disk. Nullable. No evidence that the app al
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 

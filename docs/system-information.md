@@ -102,7 +102,7 @@ Input for updating a Document. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[SystemInformationClient](./system-information.systeminformationclient.md)
+[SystemInformationClient](./system-information.systeminformationclient-interface.md)
 
 </td><td>
 

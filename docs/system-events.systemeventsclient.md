@@ -2,14 +2,522 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [SystemEventsClient](./system-events.systemeventsclient.md)
 
-## SystemEventsClient interface
+## SystemEventsClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+SystemEvents client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface SystemEventsClient extends ClientBrand<SystemEventsResources>
+declare class SystemEventsClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[SystemEventsResources](./system-events.systemeventsresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new SystemEventsClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./system-events.systemeventsclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `SystemEventsClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[actions](./system-events.systemeventsclient.actions.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ActionResourceClient](./system-events.actionresourceclient.md)
+
+</td><td>
+
+An action that can be performed on the UI element
+
+</td></tr>
+<tr><td>
+
+[classicDomainObjects](./system-events.systemeventsclient.classicdomainobjects.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ClassicDomainObjectResourceClient](./system-events.classicdomainobjectresourceclient.md)
+
+</td><td>
+
+The Classic domain in the file system
+
+</td></tr>
+<tr><td>
+
+[diskItems](./system-events.systemeventsclient.diskitems.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[DiskItemResourceClient](./system-events.diskitemresourceclient.md)
+
+</td><td>
+
+An item stored in the file system
+
+</td></tr>
+<tr><td>
+
+[domains](./system-events.systemeventsclient.domains.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[DomainResourceClient](./system-events.domainresourceclient.md)
+
+</td><td>
+
+A domain in the file system
+
+</td></tr>
+<tr><td>
+
+[folders](./system-events.systemeventsclient.folders.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[FolderResourceClient](./system-events.folderresourceclient.md)
+
+</td><td>
+
+A folder in the file system
+
+</td></tr>
+<tr><td>
+
+[http](./system-events.systemeventsclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./system-events.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[uiElements](./system-events.systemeventsclient.uielements.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[UIElementResourceClient](./system-events.uielementresourceclient.md)
+
+</td><td>
+
+A piece of the user interface of a process
+
+</td></tr>
+<tr><td>
+
+[userDomainObjects](./system-events.systemeventsclient.userdomainobjects.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[UserDomainObjectResourceClient](./system-events.userdomainobjectresourceclient.md)
+
+</td><td>
+
+The user domain in the file system
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[abortTransaction(\_\_mactsOptions)](./system-events.systemeventsclient.aborttransaction.md)
+
+</td><td>
+
+</td><td>
+
+Discard the results of a bounded update session with one or more files.
+
+</td></tr>
+<tr><td>
+
+[attachActionTo(using, \_\_mactsOptions)](./system-events.systemeventsclient.attachactionto.md)
+
+</td><td>
+
+</td><td>
+
+Attach an action to a folder
+
+</td></tr>
+<tr><td>
+
+[attachedScripts(\_\_mactsOptions)](./system-events.systemeventsclient.attachedscripts.md)
+
+</td><td>
+
+</td><td>
+
+List the actions attached to a folder
+
+</td></tr>
+<tr><td>
+
+[beginTransaction(\_\_mactsOptions)](./system-events.systemeventsclient.begintransaction.md)
+
+</td><td>
+
+</td><td>
+
+Begin a bounded update session with one or more files.
+
+</td></tr>
+<tr><td>
+
+[cancel(\_\_mactsOptions)](./system-events.systemeventsclient.cancel.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if the UI element were cancelled
+
+</td></tr>
+<tr><td>
+
+[confirm(\_\_mactsOptions)](./system-events.systemeventsclient.confirm.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if the UI element were confirmed
+
+</td></tr>
+<tr><td>
+
+[connect(\_\_mactsOptions)](./system-events.systemeventsclient.connect.md)
+
+</td><td>
+
+</td><td>
+
+connect a configuration or service
+
+</td></tr>
+<tr><td>
+
+[decrement(\_\_mactsOptions)](./system-events.systemeventsclient.decrement.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if the UI element were decremented
+
+</td></tr>
+<tr><td>
+
+[disconnect(\_\_mactsOptions)](./system-events.systemeventsclient.disconnect.md)
+
+</td><td>
+
+</td><td>
+
+disconnect a configuration or service
+
+</td></tr>
+<tr><td>
+
+[doFolderAction(folderActionCode, withItemList, withWindowSize, \_\_mactsOptions)](./system-events.systemeventsclient.dofolderaction.md)
+
+</td><td>
+
+</td><td>
+
+Send a folder action code to a folder action script
+
+</td></tr>
+<tr><td>
+
+[editActionOf(usingActionName, usingActionNumber, \_\_mactsOptions)](./system-events.systemeventsclient.editactionof.md)
+
+</td><td>
+
+</td><td>
+
+Edit an action of a folder
+
+</td></tr>
+<tr><td>
+
+[endTransaction(\_\_mactsOptions)](./system-events.systemeventsclient.endtransaction.md)
+
+</td><td>
+
+</td><td>
+
+Apply the results of a bounded update session with one or more files.
+
+</td></tr>
+<tr><td>
+
+[increment(\_\_mactsOptions)](./system-events.systemeventsclient.increment.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if the UI element were incremented
+
+</td></tr>
+<tr><td>
+
+[keyCode(using, \_\_mactsOptions)](./system-events.systemeventsclient.keycode.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if key codes were entered
+
+</td></tr>
+<tr><td>
+
+[keyDown(\_\_mactsOptions)](./system-events.systemeventsclient.keydown.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if keys were held down
+
+</td></tr>
+<tr><td>
+
+[keystroke(using, \_\_mactsOptions)](./system-events.systemeventsclient.keystroke.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if keystrokes were entered
+
+</td></tr>
+<tr><td>
+
+[keyUp(\_\_mactsOptions)](./system-events.systemeventsclient.keyup.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if keys were released
+
+</td></tr>
+<tr><td>
+
+[logOut(\_\_mactsOptions)](./system-events.systemeventsclient.logout.md)
+
+</td><td>
+
+</td><td>
+
+Log out the current user
+
+</td></tr>
+<tr><td>
+
+[move(to, \_\_mactsOptions)](./system-events.systemeventsclient.move.md)
+
+</td><td>
+
+</td><td>
+
+Move disk item(s) to a new location.
+
+</td></tr>
+<tr><td>
+
+[open(\_\_mactsOptions)](./system-events.systemeventsclient.open.md)
+
+</td><td>
+
+</td><td>
+
+Open disk item(s) with the appropriate application.
+
+</td></tr>
+<tr><td>
+
+[pick(\_\_mactsOptions)](./system-events.systemeventsclient.pick.md)
+
+</td><td>
+
+</td><td>
+
+cause the target process to behave as if the UI element were picked
+
+</td></tr>
+<tr><td>
+
+[removeActionFrom(usingActionName, usingActionNumber, \_\_mactsOptions)](./system-events.systemeventsclient.removeactionfrom.md)
+
+</td><td>
+
+</td><td>
+
+Remove a folder action from a folder
+
+</td></tr>
+<tr><td>
+
+[restart(stateSavingPreference, \_\_mactsOptions)](./system-events.systemeventsclient.restart.md)
+
+</td><td>
+
+</td><td>
+
+Restart the computer
+
+</td></tr>
+<tr><td>
+
+[shutDown(stateSavingPreference, \_\_mactsOptions)](./system-events.systemeventsclient.shutdown.md)
+
+</td><td>
+
+</td><td>
+
+Shut Down the computer
+
+</td></tr>
+<tr><td>
+
+[sleep(\_\_mactsOptions)](./system-events.systemeventsclient.sleep.md)
+
+</td><td>
+
+</td><td>
+
+Put the computer to sleep
+
+</td></tr>
+<tr><td>
+
+[start(\_\_mactsOptions)](./system-events.systemeventsclient.start.md)
+
+</td><td>
+
+</td><td>
+
+start the screen saver
+
+</td></tr>
+<tr><td>
+
+[stop(\_\_mactsOptions)](./system-events.systemeventsclient.stop.md)
+
+</td><td>
+
+</td><td>
+
+stop the screen saver
+
+</td></tr>
+</tbody></table>

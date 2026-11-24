@@ -6,7 +6,7 @@
 
 Classify the risk of a manifest [Command](./core.command.md)<!-- -->.
 
-Precedence: 1. An explicit, valid `risk` on the command (manifest override / lossless-plus). 2. Otherwise, the risk derived from the command's operation name via [classifyRiskFromOperation()](./core.classifyriskfromoperation.md)<!-- -->.
+Precedence: 1. An explicit, valid `risk` on the command (manifest override / lossless-plus). 2. A fixed property assignment is a write regardless of its name. 3. Otherwise, the risk derived from the command's operation name via [classifyRiskFromOperation()](./core.classifyriskfromoperation.md)<!-- -->.
 
 **Signature:**
 

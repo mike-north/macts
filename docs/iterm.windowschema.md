@@ -32,37 +32,47 @@ WindowSchema: z.ZodObject<
     zoomable: z.ZodBoolean
     zoomed: z.ZodBoolean
     frontmost: z.ZodBoolean
+    currentTab: z.ZodString
+    currentSession: z.ZodString
     isHotkeyWindow: z.ZodBoolean
     hotkeyWindowProfile: z.ZodString
-    position: z.ZodObject<
-      {
-        x: z.ZodNumber
-        y: z.ZodNumber
-      },
-      z.core.$strip
+    position: z.ZodOptional<
+      z.ZodObject<
+        {
+          x: z.ZodNumber
+          y: z.ZodNumber
+        },
+        z.core.$strip
+      >
     >
-    origin: z.ZodObject<
-      {
-        x: z.ZodNumber
-        y: z.ZodNumber
-      },
-      z.core.$strip
+    origin: z.ZodOptional<
+      z.ZodObject<
+        {
+          x: z.ZodNumber
+          y: z.ZodNumber
+        },
+        z.core.$strip
+      >
     >
-    size: z.ZodObject<
-      {
-        x: z.ZodNumber
-        y: z.ZodNumber
-      },
-      z.core.$strip
+    size: z.ZodOptional<
+      z.ZodObject<
+        {
+          x: z.ZodNumber
+          y: z.ZodNumber
+        },
+        z.core.$strip
+      >
     >
-    frame: z.ZodObject<
-      {
-        x: z.ZodNumber
-        y: z.ZodNumber
-        width: z.ZodNumber
-        height: z.ZodNumber
-      },
-      z.core.$strip
+    frame: z.ZodOptional<
+      z.ZodObject<
+        {
+          x: z.ZodNumber
+          y: z.ZodNumber
+          width: z.ZodNumber
+          height: z.ZodNumber
+        },
+        z.core.$strip
+      >
     >
   },
   z.core.$strip

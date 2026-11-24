@@ -2,14 +2,228 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [MailClient](./mail.mailclient.md)
 
-## MailClient interface
+## MailClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Mail client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface MailClient extends ClientBrand<MailResources>
+declare class MailClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[MailResources](./mail.mailresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new MailClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./mail.mailclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `MailClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./mail.mailclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./mail.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[messages](./mail.mailclient.messages.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[MessageResourceClient](./mail.messageresourceclient.md)
+
+</td><td>
+
+An email message
+
+</td></tr>
+<tr><td>
+
+[outgoingMessages](./mail.mailclient.outgoingmessages.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[OutgoingMessageResourceClient](./mail.outgoingmessageresourceclient.md)
+
+</td><td>
+
+A new email message
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[checkForNewMail(\_\_mactsOptions)](./mail.mailclient.checkfornewmail.md)
+
+</td><td>
+
+</td><td>
+
+Triggers a check for email.
+
+</td></tr>
+<tr><td>
+
+[duplicate(to, withProperties, \_\_mactsOptions)](./mail.mailclient.duplicate.md)
+
+</td><td>
+
+</td><td>
+
+Copy an object.
+
+</td></tr>
+<tr><td>
+
+[extractAddressFrom(\_\_mactsOptions)](./mail.mailclient.extractaddressfrom.md)
+
+</td><td>
+
+</td><td>
+
+Command to get just the email address of a fully specified email address. E.g. Calling this with "John Doe &lt;<!-- -->jdoe<!-- -->@<!-- -->example.com<!-- -->&gt;<!-- -->" as the direct object would return "jdoe<!-- -->@<!-- -->example.com"
+
+</td></tr>
+<tr><td>
+
+[extractNameFrom(\_\_mactsOptions)](./mail.mailclient.extractnamefrom.md)
+
+</td><td>
+
+</td><td>
+
+Command to get the full name out of a fully specified email address. E.g. Calling this with "John Doe &lt;<!-- -->jdoe<!-- -->@<!-- -->example.com<!-- -->&gt;<!-- -->" as the direct object would return "John Doe"
+
+</td></tr>
+<tr><td>
+
+[getURL(\_\_mactsOptions)](./mail.mailclient.geturl.md)
+
+</td><td>
+
+</td><td>
+
+Opens a mailto URL.
+
+</td></tr>
+<tr><td>
+
+[importMailMailbox(at, \_\_mactsOptions)](./mail.mailclient.importmailmailbox.md)
+
+</td><td>
+
+</td><td>
+
+Imports a mailbox created by Mail.
+
+</td></tr>
+<tr><td>
+
+[mailto(\_\_mactsOptions)](./mail.mailclient.mailto.md)
+
+</td><td>
+
+</td><td>
+
+Opens a mailto URL.
+
+</td></tr>
+<tr><td>
+
+[move(to, \_\_mactsOptions)](./mail.mailclient.move.md)
+
+</td><td>
+
+</td><td>
+
+Move an object to a new location.
+
+</td></tr>
+</tbody></table>

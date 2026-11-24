@@ -138,7 +138,7 @@ A reminder item
 </td></tr>
 <tr><td>
 
-[RemindersClient](./reminders.remindersclient.md)
+[RemindersClient](./reminders.remindersclient-interface.md)
 
 </td><td>
 

@@ -4,10 +4,10 @@
 
 ## Capability.cliSnippet property
 
-Copy-pasteable snippet showing how to invoke this capability from the CLI. Domain-agnostic: it references the public `macts` CLI surface only — never any underlying automation mechanism.
+Copy-pasteable snippet showing how to invoke this capability from the CLI. Domain-agnostic: it references the public `macts` CLI surface only — never any underlying automation mechanism. It always names a command the app's generated CLI registers; `undefined` when the CLI has no command for this operation (it is still callable through the SDK, the HTTP API and its MCP tool).
 
 **Signature:**
 
 ```typescript
-readonly cliSnippet: string;
+readonly cliSnippet: string | undefined;
 ```

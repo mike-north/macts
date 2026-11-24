@@ -193,21 +193,23 @@ describe('generateClientPackage: contract subpath', () => {
   },`)
   })
 
-  it('reports the contract entry with its own API Extractor config', () => {
+  it('reports and documents the contract entry with its own API Extractor config', () => {
     const files = generate().files
     const config = files.find((f) => f.path === 'api-extractor.contract.json')
     if (!config) throw new Error('api-extractor.contract.json not found')
     // Extends the shared base like the root config; reports dist/contract's
-    // declarations under api-report/ as contract.api.md; writes no rollup or
-    // doc model of its own; silences only the package-tag placement message
-    // that tsup's declaration output triggers.
+    // declarations under api-report/ as contract.api.md; writes the entry's
+    // doc model beside the root entry's, under its own name so the two do not
+    // overwrite each other (the API reference documents every entry point);
+    // writes no rollup; silences only the package-tag placement message that
+    // tsup's declaration output triggers.
     expect(JSON.parse(config.content)).toEqual({
       $schema:
         'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
       extends: '../../api-extractor.base.json',
       mainEntryPointFilePath: '<projectFolder>/dist/contract/index.d.ts',
       apiReport: { reportFileName: 'contract.api.md' },
-      docModel: { enabled: false },
+      docModel: { enabled: true, apiJsonFilePath: '<projectFolder>/temp/contract.api.json' },
       dtsRollup: { enabled: false },
       messages: {
         extractorMessageReporting: {
@@ -216,11 +218,40 @@ describe('generateClientPackage: contract subpath', () => {
       },
     })
     expect(files.filter((f) => f.path === 'api-extractor.json')).toHaveLength(1)
+  })
+
+  it('reports and documents the CLI plugin entry with its own API Extractor config', () => {
+    const files = generate().files
+    const config = files.find((f) => f.path === 'api-extractor.cli.json')
+    if (!config) throw new Error('api-extractor.cli.json not found')
+    // The `./cli` subpath loads dist/cli/index.js, so its declarations are
+    // dist/cli/index.d.ts; reported as cli.api.md, documented from
+    // temp/cli.api.json; no rollup, as for the contract entry.
+    expect(JSON.parse(config.content)).toEqual({
+      $schema:
+        'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
+      extends: '../../api-extractor.base.json',
+      mainEntryPointFilePath: '<projectFolder>/dist/cli/index.d.ts',
+      apiReport: { reportFileName: 'cli.api.md' },
+      docModel: { enabled: true, apiJsonFilePath: '<projectFolder>/temp/cli.api.json' },
+      dtsRollup: { enabled: false },
+      messages: {
+        extractorMessageReporting: {
+          'ae-misplaced-package-tag': { logLevel: 'none' },
+        },
+      },
+    })
+    expect(packageJson(generate()).exports).toMatchObject({
+      './cli': { import: './dist/cli/index.js' },
+    })
+  })
+
+  it('runs API Extractor once per entry point', () => {
     expect(packageJson(generate()).scripts).toMatchObject({
       'api-extractor':
-        'api-extractor run --local && api-extractor run --local --config api-extractor.contract.json',
+        'api-extractor run --local && api-extractor run --local --config api-extractor.contract.json && api-extractor run --local --config api-extractor.cli.json',
       'api-extractor:ci':
-        'api-extractor run && api-extractor run --config api-extractor.contract.json',
+        'api-extractor run && api-extractor run --config api-extractor.contract.json && api-extractor run --config api-extractor.cli.json',
     })
   })
 

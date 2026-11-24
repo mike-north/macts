@@ -4,10 +4,10 @@
 
 ## Window.position property
 
-The position of the window, relative to the upper left corner of the screen. Nullable. No evidence that the app always sets it.
+Deprecated compatibility position relative to the upper left corner of the screen. Use bounds instead. Omitted when iTerm cannot report it. Nullable. No evidence that the app always sets it.
 
 **Signature:**
 
 ```typescript
-position: Point | null
+position?: Point | null;
 ```

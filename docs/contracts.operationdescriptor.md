@@ -37,6 +37,23 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[address?](./contracts.operationdescriptor.address.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+{ readonly parents: readonly { readonly resource: string; readonly collection: string; readonly by: 'identity' \| 'index'; readonly parameter: string; }\[\]; readonly collection: string; readonly item?: { readonly by: 'identity' \| 'index'; readonly parameter: string; }; readonly traversal?: readonly string\[\]; }
+
+</td><td>
+
+_(Optional)_ Complete explicit navigation, distinct from the resource's canonical identity resolver.
+
+</td></tr>
+<tr><td>
+
 [description](./contracts.operationdescriptor.description.md)
 
 </td><td>

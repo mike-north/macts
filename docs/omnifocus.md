@@ -174,7 +174,7 @@ Input for updating an InboxTask. Omitted fields are left unchanged.
 </td></tr>
 <tr><td>
 
-[OmniFocusClient](./omnifocus.omnifocusclient.md)
+[OmniFocusClient](./omnifocus.omnifocusclient-interface.md)
 
 </td><td>
 

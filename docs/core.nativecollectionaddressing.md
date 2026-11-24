@@ -86,6 +86,23 @@ The app's spelling of the property that holds the identifier.
 </td></tr>
 <tr><td>
 
+[traversal?](./core.nativecollectionaddressing.traversal.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+readonly string\[\]
+
+</td><td>
+
+_(Optional)_ Plural containment edges between the identity container and this collection.
+
+</td></tr>
+<tr><td>
+
 [within?](./core.nativecollectionaddressing.within.md)
 
 </td><td>

@@ -2,14 +2,106 @@
 
 [Home](./index.md) &gt; [@macts/textedit](./textedit.md) &gt; [TextEditClient](./textedit.texteditclient.md)
 
-## TextEditClient interface
+## TextEditClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+TextEdit client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface TextEditClient extends ClientBrand<TextEditResources>
+declare class TextEditClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[TextEditResources](./textedit.texteditresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new TextEditClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./textedit.texteditclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `TextEditClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[documents](./textedit.texteditclient.documents.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[DocumentResourceClient](./textedit.documentresourceclient.md)
+
+</td><td>
+
+A TextEdit document
+
+</td></tr>
+<tr><td>
+
+[http](./textedit.texteditclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./textedit.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>

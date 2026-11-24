@@ -119,6 +119,15 @@ Mirrors the permission-system rule: the wildcard `'*'` matches any value; any ot
 </td></tr>
 <tr><td>
 
+[assertAddressInput(address, input)](./core.assertaddressinput.md)
+
+</td><td>
+
+Validate position semantics after value validation and before governance or app access.
+
+</td></tr>
+<tr><td>
+
 [buildAppCommandRoute(appName, segment)](./core.buildappcommandroute.md)
 
 </td><td>
@@ -216,7 +225,7 @@ Check multiple required permissions against granted permissions.
 
 Classify the risk of a manifest [Command](./core.command.md)<!-- -->.
 
-Precedence: 1. An explicit, valid `risk` on the command (manifest override / lossless-plus). 2. Otherwise, the risk derived from the command's operation name via [classifyRiskFromOperation()](./core.classifyriskfromoperation.md)<!-- -->.
+Precedence: 1. An explicit, valid `risk` on the command (manifest override / lossless-plus). 2. A fixed property assignment is a write regardless of its name. 3. Otherwise, the risk derived from the command's operation name via [classifyRiskFromOperation()](./core.classifyriskfromoperation.md)<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -241,11 +250,20 @@ This is the deterministic core: given the same operation name it always returns 
 </td></tr>
 <tr><td>
 
-[coarsePermission(app, resource, operation)](./core.coarsepermission.md)
+[coarsePermission(app, resource, operation)](./core.coarsepermission-2.md)
 
 </td><td>
 
 Create a coarse permission string.
+
+</td></tr>
+<tr><td>
+
+[commandAddress(manifest, command, resourceKey)](./core.commandaddress-2.md)
+
+</td><td>
+
+The operation plan for canonical 1.1 paths or sparse 1.0 scope. Raw 1.1 commands pass through the shared normalizer before their path is read. Validated paths have one final containment edge.
 
 </td></tr>
 <tr><td>
@@ -599,6 +617,15 @@ Filter a list of permissions to only those matching an app.
 </td></tr>
 <tr><td>
 
+[findAddressIssues(manifest)](./core.findaddressissues.md)
+
+</td><td>
+
+Format 1.1 validates normalized selections independently of their spelling. Format 1.0 retains its established single-parent and sparse-hierarchy rules.
+
+</td></tr>
+<tr><td>
+
 [findCaseOnlyMismatch(permission, known)](./core.findcaseonlymismatch.md)
 
 </td><td>
@@ -641,7 +668,16 @@ Note: `resource` is accepted so this function can be called directly with a pars
 </td></tr>
 <tr><td>
 
-[finePermission(app, resource, operation)](./core.finepermission.md)
+[findMechanismTermIssues(manifest)](./core.findmechanismtermissues.md)
+
+</td><td>
+
+Every place a manifest's text names the automation mechanism, in document order. Empty when the manifest follows the rule in the module comment.
+
+</td></tr>
+<tr><td>
+
+[finePermission(app, resource, operation)](./core.finepermission-2.md)
 
 </td><td>
 
@@ -1061,7 +1097,7 @@ Validate a permission string without parsing it.
 
 </td><td>
 
-The declared parameter that identifies a command's item: its first required parameter, in declaration order, other than its parent's. A resource-scoped command's native body addresses the item by it; an application-scoped delete passes it to the app's delete with its other declared parameters.
+The required input that names an operation's item. Canonical scoped paths name it explicitly; unscoped commands and format 1.0 use the first required input outside the parent binding. Normalization uses that same declaration rule when converting a format 1.1 source parent. No input is invented.
 
 </td></tr>
 <tr><td>
@@ -1075,7 +1111,7 @@ Why a command cannot be offered, when it must name one item (a resource-scoped c
 </td></tr>
 <tr><td>
 
-[knownItemSelectionGap(manifest, commandKey)](./core.knownitemselectiongap.md)
+[knownItemSelectionGap(manifest, commandKey)](./core.knownitemselectiongap-2.md)
 
 </td><td>
 
@@ -1166,6 +1202,15 @@ Decide what a nullability probe's observations mean for the manifest it probed. 
 Normalize an application name into the canonical route segment.
 
 Whitespace is collapsed to single hyphens and the result is lowercased, so multi-word apps (e.g. "Google Chrome") produce a stable, URL-safe segment (`google-chrome`<!-- -->) identical on both the client and the server. Both surfaces MUST use this function rather than ad-hoc `toLowerCase()` calls.
+
+</td></tr>
+<tr><td>
+
+[normalizeManifestAddresses(manifest)](./core.normalizemanifestaddresses.md)
+
+</td><td>
+
+Establish the canonical address representation before consuming a manifest. Invalid legacy declarations fail at their source site, without choosing a binding.
 
 </td></tr>
 <tr><td>
@@ -1484,7 +1529,7 @@ The alias mirrors the runtime targeting property: the value sibling operations a
 
 Resolve every canonical RPC route for a single manifest command.
 
-A command marked unsupported has no route, and a resource marked unsupported contributes none, so every surface built from these routes (the server router, the runtime's operation registry, the contract, capabilities, derived permissions) omits them.
+A command marked unsupported has no route, and a resource marked unsupported contributes none, so every surface built from these routes (the server router, the runtime's operation registry, the contract, capabilities, derived permissions) omits them. The supplied command may be outside manifest.commands; its format 1.1 bindings are canonicalized without taking ownership of the source declaration.
 
 </td></tr>
 <tr><td>
@@ -1802,7 +1847,7 @@ Validate that all command permissions are included in the permissions mapping.
 </td></tr>
 <tr><td>
 
-[wildcardPermission(app, resource, operation)](./core.wildcardpermission.md)
+[wildcardPermission(app, resource, operation)](./core.wildcardpermission-2.md)
 
 </td><td>
 
@@ -1878,6 +1923,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[AddressIssue](./core.addressissue.md)
+
+</td><td>
+
+A refusal at the manifest declaration responsible for it.
+
+</td></tr>
+<tr><td>
 
 [ApiKeyMetadata](./core.apikeymetadata.md)
 
@@ -2152,6 +2206,15 @@ Coarse-grained permission - CRUD-style groups. Format: `app:resource:crud-operat
 </td></tr>
 <tr><td>
 
+[CommandAddress](./core.commandaddress.md)
+
+</td><td>
+
+A path compiled from curated edges, with no executable expressions.
+
+</td></tr>
+<tr><td>
+
 [ComposedRestrictions](./core.composedrestrictions.md)
 
 </td><td>
@@ -2253,10 +2316,6 @@ Result of client package generation.
 [GenerateCliPluginResult](./core.generateclipluginresult.md)
 
 </td><td>
-
-CLI plugin generator.
-
-Generates Clipanion-based CLI plugins from macts manifests.
 
 </td></tr>
 <tr><td>
@@ -2612,6 +2671,15 @@ A resource-scoped command may resolve to multiple routes if it applies to multip
 The rule (and its provenance) that produced an evaluation decision.
 
 When `source` is `'default'`<!-- -->, no app/operation rule matched and the policy's `defaultDisposition` was used; `appRule` and `operationRule` are then `undefined`<!-- -->. Otherwise `appRule` is always present and `operationRule` is present only when an operation-level override matched (`source === 'operation'`<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[MechanismTermIssue](./core.mechanismtermissue.md)
+
+</td><td>
+
+A place where a manifest's text names the automation mechanism.
 
 </td></tr>
 <tr><td>
@@ -3260,6 +3328,24 @@ The native "no such object" error number, as a probe records it: the app reports
 </td></tr>
 <tr><td>
 
+[AddressParentSchema](./core.addressparentschema.md)
+
+</td><td>
+
+A selected containment edge, ordered from the application toward the target.
+
+</td></tr>
+<tr><td>
+
+[AddressSelectionSchema](./core.addressselectionschema.md)
+
+</td><td>
+
+An explicit selection binding; positions are selectors and never identity.
+
+</td></tr>
+<tr><td>
+
 [ALLOW_ALL_GOVERNANCE](./core.allow_all_governance.md)
 
 </td><td>
@@ -3282,7 +3368,7 @@ The function body that reads the app's version, as text.
 
 </td><td>
 
-Top-level manifest schema for a macOS application. This is the complete representation of an app's scriptable interface.
+The validated manifest, with one address representation for format 1.1 consumers.
 
 </td></tr>
 <tr><td>
@@ -3452,7 +3538,7 @@ Hex color string (\#RRGGBB format).
 
 </td><td>
 
-Command parameter schema.
+Command parameter schema. Strict, like [CommandSchema](./core.commandschema.md)<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -3476,6 +3562,8 @@ The parent is a fact the curator records from the app's dictionary (the parent's
 
 Schema for a command definition.
 
+Strict by design: a key the schema does not know is a parse error, never silently dropped. A command may gain a field that withholds or restricts it (the `unsupported` marker is one); a runtime that predates the field must refuse the manifest rather than strip the field and offer the command. The same holds for the command's parameters and permission-history entries.
+
 </td></tr>
 <tr><td>
 
@@ -3488,13 +3576,22 @@ Command scope - whether command operates on application or specific resource.
 </td></tr>
 <tr><td>
 
+[CommandUnsupportedEvidenceSchema](./core.commandunsupportedevidenceschema.md)
+
+</td><td>
+
+The evidence behind a command's `unsupported` marker, in one of two forms: the running app failed to address what the command reads ([LiveAbsenceEvidenceSchema](./core.liveabsenceevidenceschema.md)<!-- -->), or the app's dictionary documents the command as a handler the app sends to a script rather than one it carries out ([DictionaryHandlerEvidenceSchema](./core.dictionaryhandlerevidenceschema.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
 [CommandUnsupportedSchema](./core.commandunsupportedschema.md)
 
 </td><td>
 
-The marker on a command the running app cannot carry out: addressing what the command reads failed in a live, read-only observation (a collection a get command looks an item up in, say, that the app does not have at the application).
+The marker on a command no caller can have the app carry out, as its evidence shows: addressing what the command reads failed in a live, read-only observation (a collection a get command looks an item up in, say, that the app does not have at the application), or the app's dictionary documents the command as a handler the app itself sends to a user's script.
 
-The manifest keeps such a command, so the record of what macts expected stays complete and the omission stays auditable; the command has no route, and every generated surface (the operations behind routes, the contract, SDKs, tools, the CLI, capabilities and derived permissions) leaves it out. The marker is curated from the observation: no probe writes or changes it.
+The manifest keeps such a command, so the record of what the dictionary declares and what macts expected stays complete and the omission stays auditable; the command has no route, and every generated surface (the operations behind routes, the contract, SDKs, tools, the CLI, capabilities and derived permissions) leaves it out. The marker is curated from the evidence: no probe writes or changes it.
 
 </td></tr>
 <tr><td>
@@ -3622,6 +3719,17 @@ Evidence that an app's scripting dictionary has no collection for a resource the
 How an app's dictionary lacks a collection the manifest declares.
 
 - `no-class`<!-- -->: the dictionary declares no class with the resource's code or name, so the app has no such object at all. - `not-an-element`<!-- -->: the class exists, but no class has it as an element, so there is no collection of it; the app reaches it some other way (Finder's desktop is the application's `desktop` property).
+
+</td></tr>
+<tr><td>
+
+[DictionaryHandlerEvidenceSchema](./core.dictionaryhandlerevidenceschema.md)
+
+</td><td>
+
+Evidence that a command an app's scripting dictionary declares is a handler the app sends, not a command the app carries out: the dictionary documents that the app itself invokes it in a user's script (when a rule fires, a menu item runs a script, or a plug-in is consulted), and the script supplies the behavior. Sending such a command to the app performs nothing a caller can rely on, so a command with this evidence is never callable.
+
+It is read from the dictionary alone, never from running the app: what was read (the command's term), the finding, the dictionary's own words that establish it, and which app build on which macOS version they hold for. A later release whose dictionary no longer documents the command as a handler shows the evidence is stale.
 
 </td></tr>
 <tr><td>
@@ -3829,6 +3937,17 @@ The most items the probe reads per resource. Enough items to establish a non-nul
 The most output, in bytes, read from the automation process on each of standard output and standard error.
 
 A list result carries every item's properties in one JSON document, so it grows with the collection: a large mailbox or photo library produces tens of megabytes. The whole document is held in memory before it is parsed, so the limit bounds the memory one call can take. A process that exceeds it is stopped and the call fails with `kind: 'output-too-large'`<!-- -->; it is never truncated.
+
+</td></tr>
+<tr><td>
+
+[MECHANISM_TERMS](./core.mechanism_terms.md)
+
+</td><td>
+
+Terms that name the automation mechanism macts drives apps through.
+
+Matched case-insensitively anywhere in a string, so plurals and compounds ("AppleScripts", "osascript's") match too. Ordinary words such as "script" or "JavaScript" do not: an app can be about scripts without its text describing how macts reaches it. This is the one definition every no-leak check shares, from manifest validation to the CLI's acceptance tests.
 
 </td></tr>
 <tr><td>
@@ -4591,6 +4710,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AddressParent](./core.addressparent.md)
+
+</td><td>
+
+One explicit ancestor selection in an operation address.
+
+</td></tr>
+<tr><td>
+
 [ApiKeyValidationErrorCode](./core.apikeyvalidationerrorcode.md)
 
 </td><td>
@@ -4808,6 +4936,13 @@ The parent a command on a nested resource records: the resource whose items hold
 </td></tr>
 <tr><td>
 
+[CommandUnsupportedEvidence](./core.commandunsupportedevidence.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [Confidence](./core.confidence.md)
 
 </td><td>
@@ -4851,6 +4986,13 @@ The parent a command on a nested resource records: the resource whose items hold
 <tr><td>
 
 [DictionaryAbsenceFinding](./core.dictionaryabsencefinding.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[DictionaryHandlerEvidence](./core.dictionaryhandlerevidence.md)
 
 </td><td>
 

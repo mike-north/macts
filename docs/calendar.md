@@ -93,7 +93,7 @@ A calendar containing events
 </td></tr>
 <tr><td>
 
-[CalendarClient](./calendar.calendarclient.md)
+[CalendarClient](./calendar.calendarclient-interface.md)
 
 </td><td>
 

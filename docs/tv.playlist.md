@@ -56,7 +56,7 @@ the description of the playlist. Nullable. No evidence that the app always sets 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -73,7 +73,7 @@ the total length of all tracks (in seconds). Nullable. No evidence that the app 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -122,11 +122,28 @@ the id of the item as a hexadecimal string. This id does not change over time. N
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
 the total size of all tracks (in bytes). Nullable. No evidence that the app always sets it.
+
+</td></tr>
+<tr><td>
+
+[source](./tv.playlist.source.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ObjectReferenceVariant](./contracts.objectreferencevariant.md)<!-- -->&lt;[Source](./tv.source.md)<!-- -->, string, 'Source'&gt;
+
+</td><td>
+
+The source that holds this playlist. Never null: A playlist belongs to a source; reading its source must return that containing object. An unreadable source is a failed read, not an empty relationship.
 
 </td></tr>
 <tr><td>

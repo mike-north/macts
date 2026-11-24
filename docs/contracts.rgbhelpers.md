@@ -4,7 +4,7 @@
 
 ## RgbHelpers interface
 
-Construction and conversion of [Rgb](./contracts.rgb.md) colors.
+Construction and conversion of [Rgb](./contracts.rgb-interface.md) colors.
 
 **Signature:**
 

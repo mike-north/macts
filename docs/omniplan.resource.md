@@ -101,7 +101,7 @@ Email address for this resource. Nullable. No evidence that the app always sets 
 
 </td><td>
 
-[Integer](./contracts.integer.md)
+[Integer](./contracts.integer-type.md)
 
 </td><td>
 
@@ -163,7 +163,7 @@ The total number of units for this resource (1.0 = 100%). Nullable. No evidence 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 
@@ -229,7 +229,7 @@ Total seconds worked by this resource. Nullable. No evidence that the app always
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

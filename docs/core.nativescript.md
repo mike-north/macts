@@ -14,7 +14,7 @@ interface NativeScript
 
 ## Remarks
 
-`body` is a function body invoked as `(app, args, page)`<!-- -->, where `app` is the target application, `args` is the decoded input record, and `page` is the page window a paged list reads (`null` when there is none). The executor composes the script as: codec prelude, then the application object, then decode of `input` against `inputPlan`<!-- -->, then `body`<!-- -->, then encode of its result against `outputPlan`<!-- -->, all inside one try/catch that yields a [NativeOutcome](./core.nativeoutcome.md)<!-- -->. Decoding and encoding receive `{ app, references }`<!-- -->, because converting a reference addresses the app. No member of the app is read or called until the whole input has converted, so an input value that cannot convert fails before the app receives any event.
+`body` is a function body invoked as `(app, args, page, env)`<!-- -->, where `app` is the target application, `args` is the decoded input record, and `page` is the page window a paged list reads (`null` when there is none). The executor composes the script as: codec prelude, then the application object, then decode of `input` against `inputPlan`<!-- -->, then `body`<!-- -->, then encode of its result against `outputPlan`<!-- -->, all inside one try/catch that yields a [NativeOutcome](./core.nativeoutcome.md)<!-- -->. Decoding and encoding receive `{ app, references }`<!-- -->, because converting a reference addresses the app. No member of the app is read or called until the whole input has converted, so an input value that cannot convert fails before the app receives any event.
 
 ## Properties
 
@@ -49,7 +49,7 @@ string
 
 </td><td>
 
-Function body run as `(app, args, page)`<!-- -->.
+Function body run as `(app, args, page, env)`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -152,6 +152,23 @@ _(Optional)_ The window a paged list body reads, passed to the body as its `page
 </td><td>
 
 The resources whose references convert: at least every resource a reference in either plan names, each with its identifier plan and its addressing. Empty when the plans hold no reference.
+
+</td></tr>
+<tr><td>
+
+[rgbChannels?](./core.nativescript.rgbchannels.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+'integer16' \| 'normalized'
+
+</td><td>
+
+_(Optional)_ Color representation selected from this app's manifest, independent of provider-neutral value plans. Omission preserves integer channel lists.
 
 </td></tr>
 </tbody></table>

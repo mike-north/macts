@@ -84,7 +84,7 @@ displays a preview of the item in list view. Nullable. No evidence that the app 
 
 </td><td>
 
-[Integer](./contracts.integer.md) \| null
+[Integer](./contracts.integer-type.md) \| null
 
 </td><td>
 

@@ -50,5 +50,18 @@
     "tsup": "catalog:",
     "vitest": "catalog:",
     "typescript": "catalog:"
+  },
+  "nx": {
+    "targets": {
+      "test": {
+        "inputs": [
+          "default",
+          "^production",
+          "testWorkspaceFiles",
+          "{workspaceRoot}/docs/**/*",
+          "{workspaceRoot}/packages/*/api-report/*.api.md"
+        ]
+      }
+    }
   }
 }

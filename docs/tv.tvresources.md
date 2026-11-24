@@ -37,4 +37,4 @@ type TVResources = Readonly<{
 }>
 ```
 
-**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [BrowserWindow](./tv.browserwindow.md)<!-- -->, [Integer](./contracts.integer.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [Playlist](./tv.playlist.md)<!-- -->, [PlaylistWindow](./tv.playlistwindow.md)<!-- -->, [Source](./tv.source.md)
+**References:** [ResourceDescriptor](./contracts.resourcedescriptor.md)<!-- -->, [BrowserWindow](./tv.browserwindow.md)<!-- -->, [Integer](./contracts.integer-type.md)<!-- -->, [ValueType](./contracts.valuetype.md)<!-- -->, [Playlist](./tv.playlist.md)<!-- -->, [PlaylistWindow](./tv.playlistwindow.md)<!-- -->, [Source](./tv.source.md)

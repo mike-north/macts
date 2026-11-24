@@ -2,14 +2,363 @@
 
 [Home](./index.md) &gt; [@macts/omniplan](./omniplan.md) &gt; [OmniPlanClient](./omniplan.omniplanclient.md)
 
-## OmniPlanClient interface
+## OmniPlanClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+OmniPlan client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface OmniPlanClient extends ClientBrand<OmniPlanResources>
+declare class OmniPlanClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[OmniPlanResources](./omniplan.omniplanresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new OmniPlanClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./omniplan.omniplanclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `OmniPlanClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[assignments](./omniplan.omniplanclient.assignments.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[AssignmentResourceClient](./omniplan.assignmentresourceclient.md)
+
+</td><td>
+
+An assignment of a resource to a task
+
+</td></tr>
+<tr><td>
+
+[dependencies](./omniplan.omniplanclient.dependencies.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[DependencyResourceClient](./omniplan.dependencyresourceclient.md)
+
+</td><td>
+
+A dependency of one task upon another task
+
+</td></tr>
+<tr><td>
+
+[http](./omniplan.omniplanclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./omniplan.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+<tr><td>
+
+[milestones](./omniplan.omniplanclient.milestones.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[MilestoneResourceClient](./omniplan.milestoneresourceclient.md)
+
+</td><td>
+
+A milestone (zero-duration marker task)
+
+</td></tr>
+<tr><td>
+
+[projects](./omniplan.omniplanclient.projects.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ProjectResourceClient](./omniplan.projectresourceclient.md)
+
+</td><td>
+
+An OmniPlan project
+
+</td></tr>
+<tr><td>
+
+[resources](./omniplan.omniplanclient.resources.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ResourceResourceClient](./omniplan.resourceresourceclient.md)
+
+</td><td>
+
+A resource (person, equipment, or material)
+
+</td></tr>
+<tr><td>
+
+[scenarios](./omniplan.omniplanclient.scenarios.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ScenarioResourceClient](./omniplan.scenarioresourceclient.md)
+
+</td><td>
+
+An alternative project plan
+
+</td></tr>
+<tr><td>
+
+[tasks](./omniplan.omniplanclient.tasks.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[TaskResourceClient](./omniplan.taskresourceclient.md)
+
+</td><td>
+
+A task within an OmniPlan project
+
+</td></tr>
+<tr><td>
+
+[violations](./omniplan.omniplanclient.violations.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[ViolationResourceClient](./omniplan.violationresourceclient.md)
+
+</td><td>
+
+A scheduling conflict or issue
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[\_export(to, \_\_mactsOptions)](./omniplan.omniplanclient._export.md)
+
+</td><td>
+
+</td><td>
+
+Export a document
+
+</td></tr>
+<tr><td>
+
+[addWorkTime(schedule, \_\_mactsOptions)](./omniplan.omniplanclient.addworktime.md)
+
+</td><td>
+
+</td><td>
+
+Add working hours to a schedule
+
+</td></tr>
+<tr><td>
+
+[assign(resource, task, \_\_mactsOptions)](./omniplan.omniplanclient.assign.md)
+
+</td><td>
+
+</td><td>
+
+Assign resources to tasks
+
+</td></tr>
+<tr><td>
+
+[baseline(\_\_mactsOptions)](./omniplan.omniplanclient.baseline.md)
+
+</td><td>
+
+</td><td>
+
+Commit the current schedule as the baseline schedule
+
+</td></tr>
+<tr><td>
+
+[changeMark(\_\_mactsOptions)](./omniplan.omniplanclient.changemark.md)
+
+</td><td>
+
+</td><td>
+
+Make a change tracking mark on project
+
+</td></tr>
+<tr><td>
+
+[depend(prerequisite, dependent, \_\_mactsOptions)](./omniplan.omniplanclient.depend.md)
+
+</td><td>
+
+</td><td>
+
+Create a dependency between tasks
+
+</td></tr>
+<tr><td>
+
+[level(\_\_mactsOptions)](./omniplan.omniplanclient.level.md)
+
+</td><td>
+
+</td><td>
+
+Level resources on project
+
+</td></tr>
+<tr><td>
+
+[lookup(key, \_\_mactsOptions)](./omniplan.omniplanclient.lookup.md)
+
+</td><td>
+
+</td><td>
+
+Look up a task via a custom data key
+
+</td></tr>
+<tr><td>
+
+[redo(\_\_mactsOptions)](./omniplan.omniplanclient.redo.md)
+
+</td><td>
+
+</td><td>
+
+Redo the last undone command
+
+</td></tr>
+<tr><td>
+
+[subtractWorkTime(schedule, \_\_mactsOptions)](./omniplan.omniplanclient.subtractworktime.md)
+
+</td><td>
+
+</td><td>
+
+Remove working hours from a schedule
+
+</td></tr>
+<tr><td>
+
+[undo(\_\_mactsOptions)](./omniplan.omniplanclient.undo.md)
+
+</td><td>
+
+</td><td>
+
+Undo the last command
+
+</td></tr>
+</tbody></table>

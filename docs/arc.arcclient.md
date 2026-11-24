@@ -2,14 +2,216 @@
 
 [Home](./index.md) &gt; [@macts/arc](./arc.md) &gt; [ArcClient](./arc.arcclient.md)
 
-## ArcClient interface
+## ArcClient class
 
-The shared type-only resource brand lets caller-built references target this facade. It adds no runtime fields; construction registers the actual instance.
+Arc client for HTTP-based macOS automation.
 
 **Signature:**
 
 ```typescript
-interface ArcClient extends ClientBrand<ArcResources>
+declare class ArcClient
 ```
 
-**Extends:** [ClientBrand](./contracts.clientbrand.md)<!-- -->&lt;[ArcResources](./arc.arcresources.md)<!-- -->&gt;
+## Example
+
+```typescript
+const client = new ArcClient({
+  apiKey: process.env.MACTS_API_KEY!,
+})
+
+// List calendars
+const calendars = await client.calendars.list()
+```
+
+## Constructors
+
+<table><thead><tr><th>
+
+Constructor
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./arc.arcclient._constructor_.md)
+
+</td><td>
+
+</td><td>
+
+Constructs a new instance of the `ArcClient` class
+
+</td></tr>
+</tbody></table>
+
+## Properties
+
+<table><thead><tr><th>
+
+Property
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[http](./arc.arcclient.http.md)
+
+</td><td>
+
+`readonly`
+
+</td><td>
+
+[HttpClient](./arc.httpclient.md)
+
+</td><td>
+
+Get the HTTP client for making custom requests.
+
+</td></tr>
+</tbody></table>
+
+## Methods
+
+<table><thead><tr><th>
+
+Method
+
+</th><th>
+
+Modifiers
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[close(\_\_mactsOptions)](./arc.arcclient.close.md)
+
+</td><td>
+
+</td><td>
+
+Close
+
+</td></tr>
+<tr><td>
+
+[count(each, \_\_mactsOptions)](./arc.arcclient.count.md)
+
+</td><td>
+
+</td><td>
+
+Return the number of elements of a particular class within an object.
+
+</td></tr>
+<tr><td>
+
+[execute(javascript, \_\_mactsOptions)](./arc.arcclient.execute.md)
+
+</td><td>
+
+</td><td>
+
+Execute a piece of javascript.
+
+</td></tr>
+<tr><td>
+
+[focus(\_\_mactsOptions)](./arc.arcclient.focus.md)
+
+</td><td>
+
+</td><td>
+
+Focus on a space.
+
+</td></tr>
+<tr><td>
+
+[goBack(\_\_mactsOptions)](./arc.arcclient.goback.md)
+
+</td><td>
+
+</td><td>
+
+Go Back (If Possible).
+
+</td></tr>
+<tr><td>
+
+[goForward(\_\_mactsOptions)](./arc.arcclient.goforward.md)
+
+</td><td>
+
+</td><td>
+
+Go Forward (If Possible).
+
+</td></tr>
+<tr><td>
+
+[make(\_new, withProperties, \_\_mactsOptions)](./arc.arcclient.make.md)
+
+</td><td>
+
+</td><td>
+
+Make a new object.
+
+</td></tr>
+<tr><td>
+
+[reload(\_\_mactsOptions)](./arc.arcclient.reload.md)
+
+</td><td>
+
+</td><td>
+
+Reload a tab.
+
+</td></tr>
+<tr><td>
+
+[select(\_\_mactsOptions)](./arc.arcclient.select.md)
+
+</td><td>
+
+</td><td>
+
+Select the tab.
+
+</td></tr>
+<tr><td>
+
+[stop(\_\_mactsOptions)](./arc.arcclient.stop.md)
+
+</td><td>
+
+</td><td>
+
+Stop the current tab from loading.
+
+</td></tr>
+</tbody></table>

@@ -64,7 +64,7 @@ number
 
 **Returns:**
 
-[Rgb](./contracts.rgb.md)
+[Rgb](./contracts.rgb-interface.md)
 
 ## Exceptions
 
