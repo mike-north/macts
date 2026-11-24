@@ -12,12 +12,23 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  lutimesSync,
+  symlinkSync,
+  utimesSync,
+  writeFileSync,
+} from 'node:fs'
 import { join } from 'node:path'
 import { loadSqlite } from '../storage/sqlite.js'
 import {
   ALICE,
   MINUTE,
+  START,
   chunks,
   expectTransferError,
   useTransferStore,
@@ -44,6 +55,9 @@ function rowCounts(home: string): Record<string, number> {
     database.close()
   }
 }
+
+/** The instant every test clock starts at, in epoch milliseconds. */
+const START_MS = START.getTime()
 
 describe('sweep', () => {
   const fixture = useTransferStore()
@@ -268,5 +282,155 @@ describe('upload records with ids the store never minted', () => {
     await expectTransferError(fixture.store.consumeUpload(ALICE, '../victim'), 'unknown-transfer')
 
     expect(readFileSync(join(transfers, 'victim'), 'utf8')).toBe('untouched')
+  })
+})
+
+/**
+ * Files in `uploads/` and `copies/` that no record names: a crash between
+ * creating a file and recording it, or a receive that recreated a swept
+ * upload, leaves one. The sweep removes a minted-name, regular, unrecorded
+ * file once it is older than the longest lifetime any transfer has (60
+ * minutes by default, the temporary copy lifetime), and touches nothing else.
+ */
+describe('unrecorded files in the transfer directories', () => {
+  const fixture = useTransferStore()
+  const MINTED = '5d3f1c7e-8a2b-4c6d-9e0f-1a2b3c4d5e6f'
+  const OTHER_MINTED = '0b9d8c7a-6e5f-4a3b-8c2d-1e0f9a8b7c6d'
+  const LONGEST_MS = 60 * MINUTE
+
+  function directory(name: 'uploads' | 'copies'): string {
+    return join(fixture.home, 'transfers', name)
+  }
+
+  /** Write `name` in `name`'s directory with a modification time of `modifiedAt`. */
+  function plant(dir: 'uploads' | 'copies', name: string, modifiedAt: Date): string {
+    const file = join(directory(dir), name)
+    writeFileSync(file, 'orphaned bytes')
+    utimesSync(file, modifiedAt, modifiedAt)
+    return file
+  }
+
+  it.each(['uploads', 'copies'] as const)(
+    'removes an old unrecorded minted file in %s',
+    async (dir) => {
+      const name = dir === 'copies' ? `${MINTED}.txt` : MINTED
+      const file = plant(dir, name, new Date(START_MS))
+
+      fixture.clock.set(new Date(START_MS + LONGEST_MS))
+      await fixture.store.sweep()
+
+      expect(existsSync(file)).toBe(false)
+    }
+  )
+
+  it.each(['uploads', 'copies'] as const)(
+    'keeps an unrecorded minted file in %s until it is older than the longest lifetime',
+    async (dir) => {
+      const file = plant(dir, MINTED, new Date(START_MS))
+
+      fixture.clock.set(new Date(START_MS + LONGEST_MS - 1))
+      await fixture.store.sweep()
+
+      expect(existsSync(file)).toBe(true)
+    }
+  )
+
+  it('measures the longest lifetime from the store limits, not the defaults', async () => {
+    const store = await fixture.open({ temporaryCopyTtlMs: 5 * MINUTE, uploadTtlMs: 20 * MINUTE })
+    const file = plant('uploads', MINTED, new Date(START_MS))
+
+    fixture.clock.set(new Date(START_MS + 19 * MINUTE))
+    await store.sweep()
+    expect(existsSync(file)).toBe(true)
+
+    // The longest of this store's lifetimes is the upload lifetime, 20 minutes.
+    fixture.clock.set(new Date(START_MS + 20 * MINUTE))
+    await store.sweep()
+    expect(existsSync(file)).toBe(false)
+  })
+
+  it.each(['uploads', 'copies'] as const)(
+    'leaves non-minted names in %s alone, however old',
+    async (dir) => {
+      const names = ['notes.txt', 'ABCDEF01-8a2b-4c6d-9e0f-1a2b3c4d5e6f', `${MINTED}.bad-ext`]
+      const files = names.map((name) => plant(dir, name, new Date(START_MS)))
+
+      fixture.clock.set(new Date(START_MS + 24 * 60 * MINUTE))
+      await fixture.store.sweep()
+
+      for (const file of files) {
+        expect(existsSync(file)).toBe(true)
+      }
+    }
+  )
+
+  it('leaves a minted upload name with a copy extension alone in uploads', async () => {
+    const file = plant('uploads', `${MINTED}.txt`, new Date(START_MS))
+    fixture.clock.set(new Date(START_MS + 2 * LONGEST_MS))
+    await fixture.store.sweep()
+    expect(existsSync(file)).toBe(true)
+  })
+
+  it.each(['uploads', 'copies'] as const)(
+    'never follows or removes a symlink with a minted name in %s',
+    async (dir) => {
+      const target = join(fixture.home, 'outside.txt')
+      writeFileSync(target, 'outside the store')
+      const link = join(directory(dir), MINTED)
+      symlinkSync(target, link)
+      lutimesSync(link, new Date(START_MS), new Date(START_MS))
+
+      fixture.clock.set(new Date(START_MS + 2 * LONGEST_MS))
+      await fixture.store.sweep()
+
+      expect(readFileSync(target, 'utf8')).toBe('outside the store')
+      expect(existsSync(link)).toBe(true)
+    }
+  )
+
+  it.each(['uploads', 'copies'] as const)(
+    'never removes a directory with a minted name in %s',
+    async (dir) => {
+      const folder = join(directory(dir), MINTED)
+      mkdirSync(folder)
+      writeFileSync(join(folder, 'inner'), 'kept')
+      utimesSync(folder, new Date(START_MS), new Date(START_MS))
+
+      fixture.clock.set(new Date(START_MS + 2 * LONGEST_MS))
+      await fixture.store.sweep()
+
+      expect(readFileSync(join(folder, 'inner'), 'utf8')).toBe('kept')
+    }
+  )
+
+  it('never removes a file a record still names, even when the file is old', async () => {
+    const { store, clock } = fixture
+    const upload = await store.createUpload(ALICE)
+    await store.receiveUpload(ALICE, upload.uploadId, chunks('live'))
+    const uploadBytes = join(directory('uploads'), upload.uploadId)
+    const copy = await store.allocateTemporaryCopy(ALICE)
+    const longAgo = new Date(START_MS - 24 * 60 * MINUTE)
+    utimesSync(uploadBytes, longAgo, longAgo)
+    utimesSync(copy.path, longAgo, longAgo)
+
+    // Both records are live at 10:10 (upload to 10:15, copy to 11:00), but
+    // their files are older than the longest lifetime.
+    clock.set(new Date(START_MS + 10 * MINUTE))
+    await store.sweep()
+
+    expect(existsSync(uploadBytes)).toBe(true)
+    expect(existsSync(copy.path)).toBe(true)
+  })
+
+  it('removes only the unrecorded file when a recorded one sits beside it', async () => {
+    const { store, clock } = fixture
+    const copy = await store.allocateTemporaryCopy(ALICE)
+    const orphan = plant('copies', OTHER_MINTED, new Date(START_MS - 24 * 60 * MINUTE))
+
+    clock.set(new Date(START_MS + 10 * MINUTE))
+    await store.sweep()
+
+    expect(existsSync(orphan)).toBe(false)
+    expect(existsSync(copy.path)).toBe(true)
   })
 })

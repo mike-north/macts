@@ -42,10 +42,27 @@ const refusedUnlinks = vi.hoisted(
   () => new Map<string, { code: string; becomesDirectory: boolean }>()
 )
 
+/**
+ * Paths whose `lstat` fails with the given code once an `unlink` of the same
+ * path has been refused: the follow-up check the store makes to tell a
+ * directory swap from an undeletable file, failing for a reason other than
+ * the path being absent.
+ */
+const failingLstats = vi.hoisted(() => new Map<string, string>())
+
 vi.mock('node:fs/promises', async (importOriginal) => {
   const real = await importOriginal<typeof import('node:fs/promises')>()
+  /** Paths whose unlink was refused, so only the follow-up `lstat` fails. */
+  const refused = new Set<string>()
   return {
     ...real,
+    lstat: (file: Parameters<typeof real.lstat>[0], ...rest: unknown[]) => {
+      const code = failingLstats.get(String(file))
+      if (code !== undefined && refused.has(String(file))) {
+        return Promise.reject(Object.assign(new Error(`${code}: lstat failed`), { code }))
+      }
+      return (real.lstat as (...args: unknown[]) => Promise<unknown>)(file, ...rest)
+    },
     unlink: async (file: Parameters<typeof real.unlink>[0]) => {
       const refusal = refusedUnlinks.get(String(file))
       if (refusal === undefined) {
@@ -55,6 +72,7 @@ vi.mock('node:fs/promises', async (importOriginal) => {
         await real.unlink(file)
         await real.mkdir(file)
       }
+      refused.add(String(file))
       throw Object.assign(new Error(`${refusal.code}: refused`), { code: refusal.code })
     },
   }
@@ -360,3 +378,60 @@ describe.each(['EPERM', 'EISDIR'])(
     })
   }
 )
+
+/**
+ * When a refused `unlink` is followed by an `lstat` that fails for a reason
+ * other than the path being absent (an I/O error), the copy's state is
+ * unknown: it may still hold the caller's content. The failure is reported
+ * and the record is kept, rather than the copy being treated as refused and
+ * forgotten.
+ */
+describe('a minted copy whose state is unknown after its deletion is refused (EIO)', () => {
+  const fixture = useTransferStore()
+
+  afterEach(() => {
+    refusedUnlinks.clear()
+    failingLstats.clear()
+  })
+
+  function recordedCopies(home: string): number {
+    const { DatabaseSync } = loadSqlite()
+    const database = new DatabaseSync(join(home, 'transfers', 'transfers.db'), { readOnly: true })
+    try {
+      const row = database.prepare('SELECT COUNT(*) AS count FROM temporary_copies').get()
+      return Number(row?.['count'])
+    } finally {
+      database.close()
+    }
+  }
+
+  it('release() rejects and keeps the record and the file', async () => {
+    const copy = await fixture.store.allocateTemporaryCopy(ALICE)
+    writeFileSync(copy.path, 'user content')
+    refusedUnlinks.set(copy.path, { code: 'EPERM', becomesDirectory: false })
+    failingLstats.set(copy.path, 'EIO')
+
+    const error = await rejectionOf(copy.release())
+
+    expect((error as Error).message).toBe('The transfer store could not delete the temporary copy.')
+    expect(recordedCopies(fixture.home)).toBe(1)
+    expect(readFileSync(copy.path, 'utf8')).toBe('user content')
+  })
+
+  it('the sweep keeps the record for the next sweep', async () => {
+    const copy = await fixture.store.allocateTemporaryCopy(ALICE)
+    writeFileSync(copy.path, 'user content')
+    fixture.clock.advance(61 * MINUTE)
+    refusedUnlinks.set(copy.path, { code: 'EPERM', becomesDirectory: false })
+    failingLstats.set(copy.path, 'EIO')
+
+    await fixture.store.sweep()
+    expect(recordedCopies(fixture.home)).toBe(1)
+
+    refusedUnlinks.clear()
+    failingLstats.clear()
+    await fixture.store.sweep()
+    expect(recordedCopies(fixture.home)).toBe(0)
+    expect(existsSync(copy.path)).toBe(false)
+  })
+})
