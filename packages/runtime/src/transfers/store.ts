@@ -539,12 +539,22 @@ function isDirectoryRefusal(error: unknown): boolean {
   )
 }
 
-/** Whether `file` is, right now, a regular file (not a link, directory, or absent). */
+/**
+ * Whether `file` is, right now, a regular file (not a link or directory).
+ *
+ * Only a path that is absent counts as "not a regular file" because of an
+ * `ENOENT`. Any other `lstat` failure leaves the file's state unknown, so it
+ * is rethrown: a caller must not conclude the file is gone, or never was a
+ * file, from an error that says nothing about it.
+ */
 async function isRegularFile(file: string): Promise<boolean> {
   try {
     return (await fsp.lstat(file)).isFile()
-  } catch {
-    return false
+  } catch (error) {
+    if (isMissingFile(error)) {
+      return false
+    }
+    throw error
   }
 }
 
@@ -1193,6 +1203,70 @@ class SqliteTransferStore implements TransferStore {
         }
       })
     })
+
+    await this.#sweepUnrecordedFiles(now)
+  }
+
+  /**
+   * Remove minted-name files in the uploads and copies directories that no
+   * record names and that are older than the longest lifetime of any
+   * transfer.
+   *
+   * The record-driven sweep cannot see these: a process that ended between
+   * creating a file and recording it (or a receive that recreated an upload
+   * the sweep had consumed) leaves a file nothing points at, and for a copy
+   * it may hold user content. Age is the modification time against the
+   * longest of the limits' lifetimes, so a file still being created, written
+   * or recorded is never old enough to be taken. The directory is listed
+   * before the records are read, so a file created after the listing is not
+   * a candidate, and one recorded before the read is seen as recorded.
+   *
+   * Only a regular file whose name is exactly a name the store mints for
+   * that directory is removed; links, directories and any other name are
+   * left alone. A file that cannot be removed now is retried at the next
+   * sweep.
+   */
+  async #sweepUnrecordedFiles(now: number): Promise<void> {
+    const oldestKept =
+      now -
+      Math.max(
+        this.limits.uploadTtlMs,
+        this.limits.consumedUploadRetentionMs,
+        this.limits.temporaryCopyTtlMs
+      )
+    const uploadNames = await fsp.readdir(this.#uploads)
+    const copyNames = await fsp.readdir(this.#copies)
+    this.#assertOpen()
+    const recordedUploads = new Set(
+      this.#database
+        .prepare('SELECT upload_id FROM uploads')
+        .all()
+        .map((row) => textColumn(row, 'upload_id'))
+    )
+    const recordedCopies = new Set(
+      this.#database
+        .prepare('SELECT path FROM temporary_copies')
+        .all()
+        .map((row) => textColumn(row, 'path'))
+    )
+
+    const unrecorded = [
+      ...uploadNames
+        .filter((name) => UPLOAD_ID.test(name) && !recordedUploads.has(name))
+        .map((name) => path.join(this.#uploads, name)),
+      ...copyNames
+        .filter((name) => COPY_NAME.test(name))
+        .map((name) => path.join(this.#copies, name))
+        .filter((file) => !recordedCopies.has(file)),
+    ]
+    await Promise.allSettled(
+      unrecorded.map(async (file) => {
+        const stats = await fsp.lstat(file)
+        if (stats.isFile() && stats.mtimeMs <= oldestKept) {
+          await removeFile(file)
+        }
+      })
+    )
   }
 
   close(): void {
