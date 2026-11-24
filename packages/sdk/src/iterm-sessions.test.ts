@@ -47,6 +47,12 @@ interface IState {
   reads: string[]
   failSessionRead?: boolean
   disappearedTab?: boolean
+  /**
+   * A Session that leaves its Tab and returns during one read: its property reads numbered
+   * `from` (inclusive) to `to` (exclusive) are made while it is away, when it does not exist
+   * and every read of it fails as "no such object".
+   */
+  away?: { session: string; from: number; to: number; reads: number }
 }
 const int = (value: number): Integer => Integer.validate(value)
 const permissions = [
@@ -87,7 +93,19 @@ function fixture(state: IState): object {
       {},
       {
         get(_target, key) {
-          if (key === 'exists') return () => !(kind === 'Tab' && state.disappearedTab)
+          const away =
+            kind === 'Session' && state.away?.session === values['id'] ? state.away : undefined
+          const isAway = (): boolean =>
+            away !== undefined && away.reads >= away.from && away.reads < away.to
+          if (away !== undefined && key !== 'exists' && key !== 'properties')
+            return () => {
+              if (key !== 'id') away.reads++
+              if (isAway())
+                throw Object.assign(new Error('No such object.'), { errorNumber: -1728 })
+              state.reads.push(`${kind}.${String(key)}`)
+              return values[String(key)] ?? null
+            }
+          if (key === 'exists') return () => !(kind === 'Tab' && state.disappearedTab) && !isAway()
           if (key === 'properties')
             return () => {
               state.reads.push(`${kind}.properties`)
@@ -254,6 +272,30 @@ describe.each(['local', 'remote'] as const)('Session identity via %s', (locality
     state.disappearedTab = true
     await expect(reference?.resolve()).rejects.toBeInstanceOf(CollectionChangedError)
   })
+
+  it.each(['get', 'resolve', 'reference'] as const)(
+    'fails a %s closed when its Session leaves its Tab and returns mid-read (#332)',
+    async (read) => {
+      const { state, client } = await setup(locality)
+      const reference = (await client.windows.get(int(7))).currentSession
+      state.away = { session: 'a', from: 2, to: 9, reads: 0 }
+      const outcome =
+        read === 'get'
+          ? client.sessions.get(int(7), int(0), 'a')
+          : read === 'resolve'
+            ? client.sessions.resolve(int(7), 'a')
+            : reference?.resolve()
+      const error: unknown = await outcome?.then(
+        () => undefined,
+        (failure: unknown) => failure
+      )
+      // Never a partial record surfaced as a contract violation.
+      expect(error).not.toBeInstanceOf(UnexpectedValueError)
+      expect(error instanceof CollectionChangedError || error instanceof TargetNotFoundError).toBe(
+        true
+      )
+    }
+  )
 
   it('distinguishes an empty tab from a missing window and missing Session', async () => {
     const { state, client } = await setup(locality)

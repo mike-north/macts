@@ -1580,7 +1580,9 @@ commands:
     parameters:
       - name: each
         type: string
-        description: the class of the elements to be counted. Keyword 'each' is optional in AppleScript
+        # The dictionary adds that the keyword is optional in its scripting
+        # syntax; macts calls carry named inputs, so the clause is dropped.
+        description: the class of the elements to be counted
         required: true
         code: kocl
   # Delete is not offered yet: as declared at application scope, it names no
@@ -1610,7 +1612,9 @@ commands:
     parameters:
       - name: new
         type: string
-        description: the class of the new element. Keyword 'new' is optional in AppleScript
+        # The dictionary adds that the keyword is optional in its scripting
+        # syntax; macts calls carry named inputs, so the clause is dropped.
+        description: the class of the new element
         required: true
         code: kocl
       - name: at

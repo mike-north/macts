@@ -12,6 +12,10 @@
  *
  * - Mail 16.0, "perform mail action with messages": its description says it is
  *   a "Script handler invoked by rules and menus".
+ * - Contacts 14.0, the hidden "Address Book Rollover Suite" (`az99`): its
+ *   description says the suite's events "are used for constructing Address Book
+ *   Rollover plug-ins", so Contacts sends `action property`, `action title`,
+ *   `perform action` and `should enable action` to a plug-in.
  *
  * A capability is named `<app>.app.<command key>` for an application command,
  * the app segment being the app's name in lower case.
@@ -35,10 +39,22 @@ import { deriveCapabilities } from './registry.js'
 const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
 
 /** The handler commands of the shipped manifests, by manifest directory and command key. */
-const HANDLER_COMMANDS = ['mail/performMailActionWithMessages']
+const HANDLER_COMMANDS = [
+  'contacts/actionProperty',
+  'contacts/actionTitle',
+  'contacts/performAction',
+  'contacts/shouldEnableAction',
+  'mail/performMailActionWithMessages',
+]
 
 /** The capabilities those commands would have if they were not marked. */
-const HANDLER_CAPABILITIES = ['mail.app.performMailActionWithMessages']
+const HANDLER_CAPABILITIES = [
+  'contacts.app.actionProperty',
+  'contacts.app.actionTitle',
+  'contacts.app.performAction',
+  'contacts.app.shouldEnableAction',
+  'mail.app.performMailActionWithMessages',
+]
 
 let manifests: { dir: string; manifest: AppManifest }[] = []
 

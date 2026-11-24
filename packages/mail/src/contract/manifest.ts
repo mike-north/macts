@@ -917,7 +917,7 @@ export const manifest: unknown = {
           access: 'rw',
           type: 'string',
           description:
-            'If rule matches, run this compiled AppleScript file. Set to empty string to disable this action',
+            'If rule matches, run this compiled script file. Set to empty string to disable this action',
           code: 'rras',
           optional: false,
         },
@@ -2055,7 +2055,7 @@ export const manifest: unknown = {
     performMailActionWithMessages: {
       name: 'performMailActionWithMessages',
       description:
-        'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
+        'Script handler invoked by rules and menus that run scripts. The direct parameter of this handler is a list of messages being acted upon.',
       scope: 'application',
       parameters: [
         {

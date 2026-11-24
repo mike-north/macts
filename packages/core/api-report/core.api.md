@@ -1723,6 +1723,9 @@ export function findDuplicateRoutes(manifest: AppManifest): {
 export function findMatchingPolicyRule(policy: GovernancePolicy, app: string, _resource: string, operation: string): PolicyRuleMatch | undefined;
 
 // @public
+export function findMechanismTermIssues(manifest: unknown): MechanismTermIssue[];
+
+// @public
 export interface FinePermission {
     // (undocumented)
     readonly app: string;
@@ -2481,6 +2484,15 @@ export const MAX_ITEMS_PER_COLLECTION = 60;
 
 // @public
 export const MAX_OUTPUT_BYTES: number;
+
+// @public
+export const MECHANISM_TERMS: RegExp;
+
+// @public
+export interface MechanismTermIssue {
+    readonly message: string;
+    readonly path: (string | number)[];
+}
 
 // @public
 export function mergeNullabilityObservations(manifest: AppManifest, observed: AppNullabilityResult): NullabilityMergeResult;

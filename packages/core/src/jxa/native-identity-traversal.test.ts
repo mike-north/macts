@@ -4,7 +4,7 @@
  */
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
-import { expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { AppManifestSchema } from '../manifest/schemas/app.js'
 import { panesManifest } from '../manifest/test-support/panes-positional.js'
 import { parseManifestYaml } from '../manifest/loader.js'
@@ -482,4 +482,114 @@ it.each([
   ['answered', { name: 'MactsCollectionChanged' }],
 ] as const)('tab-scoped get fails closed when its Session %s mid-read', (change, expected) => {
   expect(runTabScopedGet(change)).toMatchObject({ thrown: expected })
+})
+
+/**
+ * Window `7`: Tab 0 holds Sessions `[a, b]`, Tab 1 none. Session `a` leaves Tab 0 for Tab 1 on
+ * its second non-identity property read and is back in Tab 0 by its fifth, so every property read
+ * in between fails with "no such object" while the final identity check finds `a` where it began.
+ * A Session found by identity is a live specifier: while it is away it does not exist and its
+ * reads fail.
+ */
+function awayAndBackHost() {
+  const tabs: string[][] = [['a', 'b'], []]
+  let propertyReadsOfA = 0
+  /** `named` is the id a specifier was made with; a positional specifier names its occupant. */
+  const session = (occupant: () => string | undefined, named?: string) =>
+    new Proxy(
+      {},
+      {
+        get(_target, key) {
+          if (key === 'exists') return () => occupant() !== undefined
+          return () => {
+            if (key !== 'id' && (named ?? occupant()) === 'a') {
+              propertyReadsOfA++
+              if (propertyReadsOfA === 2) {
+                tabs[0] = ['b']
+                tabs[1] = ['a']
+              }
+              if (propertyReadsOfA === 5) {
+                tabs[0] = ['a', 'b']
+                tabs[1] = []
+              }
+            }
+            const id = occupant()
+            if (id === undefined)
+              throw Object.assign(new Error('No such object.'), { errorNumber: -1728 })
+            return key === 'id' ? id : `${String(key)}-of-${id}`
+          }
+        },
+      }
+    )
+  const tab = (index: number) => ({
+    exists: () => true,
+    sessions: {
+      get length() {
+        return tabs[index]?.length ?? 0
+      },
+      at: (position: number) => session(() => tabs[index]?.[position]),
+      byId: (id: string) => session(() => (tabs[index]?.includes(id) ? id : undefined), id),
+    },
+  })
+  const window = { exists: () => true, id: () => 7, tabs: { length: 2, at: tab } }
+  return { windows: { byId: () => window } }
+}
+
+/**
+ * The outcome of a read: the record it returned, or the error it threw. A Session that left
+ * and returned mid-read fails closed, as a missing target or a retryable collection change.
+ */
+function settle(read: () => unknown): { returned: unknown } | { thrown: unknown } {
+  try {
+    return { returned: read() }
+  } catch (error) {
+    return { thrown: error }
+  }
+}
+
+/** A missing target (`errorNumber`) or a collection change (`name`); never a returned record. */
+function expectMissingOrChanged(outcome: { returned: unknown } | { thrown: unknown }): void {
+  expect(outcome).not.toHaveProperty('returned')
+  const error = 'thrown' in outcome ? (outcome.thrown as Record<string, unknown>) : {}
+  expect(error['errorNumber'] === -1728 || error['name'] === 'MactsCollectionChanged').toBe(true)
+}
+
+describe('a Session that leaves its Tab and returns during one read (#332)', () => {
+  it('fails the Tab-scoped get closed instead of returning a partial record', () => {
+    const app = awayAndBackHost()
+    const body = buildNativeBody(manifest, { command: 'getSession', resource: 'Session' })
+    expectMissingOrChanged(
+      settle(() =>
+        evaluateBody(body, app, { windowId: 7, tabIndex: 0, sessionId: 'a' }, environment(app))
+      )
+    )
+  })
+
+  it('fails the Window-scoped resolve closed instead of returning a partial record', () => {
+    const app = awayAndBackHost()
+    const body = buildNativeBody(manifest, { command: 'resolveSession', resource: 'Session' })
+    expectMissingOrChanged(
+      settle(() => evaluateBody(body, app, { windowId: 7, sessionId: 'a' }, environment(app)))
+    )
+  })
+
+  it('fails a decoded reference read closed instead of returning a partial record', () => {
+    const app = awayAndBackHost()
+    const env = environment(app)
+    const body = buildResolutionBody(manifest, 'Session', 'one')
+    expectMissingOrChanged(
+      settle(() => {
+        const target = createNativeCodecFunctions().decode(reference, plan, env)
+        return evaluateBody(body, app, { target }, env)
+      })
+    )
+  })
+
+  it('still returns the whole record when the Session stays put (control)', () => {
+    const app = midReadHost('none')
+    const body = buildNativeBody(manifest, { command: 'resolveSession', resource: 'Session' })
+    expect(
+      evaluateBody(body, app, { windowId: 7, sessionId: 'a' }, environment(app))
+    ).toMatchObject({ id: 'a', columns: 'columns-of-a', backgroundColor: 'backgroundColor-of-a' })
+  })
 })

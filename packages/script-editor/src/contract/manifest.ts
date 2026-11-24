@@ -61,7 +61,8 @@ export const manifest: unknown = {
         language: {
           access: 'rw',
           type: 'string',
-          description: 'The scripting language (AppleScript or JavaScript)',
+          description:
+            'The name of the scripting language the document is written in, such as JavaScript',
           code: 'slng',
           optional: false,
         },

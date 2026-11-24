@@ -22,9 +22,9 @@
  * - phases/13 D7, "Resolvable targets": an operation whose required input
  *   admits no value is neither a tool nor a discoverable capability. Mail has
  *   no operation that gets one account, so Mail's synchronize is left out and
- *   Mail's check for new mail takes no account. Contacts gets one person
- *   (`people.get`), so its action commands, whose required input is a person,
- *   are served.
+ *   Mail's check for new mail takes no account.
+ * - Handlers an app sends to scripts are marked unsupported and are neither
+ *   tools nor capabilities: Contacts' Rollover plug-in handlers.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D5, D9)
  * @see https://github.com/mike-north/macts/issues/101
@@ -139,22 +139,25 @@ describe('macts --mcp (UAT): operations that cannot be called', () => {
     expect(names).toContain('macts__mail__app_check_for_new_mail')
   })
 
-  it('serves the Contacts actions, whose required person can be resolved', async () => {
+  it('lists no tool for the handlers Contacts sends to Rollover plug-ins', async () => {
     const { tools } = await session.client.listTools()
     const names = tools.map((tool) => tool.name)
     for (const name of [
+      'macts__contacts__app_action_property',
       'macts__contacts__app_action_title',
       'macts__contacts__app_perform_action',
       'macts__contacts__app_should_enable_action',
     ]) {
-      expect(names, name).toContain(name)
+      expect(names, name).not.toContain(name)
     }
+    // Contacts' own operations are served, so the absence is not vacuous.
+    expect(names).toContain('macts__contacts__people_get')
     const result = await callTool(session, 'macts__capabilities__discover', {
       capability: 'contacts.app.actionTitle',
     })
     expect(toolDocument(result)).toMatchObject({
-      found: true,
-      capability: { name: 'contacts.app.actionTitle', inputSchema: { required: ['with', 'for'] } },
+      found: false,
+      capability: 'contacts.app.actionTitle',
     })
   })
 

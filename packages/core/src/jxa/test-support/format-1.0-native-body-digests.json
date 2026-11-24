@@ -1,0 +1,141 @@
+{
+  "commit": "2341796537313e60f761cbdf90dc21d0051a31d7",
+  "cases": {
+    "alfred": {
+      "bodies": 38,
+      "digest": "fc5ac2ab680393edcbbad11dead52c8395bb82fccfc19948fb219376ef3f0b2e"
+    },
+    "arc": {
+      "bodies": 46,
+      "digest": "16336bd9c20e0b8aae14e3e8b36b7bafe4f0d2871db7b7a9ec0ed45fdd017ad3"
+    },
+    "automator": {
+      "bodies": 62,
+      "digest": "be1b148379227e4b0ebfb3b16b198000f3b53f3611f5d96fcff7128eea942ea4"
+    },
+    "bluetooth-file-exchange": {
+      "bodies": 10,
+      "digest": "5af44574c5d0eecf670b1f583e849e5b90e046045c41a07937e6ab11b24b9e7e"
+    },
+    "calendar": {
+      "bodies": 62,
+      "digest": "11c64c99063e92848406b203e37667fb9a84cee749f8e14948519f91f13c3e93"
+    },
+    "console": {
+      "bodies": 6,
+      "digest": "4c323175b2120f23b37448872161a74e31ce4c8ea69b8bde1393966599e3d49d"
+    },
+    "contacts": {
+      "bodies": 102,
+      "digest": "ac67b498f37f07edce8ed13afe55d48b9531c254520e07dfa6c01b3942764d5c"
+    },
+    "finder": {
+      "bodies": 128,
+      "digest": "60c71ec3cb8c6f9215939eddafb7f1f825e100d2fc8651964f65eed8cab97f33"
+    },
+    "google-chrome": {
+      "bodies": 112,
+      "digest": "b8c913f73925d2b35327d680637e31c46730c1aa809fb711fc86bee04d6ba525"
+    },
+    "mail": {
+      "bodies": 94,
+      "digest": "cc15a20b836eb2c4ee6aadcada247a503a8f23b232354ecf1ae23d5d433e215f"
+    },
+    "messages": {
+      "bodies": 18,
+      "digest": "bf3bb317fd0151f43b1d33eaa9905d58e905c299d29b2c9969ba69fa43ee7c29"
+    },
+    "microsoft-edge": {
+      "bodies": 96,
+      "digest": "210bcf9e09d8ba44ad42e4d0324d6ff297c2a9dba8961f5cc4d5d9e292454e5c"
+    },
+    "microsoft-word": {
+      "bodies": 98,
+      "digest": "4b53d490b00864d77a12ad0b8dfc929559aed2eafbadc41906bf34a467215f35"
+    },
+    "music": {
+      "bodies": 180,
+      "digest": "4e29235211bba3a23928e62892a7231d12c6e0447addede46d2238731f304e33"
+    },
+    "notes": {
+      "bodies": 48,
+      "digest": "cb8d47107d6f4b9e8cf71390d5170dad011a26de7733cc17e9ac3aa903e83e4f"
+    },
+    "omnifocus": {
+      "bodies": 124,
+      "digest": "9eb0c71db95a19fe2bdfb1a739c021798f5f8df120f328384da874fb300d67df"
+    },
+    "omnigraffle": {
+      "bodies": 106,
+      "digest": "adcd2d2a8c60efdca094cdb58d81941645e577a3ad3d23e05d777e34964f936a"
+    },
+    "omniplan": {
+      "bodies": 132,
+      "digest": "8f09228168639a65663bbaf1a88b02728fea4823c35d6bb2e96831bc0f7d7b5e"
+    },
+    "photos": {
+      "bodies": 90,
+      "digest": "d94f64fdf879b0ec2f3e3a4cff4a0a5c26713eecf5dea8d8a58b2e1133e24e47"
+    },
+    "preview": {
+      "bodies": 10,
+      "digest": "8f278fe9a9341014230995feecc08765dec6c34f80a9a3e7f5eba66945eb6a10"
+    },
+    "quicktime-player": {
+      "bodies": 62,
+      "digest": "d6efc54ab7ef0aa6fb5d8f4629cdf1719606fb8c89e621d2ff56aa6fbb695527"
+    },
+    "reminders": {
+      "bodies": 46,
+      "digest": "055644cf198a4dafd13941d5d951496d5c857849b49405ab4e2bfb0ab2bcc5cb"
+    },
+    "safari": {
+      "bodies": 44,
+      "digest": "17667020615a4b9a1daa8d2094c0652043857e846e1dd1b65a263e2356db3e1c"
+    },
+    "screen-sharing": {
+      "bodies": 14,
+      "digest": "f62f3693473f36353c52524f7e28ed248cfb58196d676d8fc7a27643e487afcc"
+    },
+    "script-editor": {
+      "bodies": 14,
+      "digest": "023d9f316a675d343300e6f6bb8679ecd5a0cea4666ed6573719839b031b93be"
+    },
+    "shortcuts": {
+      "bodies": 24,
+      "digest": "bb799e84384ce38485dd5787c3a2fc954faff8a5e9b26acacfb8b8f8577f740f"
+    },
+    "spotify": {
+      "bodies": 26,
+      "digest": "3a48f5805c616668cb68295239370c05224575e2cb2bab758fb04283d7c00c2c"
+    },
+    "system-events": {
+      "bodies": 298,
+      "digest": "af4f4491e31d73536cb832167cc0fc8125d13334a11c8d2381f1152e57f7c234"
+    },
+    "system-information": {
+      "bodies": 14,
+      "digest": "dab877aef8dce6be8b72eeed8e58a09f43ebedba4ab5f830f0a79063a9a64c37"
+    },
+    "system-settings": {
+      "bodies": 8,
+      "digest": "fa1779e1d65d7691d7058d31c00789123cf131778d0990ccc1c493cd540d2865"
+    },
+    "terminal": {
+      "bodies": 34,
+      "digest": "26dbcc0ec9f13d12611a6ad96d2ffc2ead758db102b71f7017169bf33ee07b52"
+    },
+    "textedit": {
+      "bodies": 14,
+      "digest": "b813888205bcc85550c9ebd2be44d9a4d0c835413ff18e059a83bb55451fc4a5"
+    },
+    "tv": {
+      "bodies": 168,
+      "digest": "99adf9d398f51dad85f3fe7f0d444608f0a275cef2391d2805effcb90c95de15"
+    },
+    "xcode": {
+      "bodies": 94,
+      "digest": "b6b3f8dd76d35966d355cbfe307ba6de8bc7ae26aa6128df59d5a1c5c062050d"
+    }
+  }
+}

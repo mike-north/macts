@@ -1031,12 +1031,12 @@ The native `Executor` maps a `NativeOutcome` failure to canonical errors:
   `InternalError`, never `ValidationError` or `UnexpectedValueError`: no input
   or result at that position can be converted, so neither the caller nor the
   app is at fault. Its message names the operation, the kind and the position.
-  For a reference it reads: The Contacts operation "actionTitle" takes a
-  reference at `for` that the macOS provider cannot convert yet.
+  For a reference it reads: The <App> operation "<command>" takes a
+  reference at `<position>` that the macOS provider cannot convert yet.
 - A codec `decode` failure with `missingResource` maps to
   `TargetNotFoundError` with `details: { resource }`, the referenced resource,
-  and a message naming the position: Contacts has no Person matching the
-  reference at `for`. It is not read from an app error number; the codec
+  and a message naming the position: <App> has no <Resource> matching the
+  reference at `<position>`. It is not read from an app error number; the codec
   checks existence before any command runs.
 - An app failure with -1728 and `missingResource` maps to
   `TargetNotFoundError` with `details: { resource }`, that resource: a scoped
@@ -2910,8 +2910,14 @@ exists in that Tab (closed, or moved to another Tab) is a retryable
 searches another Window. Tab reorder, closure of an earlier Tab, or
 movement of a Session between Tabs of its Window does not change what a
 reference means between reads. If a Session closes or moves while a single read
-is in progress, that read fails closed, reporting either a missing target or a
-retryable `CollectionChangedError`, and never returns a different Session.
+is in progress, that read fails closed and never returns another Session's
+data. When a property read finds the Session missing, the read re-checks that
+the Session still exists with its identity. A Session that is gone, moved or
+replaced at that re-check fails as a missing target or a retryable
+`CollectionChangedError`, even if it is back where it began before the read
+ends. A Session that leaves and returns within a single property read passes
+the re-check, so its record can lack fields. That record still holds only the
+Session's own data, and the output check reports it as `UnexpectedValueError`.
 Movement to another Window makes the old reference missing. No persistence
 across restoration or relaunch is promised.
 

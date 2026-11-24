@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest'
 import { generateCapabilitiesModule } from './index.js'
 import { notebookManifest } from '../../capabilities/test-fixtures.js'
+import { MECHANISM_TERMS } from '../../manifest/mechanism-terms.js'
 
 describe('generateCapabilitiesModule', () => {
   const source = generateCapabilitiesModule(notebookManifest())
@@ -47,7 +48,7 @@ describe('generateCapabilitiesModule', () => {
   })
 
   it('does not leak automation-mechanism terminology', () => {
-    expect(source).not.toMatch(/applescript|jxa|osascript/i)
+    expect(source).not.toMatch(MECHANISM_TERMS)
   })
 })
 

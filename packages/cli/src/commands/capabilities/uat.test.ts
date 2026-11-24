@@ -13,6 +13,7 @@ import { promisify } from 'node:util'
 import { existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { MECHANISM_TERMS } from '@macts/core'
 
 const execFileAsync = promisify(execFile)
 
@@ -22,8 +23,8 @@ const repoRoot = resolve(here, '../../../../..')
 const cliPackageDir = resolve(here, '../../..')
 const binPath = resolve(cliPackageDir, 'dist/bin.js')
 
-/** Regex matching any automation-mechanism terminology that must never leak. */
-const BANNED = /applescript|jxa|osascript|javascript for automation/i
+/** Automation-mechanism terminology that must never leak: core's one shared definition. */
+const BANNED = MECHANISM_TERMS
 
 interface CliResult {
   stdout: string
@@ -207,6 +208,30 @@ describe('macts capabilities (UAT)', () => {
     expect(inspect.stdout).not.toMatch(BANNED)
     expect(inspect.stderr).not.toMatch(BANNED)
   })
+
+  // These capabilities' dictionary text names the mechanism (a keyword its
+  // syntax makes optional, or a language that shares its name), so they are
+  // where a leak would show; the shipped manifests say what each input is.
+  it.each(['music.app.count', 'tv.app.make', 'script-editor.documents.create'])(
+    'never leaks automation-mechanism terminology when inspecting %s',
+    async (name) => {
+      const inspect = await runCli(['capabilities', 'inspect', name, '--json'])
+      expect(inspect.code).toBe(0)
+      expect(inspect.stdout).toContain(name)
+      expect(inspect.stdout).not.toMatch(BANNED)
+      expect(inspect.stderr).not.toMatch(BANNED)
+    }
+  )
+
+  it.each(['count elements', 'make a new element', 'create a script document'])(
+    'never leaks automation-mechanism terminology when searching for %s',
+    async (intent) => {
+      const search = await runCli(['capabilities', 'search', intent, '--limit', '50', '--json'])
+      expect(search.code).toBe(0)
+      expect(search.stdout).not.toMatch(BANNED)
+      expect(search.stderr).not.toMatch(BANNED)
+    }
+  )
 
   // Mail's "perform mail action with messages" is a handler Mail sends to a
   // user's script when a rule or menu item runs it, as its dictionary says; the

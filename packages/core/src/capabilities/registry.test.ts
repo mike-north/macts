@@ -15,6 +15,7 @@ import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
 import { NOTEBOOK_MANIFEST_YAML, notebookManifest } from './test-fixtures.js'
 import type { AppManifest } from '../manifest/index.js'
 import { panesManifest } from '../manifest/test-support/panes-positional.js'
+import { MECHANISM_TERMS } from '../manifest/mechanism-terms.js'
 
 /** Collection inputs remain flags; only an operation selecting an item has an item positional. */
 it('distinguishes an unscoped 1.1 list flag from the get item positional', () => {
@@ -109,9 +110,8 @@ describe('deriveCapabilities', () => {
   })
 
   it('never leaks automation-mechanism terminology into any snippet', () => {
-    const banned = /applescript|jxa|osascript|javascript for automation/i
     for (const cap of caps) {
-      expect(cap.cliSnippet ?? '').not.toMatch(banned)
+      expect(cap.cliSnippet ?? '').not.toMatch(MECHANISM_TERMS)
     }
   })
 
