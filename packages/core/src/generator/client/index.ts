@@ -264,13 +264,14 @@ function generatePackageJson(
     },
     publishConfig: { access: 'public' },
     type: 'module',
+    // Root declarations use the API rollup; subpaths use their built entry declarations.
     exports: {
       '.': {
         types: `./dist/${unscopedName}.d.ts`,
         import: './dist/index.js',
       },
       './cli': {
-        types: './dist/cli.d.ts',
+        types: './dist/cli/index.d.ts',
         import: './dist/cli/index.js',
       },
       './contract': {

@@ -171,7 +171,7 @@ describe('generateClientPackage: contract subpath', () => {
     const pkg = packageJson(generate())
     expect(pkg.exports).toEqual({
       '.': { types: './dist/calendar.d.ts', import: './dist/index.js' },
-      './cli': { types: './dist/cli.d.ts', import: './dist/cli/index.js' },
+      './cli': { types: './dist/cli/index.d.ts', import: './dist/cli/index.js' },
       './contract': {
         types: './dist/contract/index.d.ts',
         import: './dist/contract/index.js',

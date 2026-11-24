@@ -18,7 +18,7 @@
       "import": "./dist/index.js"
     },
     "./cli": {
-      "types": "./dist/cli.d.ts",
+      "types": "./dist/cli/index.d.ts",
       "import": "./dist/cli/index.js"
     },
     "./contract": {
