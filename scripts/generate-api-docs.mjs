@@ -283,10 +283,13 @@ for (const { packageName, identity, model } of entryPoints) {
  *
  * `api-documenter` computes every page file and every link to a page through
  * one method, so replacing that method keeps each link pointed at its page.
- * The method is not public API; if it is missing, the run fails instead of
- * silently writing colliding pages.
+ * The method is not public API; if it is missing, or the documenter never
+ * calls it, the run fails instead of silently writing colliding pages. For
+ * that reason `@microsoft/api-documenter` is pinned to an exact version in the
+ * root `package.json` (a manifest cannot hold comments): a release that renamed
+ * or stopped using the method would otherwise arrive with a routine install.
  */
-function documentWithDistinctPageNames(inputFolder, outputFolder) {
+async function documentWithDistinctPageNames(inputFolder, outputFolder) {
   // The documenter's own dependencies, so the model classes are the ones it uses.
   const requireTool = createRequire(
     createRequire(join(toolRoot, 'package.json')).resolve('@microsoft/api-documenter/package.json')
@@ -393,13 +396,22 @@ function documentWithDistinctPageNames(inputFolder, outputFolder) {
     return fileName
   }
 
-  return new ApiDocumenterCommandLine().executeAsync([
+  const documented = await new ApiDocumenterCommandLine().executeAsync([
     'markdown',
     '-i',
     inputFolder,
     '-o',
     outputFolder,
   ])
+  // A documenter that stopped naming pages through the replaced method would
+  // still succeed, with its own colliding names, so the run must prove the
+  // replacement named at least one page.
+  if (documented && owners.size === 0) {
+    throw new Error(
+      'api-documenter did not name any page through the replaced _getFilenameForApiItem, so page names are not guaranteed distinct'
+    )
+  }
+  return documented
 }
 
 let documented

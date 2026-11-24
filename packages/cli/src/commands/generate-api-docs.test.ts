@@ -327,6 +327,36 @@ function generate(
   return { status: run.status, stderr: run.stderr }
 }
 
+/**
+ * Run the script with a module preloaded (`--import`) that changes the
+ * documenter the script loads, to stand in for a documenter release that no
+ * longer names pages through the method the script replaces. The preload shares
+ * the script's module cache, so the change is in place before the script reads
+ * the documenter.
+ */
+async function generateWithDocumenterChange(change: string): Promise<{
+  status: number | null
+  stderr: string
+}> {
+  const preload = join(workspace, 'documenter-change.mjs')
+  await writeFile(
+    preload,
+    `import { createRequire } from 'node:module'
+const requireRoot = createRequire(${JSON.stringify(join(REPO_ROOT, 'package.json'))})
+const requireTool = createRequire(requireRoot.resolve('@microsoft/api-documenter/package.json'))
+const { MarkdownDocumenter } = requireTool('./lib/documenters/MarkdownDocumenter')
+const original = MarkdownDocumenter.prototype._getFilenameForApiItem
+${change}
+`
+  )
+  const nodeOptions = `${process.env['NODE_OPTIONS'] ?? ''} --import ${preload}`.trim()
+  const run = spawnSync(process.execPath, [DOCS_SCRIPT, '--root', workspace], {
+    encoding: 'utf-8',
+    env: { ...process.env, NODE_OPTIONS: nodeOptions },
+  })
+  return { status: run.status, stderr: run.stderr }
+}
+
 /** The page files `docs/` holds. */
 async function pages(): Promise<string[]> {
   return readdir(join(workspace, 'docs'))
@@ -597,6 +627,33 @@ describe('generate-api-docs', () => {
 
     expect(status).toBe(1)
     expect(stderr).toContain('widgets.make_1.md')
+  })
+
+  it('fails when this api-documenter version no longer has the method that names pages', async () => {
+    await plantPackage('widgets', 'weave')
+
+    const { status, stderr } = await generateWithDocumenterChange(
+      'delete MarkdownDocumenter.prototype._getFilenameForApiItem'
+    )
+
+    expect(status).toBe(1)
+    expect(stderr).toContain('no longer names pages through _getFilenameForApiItem')
+  })
+
+  it('fails when api-documenter never names a page through the replaced method', async () => {
+    await plantPackage('widgets', 'weave')
+
+    // The documenter keeps its own method; the script's replacement is ignored.
+    const { status, stderr } = await generateWithDocumenterChange(
+      `Object.defineProperty(MarkdownDocumenter.prototype, '_getFilenameForApiItem', {
+  configurable: true,
+  get: () => original,
+  set: () => undefined,
+})`
+    )
+
+    expect(status).toBe(1)
+    expect(stderr).toContain('did not name any page through the replaced _getFilenameForApiItem')
   })
 
   it("links a subpath member to the subpath's own declaration of a name the root entry also declares", async () => {
