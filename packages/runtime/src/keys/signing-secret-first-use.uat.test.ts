@@ -1,10 +1,10 @@
 /** First-use callers adopt the complete secret published by any winner. */
 import { afterEach, beforeEach, expect, it } from 'vitest'
-import { execFile } from 'node:child_process'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { PROCESS_UAT_TIMEOUT_MS, runTestChild } from '../child-process-test-helper.js'
 import { childEnvironment } from './child-environment.js'
 
 const entry = pathToFileURL(
@@ -64,7 +64,13 @@ try {
     const pending = m.getSigningSecret().then(value => ({ ok: true, value }), () => ({ ok: false }))
     await writeGate.ready
     if (mode === 'sync-wins') m.setKeyPolicy('probe', policy)
-    if (mode === 'external-wins') await new Promise((resolve, reject) => execFile(process.execPath, [winner], { env: process.env }, error => error ? reject(error) : resolve()))
+    if (mode === 'external-wins') await new Promise((resolve, reject) => {
+      const started = Date.now()
+      execFile(process.execPath, [winner], { env: process.env, timeout: 20000, killSignal: 'SIGKILL' }, (error, _stdout, stderr) => {
+        if (error) reject(new Error('external winner ' + (error.killed ? 'timed out' : 'failed') + ' after ' + (Date.now() - started) + ' ms; stderr:\\n' + stderr))
+        else resolve()
+      })
+    })
     writeGate.release()
     if (mode !== 'sync-wins') { await unlinkGate.ready; m.setKeyPolicy('probe', policy) }
     const disk = fs.readFileSync(file, 'utf8').trim(), identity = fs.statSync(file).ino
@@ -76,22 +82,12 @@ try {
 `
     )
     const env = { ...childEnvironment(), MACTS_HOME: join(work, 'home') }
-    const stdout = await new Promise<string>((resolve, reject) => {
-      execFile(
-        process.execPath,
-        [script, mode, winner],
-        { env, timeout: 30000 },
-        (error, output) => {
-          if (error instanceof Error) reject(error)
-          else resolve(output)
-        }
-      )
-    })
+    const { stdout } = await runTestChild(`first-use ${mode}`, [script, mode, winner], { env })
     expect(JSON.parse(stdout)).toEqual(
       mode === 'eight-callers'
         ? { matches: true, clean: true }
         : { matches: true, unchanged: true, clean: true, sync: true }
     )
   },
-  40000
+  PROCESS_UAT_TIMEOUT_MS
 )

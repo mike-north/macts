@@ -1,11 +1,15 @@
 /** Separate processes observe complete secrets and pick up rotations. */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { execFile } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import {
+  PROCESS_UAT_TIMEOUT_MS,
+  rejectOnTestChildFailure,
+  runTestChild,
+} from '../child-process-test-helper.js'
 import { childEnvironment } from './child-environment.js'
 
 const entry = pathToFileURL(
@@ -18,12 +22,9 @@ const hash = (s: string): string => createHash('sha256').update(s).digest('hex')
 /** Run the built package in a separate process with the same guarded environment. */
 function child(script: string, dir: string, role: string): Promise<string> {
   const env: NodeJS.ProcessEnv = { ...childEnvironment(), MACTS_HOME: join(dir, 'home') }
-  return new Promise((resolve, reject) => {
-    execFile(process.execPath, [script, dir, role], { env, timeout: 30000 }, (error, stdout) => {
-      if (error instanceof Error) reject(error)
-      else resolve(stdout)
-    })
-  })
+  return runTestChild(`replacement ${role}`, [script, dir, role], { env }).then(
+    (result) => result.stdout
+  )
 }
 
 /** Wait for a child to reach a named synchronization point. */
@@ -44,14 +45,16 @@ describe('signing secret replacement across processes', () => {
     rmSync(work, { recursive: true, force: true })
   })
 
-  it('keeps both reader paths on complete secrets during a paused write', async () => {
-    const home = join(work, 'home', 'secrets')
-    mkdirSync(home, { recursive: true })
-    writeFileSync(join(home, 'api-key-secret'), oldSecret)
-    const script = join(work, 'child.mjs')
-    writeFileSync(
-      script,
-      `
+  it(
+    'keeps both reader paths on complete secrets during a paused write',
+    async () => {
+      const home = join(work, 'home', 'secrets')
+      mkdirSync(home, { recursive: true })
+      writeFileSync(join(home, 'api-key-secret'), oldSecret)
+      const script = join(work, 'child.mjs')
+      writeFileSync(
+        script,
+        `
 import fs from 'node:fs/promises'
 import { existsSync, writeFileSync } from 'node:fs'
 import { syncBuiltinESMExports } from 'node:module'
@@ -80,23 +83,29 @@ else if (role === 'sync' || role === 'sync-new') {
   process.stdout.write(String(matched))
 }
 `
-    )
-    const replacing = child(script, work, 'replace')
-    try {
-      await waitFor(join(work, 'paused'))
-      const results = await Promise.all([child(script, work, 'async'), child(script, work, 'sync')])
-      expect(results).toEqual([hash(oldSecret), 'true'])
-    } finally {
-      writeFileSync(join(work, 'go'), '')
-      await replacing
-    }
-    const results = await Promise.all([
-      child(script, work, 'async'),
-      child(script, work, 'sync-new'),
-    ])
-    expect(results).toEqual([hash(newSecret), 'true'])
-    expect(statSync(join(home, 'api-key-secret')).mode & 0o777).toBe(0o600)
-  })
+      )
+      const replacing = child(script, work, 'replace')
+      const replacementFailure = rejectOnTestChildFailure([replacing])
+      try {
+        await Promise.race([waitFor(join(work, 'paused')), replacementFailure])
+        const results = await Promise.all([
+          child(script, work, 'async'),
+          child(script, work, 'sync'),
+        ])
+        expect(results).toEqual([hash(oldSecret), 'true'])
+      } finally {
+        writeFileSync(join(work, 'go'), '')
+        await replacing
+      }
+      const results = await Promise.all([
+        child(script, work, 'async'),
+        child(script, work, 'sync-new'),
+      ])
+      expect(results).toEqual([hash(newSecret), 'true'])
+      expect(statSync(join(home, 'api-key-secret')).mode & 0o777).toBe(0o600)
+    },
+    PROCESS_UAT_TIMEOUT_MS
+  )
 
   it.each(['async', 'sync'])(
     'refreshes a running process on its next %s operation',
@@ -135,13 +144,18 @@ else {
 `
       )
       const reader = child(script, work, kind)
+      const readerFailure = rejectOnTestChildFailure([reader])
+      let replaced = false
       try {
-        await waitFor(join(work, 'ready'))
+        await Promise.race([waitFor(join(work, 'ready')), readerFailure])
         await child(script, work, 'replace')
+        replaced = true
       } finally {
         writeFileSync(join(work, 'go'), '')
+        if (!replaced) await Promise.allSettled([reader])
       }
       expect(await reader).toBe(kind === 'async' ? hash(newSecret) : 'true')
-    }
+    },
+    PROCESS_UAT_TIMEOUT_MS
   )
 })
