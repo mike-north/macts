@@ -48,7 +48,7 @@ vi.mock('node:fs/promises', async (original) => {
   }
 })
 
-it('refuses a candidate after observing different bytes even if those bytes change back', async () => {
+it('adopts the current file after observing different bytes and changing back', async () => {
   const file = path.join(home, 'secrets', 'api-key-secret')
   gate.phase = 'unlink'
   let resume = () => {
@@ -65,6 +65,7 @@ it('refuses a candidate after observing different bytes even if those bytes chan
   try {
     await reached
     const candidate = fs.readFileSync(file, 'utf8')
+    const identity = fs.statSync(file).ino
     const policy = {
       version: '1' as const,
       defaultDisposition: 'forbidden' as const,
@@ -76,12 +77,16 @@ it('refuses a candidate after observing different bytes even if those bytes chan
     fs.writeFileSync(file, candidate)
     storage.setKeyPolicy('probe', policy)
     resume()
+    // A previously observed value does not prevent adopting the current file.
     expect(
       await pending.then(
-        () => false,
-        () => true
+        (value) => value === candidate,
+        () => false
       )
     ).toBe(true)
+    expect(fs.statSync(file).ino).toBe(identity)
+    expect(fs.readFileSync(file, 'utf8')).toBe(candidate)
+    expect(fs.readdirSync(path.dirname(file))).toEqual(['api-key-secret'])
   } finally {
     resume()
     storage.closeKeyStore()

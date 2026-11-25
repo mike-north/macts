@@ -82,9 +82,6 @@ function hasUsedSecretFile(): boolean {
 /** Concurrent asynchronous initializers share the same candidate publication. */
 let pendingSecretCreation: Promise<string> | null = null
 
-/** Remembers any conflicting file observation throughout an async publication. */
-let creationObservation: { candidate: string; conflict: boolean } | null = null
-
 /** Current schema version (bump when adding migrations) */
 const SCHEMA_VERSION = 1
 
@@ -444,9 +441,6 @@ function refreshSigningSecret(): string {
   const fd = fsSync.openSync(SECRET_FILE, 'r')
   try {
     const secret = requireStoredSecret(fsSync.readFileSync(fd, 'utf8'))
-    if (creationObservation && creationObservation.candidate !== secret) {
-      creationObservation.conflict = true
-    }
     if (cachedSigningSecret !== secret) cachedEncryptionKey = null
     cachedSigningSecret = secret
     hasSeenSecretFile = true
@@ -478,7 +472,7 @@ function readOrCreateSecretSync(): string {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
   }
-  if (hasSeenSecretFile) throw new Error('The API key signing secret file is missing.')
+  if (hasSeenSecretFile) return refreshSigningSecret()
   fsSync.mkdirSync(SECRETS_DIR, { recursive: true, mode: 0o700 })
   const candidate = secretCandidatePath()
   const fd = fsSync.openSync(candidate, 'wx', 0o600)
@@ -524,26 +518,23 @@ async function readOrCreateSecret(): Promise<string> {
   }
   pendingSecretCreation ??= createSecret().finally(() => {
     pendingSecretCreation = null
-    creationObservation = null
   })
   return pendingSecretCreation
 }
 
 /**
- * Once a process has used a file secret it cannot establish a new identity.
- * Async callers share creation; observation is checked before candidate creation
- * and again immediately before synchronous publication, with no interleaving
- * between the latter check and link. If another path observes different bytes
- * while cleanup awaits, the initializer refuses its result as well.
+ * A process that has used a file secret may adopt an existing secret but must
+ * not publish a new one. Async callers share creation; checks before candidate
+ * creation and immediately before synchronous linking prevent publication
+ * after use. Refreshing after cleanup adopts the current winner or fails if
+ * it is missing or blank, including when another path won the race.
  */
 async function createSecret(): Promise<string> {
   await ensureSecretsDir()
-  if (hasSeenSecretFile) throw new Error('The API key signing secret file is missing.')
+  if (hasSeenSecretFile) return refreshSigningSecret()
   const candidate = secretCandidatePath()
   const handle = await fs.open(candidate, 'wx', 0o600)
   const generated = generateSecret()
-  creationObservation = { candidate: generated, conflict: false }
-  let result: string
   try {
     try {
       await handle.writeFile(generated)
@@ -557,13 +548,13 @@ async function createSecret(): Promise<string> {
       throw error
     }
     await handle.close()
-    if (hasUsedSecretFile()) throw new Error('The API key signing secret file is missing.')
-    try {
-      fsSync.linkSync(candidate, SECRET_FILE)
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+    if (!hasUsedSecretFile()) {
+      try {
+        fsSync.linkSync(candidate, SECRET_FILE)
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+      }
     }
-    result = requireStoredSecret(await fs.readFile(SECRET_FILE, 'utf8'))
   } finally {
     try {
       await fs.unlink(candidate)
@@ -571,10 +562,7 @@ async function createSecret(): Promise<string> {
       warnSecretCleanup(candidate, 'remove', error)
     }
   }
-  if (creationObservation.conflict || (hasUsedSecretFile() && cachedSigningSecret !== result)) {
-    throw new Error('The API key signing secret changed during initialization.')
-  }
-  return result
+  return refreshSigningSecret()
 }
 
 /**
