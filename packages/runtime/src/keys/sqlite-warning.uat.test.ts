@@ -53,7 +53,12 @@ interface ProcessResult {
  */
 function childEnv(mactsHome: string): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: mactsHome }
-  delete env['NODE_OPTIONS']
+  // Preserve preloads while preventing inherited flags from hiding warnings.
+  if (env['NODE_OPTIONS']) {
+    env['NODE_OPTIONS'] = env['NODE_OPTIONS']
+      .replace(/(?:^|\s)--no-warnings(?=\s|$)/g, '')
+      .replace(/(?:^|\s)--disable-warning(?:=\S+|\s+\S+)/g, '')
+  }
   delete env['NODE_NO_WARNINGS']
   delete env['MACTS_API_KEY_SECRET']
   return env

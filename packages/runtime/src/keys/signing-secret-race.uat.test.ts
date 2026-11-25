@@ -71,7 +71,6 @@ process.stdout.write(JSON.stringify({ hash, valid, count }))
       const { mkdirSync } = await import('node:fs')
       mkdirSync(dir)
       const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: join(dir, 'home') }
-      delete env['NODE_OPTIONS']
       delete env['MACTS_API_KEY_SECRET']
       const children = Array.from({ length: processes }, (_, i) =>
         exec(script, dir, String(i), env)

@@ -65,11 +65,17 @@ const SECRET_ENV_VAR = 'MACTS_API_KEY_SECRET'
 /** Singleton database instance */
 let db: SqliteDatabase | null = null
 
-/** Cached signing secret (indefinite per-process cache) */
+/** Secret last selected from the environment or the shared file. */
 let cachedSigningSecret: string | null = null
 
 /** Cached encryption key derived from signing secret */
 let cachedEncryptionKey: Buffer | null = null
+
+/** Identity and modification state of the file from which the cache was read. */
+let cachedSecretStat: fsSync.Stats | null = null
+
+/** Once a file has been used, its disappearance must not create a new identity. */
+let hasSeenSecretFile = false
 
 /** Current schema version (bump when adding migrations) */
 const SCHEMA_VERSION = 1
@@ -206,27 +212,15 @@ function migrateSchema(database: SqliteDatabase): void {
 }
 
 /**
- * Get the encryption key, deriving it from the cached signing secret.
- *
- * The signing secret must already be cached (via getSigningSecret)
- * before calling any storage functions that need encryption.
- * Falls back to reading from file synchronously if not cached.
+ * Get the metadata key after checking the same secret used for signing.
  */
 function getEncryptionKey(): Buffer {
-  if (cachedEncryptionKey) {
-    return cachedEncryptionKey
+  if (!process.env[SECRET_ENV_VAR] && !hasSeenSecretFile) {
+    readOrCreateSecretSync()
+    hasSeenSecretFile = true
   }
-
-  if (!cachedSigningSecret) {
-    const envSecret = process.env[SECRET_ENV_VAR]
-    if (envSecret) {
-      cachedSigningSecret = envSecret
-    } else {
-      cachedSigningSecret = readOrCreateSecretSync()
-    }
-  }
-
-  cachedEncryptionKey = deriveEncryptionKey(cachedSigningSecret)
+  const secret = refreshSigningSecret()
+  cachedEncryptionKey ??= deriveEncryptionKey(secret)
   return cachedEncryptionKey
 }
 
@@ -421,6 +415,53 @@ function requireStoredSecret(contents: string): string {
   return secret
 }
 
+/**
+ * Select the current secret for both signing and metadata. A single stat on
+ * each access is inexpensive beside signing or database encryption and lets
+ * each process notice replacement without cross-process notification. A file
+ * descriptor binds a re-read to its own identity even if a rename races it.
+ * Changes to file metadata also make in-place damage visible. A missing or
+ * blank file after first use fails closed rather than creating a new secret.
+ * The environment override does not consult the file.
+ *
+ * Rotation takes effect on the next key operation in each process. Tokens and
+ * encrypted metadata created with the old secret cannot be verified or
+ * decrypted with the new secret.
+ */
+function refreshSigningSecret(): string {
+  const envSecret = process.env[SECRET_ENV_VAR]
+  if (envSecret) {
+    if (cachedSigningSecret !== envSecret || cachedSecretStat !== null) cachedEncryptionKey = null
+    cachedSigningSecret = envSecret
+    cachedSecretStat = null
+    return envSecret
+  }
+  const current = fsSync.statSync(SECRET_FILE)
+  const previous = cachedSecretStat
+  if (
+    previous &&
+    cachedSigningSecret !== null &&
+    previous.dev === current.dev &&
+    previous.ino === current.ino &&
+    previous.size === current.size &&
+    previous.mtimeMs === current.mtimeMs &&
+    previous.ctimeMs === current.ctimeMs
+  )
+    return cachedSigningSecret
+  const fd = fsSync.openSync(SECRET_FILE, 'r')
+  try {
+    const identity = fsSync.fstatSync(fd)
+    const secret = requireStoredSecret(fsSync.readFileSync(fd, 'utf8'))
+    cachedSigningSecret = secret
+    cachedSecretStat = identity
+    cachedEncryptionKey = null
+    hasSeenSecretFile = true
+    return secret
+  } finally {
+    fsSync.closeSync(fd)
+  }
+}
+
 /** A private candidate name in the same directory permits atomic hard-link publication. */
 function secretCandidatePath(): string {
   return path.join(SECRETS_DIR, `.api-key-secret-${crypto.randomBytes(16).toString('hex')}`)
@@ -537,21 +578,11 @@ export function generateSecret(): string {
  * @returns The signing secret
  */
 export async function getSigningSecret(): Promise<string> {
-  // Return cached secret if available
-  if (cachedSigningSecret) {
-    return cachedSigningSecret
+  if (!process.env[SECRET_ENV_VAR] && !hasSeenSecretFile) {
+    await readOrCreateSecret()
+    hasSeenSecretFile = true
   }
-
-  // Check environment variable first
-  const envSecret = process.env[SECRET_ENV_VAR]
-  if (envSecret) {
-    cachedSigningSecret = envSecret
-    return envSecret
-  }
-
-  const secret = await readOrCreateSecret()
-  cachedSigningSecret = secret
-  return secret
+  return refreshSigningSecret()
 }
 
 /**
@@ -560,10 +591,36 @@ export async function getSigningSecret(): Promise<string> {
  * @param secret - The secret to store
  */
 export async function setSigningSecret(secret: string): Promise<void> {
+  requireStoredSecret(secret)
   await ensureSecretsDir()
-  await fs.writeFile(SECRET_FILE, secret, { mode: 0o600 })
-  cachedSigningSecret = secret
-  cachedEncryptionKey = null // Invalidate derived key
+  const candidate = secretCandidatePath()
+  const handle = await fs.open(candidate, 'wx', 0o600)
+  let published = false
+  try {
+    try {
+      await handle.writeFile(secret)
+      await handle.sync()
+    } catch (error) {
+      try {
+        await handle.close()
+      } catch (closeError) {
+        warnSecretCleanup(candidate, 'close', closeError)
+      }
+      throw error
+    }
+    await handle.close()
+    await fs.rename(candidate, SECRET_FILE)
+    published = true
+    hasSeenSecretFile = true
+  } finally {
+    if (!published) {
+      try {
+        await fs.unlink(candidate)
+      } catch (error) {
+        warnSecretCleanup(candidate, 'remove', error)
+      }
+    }
+  }
 }
 
 // =============================================================================

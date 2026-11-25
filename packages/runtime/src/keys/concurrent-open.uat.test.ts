@@ -69,7 +69,6 @@ describe('opening one fresh key store from several processes at once (UAT)', () 
   /** Environment for a child process: the parent's, with a throwaway home and no inherited secret. */
   function childEnv(home: string): NodeJS.ProcessEnv {
     const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: home }
-    delete env['NODE_OPTIONS']
     delete env['MACTS_API_KEY_SECRET']
     return env
   }
