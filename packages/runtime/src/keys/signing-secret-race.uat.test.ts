@@ -15,18 +15,14 @@ import {
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { childEnvironment } from './child-environment.js'
 
 const exec = (script: string, dir: string, id: string, env: NodeJS.ProcessEnv): Promise<string> =>
   new Promise((resolve, reject) => {
-    execFile(
-      process.execPath,
-      ['--no-warnings', script, dir, id],
-      { env, timeout: 30000 },
-      (error, stdout) => {
-        if (error instanceof Error) reject(error)
-        else resolve(stdout)
-      }
-    )
+    execFile(process.execPath, [script, dir, id], { env, timeout: 30000 }, (error, stdout) => {
+      if (error instanceof Error) reject(error)
+      else resolve(stdout)
+    })
   })
 const entry = pathToFileURL(
   resolve(dirname(fileURLToPath(import.meta.url)), '../../dist/index.js')
@@ -70,8 +66,7 @@ process.stdout.write(JSON.stringify({ hash, valid, count }))
       const dir = join(work, String(round))
       const { mkdirSync } = await import('node:fs')
       mkdirSync(dir)
-      const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: join(dir, 'home') }
-      delete env['MACTS_API_KEY_SECRET']
+      const env: NodeJS.ProcessEnv = { ...childEnvironment(), MACTS_HOME: join(dir, 'home') }
       const children = Array.from({ length: processes }, (_, i) =>
         exec(script, dir, String(i), env)
       )

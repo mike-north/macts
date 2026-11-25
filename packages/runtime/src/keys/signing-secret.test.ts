@@ -48,6 +48,16 @@ vi.mock('node:fs/promises', async (original) => {
     },
   }
 })
+vi.mock('node:fs', async (original) => {
+  const actual = await original<typeof import('node:fs')>()
+  return {
+    ...actual,
+    linkSync: (source: string, target: string) => {
+      if (faults.lose) actual.writeFileSync(target, 'winner-secret', { mode: 0o600 })
+      actual.linkSync(source, target)
+    },
+  }
+})
 
 describe('signing secret publication', () => {
   let home: string

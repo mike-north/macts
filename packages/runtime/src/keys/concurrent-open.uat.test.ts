@@ -22,6 +22,7 @@ import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { childEnvironment } from './child-environment.js'
 
 /** Capture both streams even when execFile is wrapped by a process guard. */
 function execFileAsync(
@@ -68,9 +69,7 @@ describe('opening one fresh key store from several processes at once (UAT)', () 
 
   /** Environment for a child process: the parent's, with a throwaway home and no inherited secret. */
   function childEnv(home: string): NodeJS.ProcessEnv {
-    const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: home }
-    delete env['MACTS_API_KEY_SECRET']
-    return env
+    return { ...childEnvironment(), MACTS_HOME: home }
   }
 
   it('succeeds in every process, and the store they share then works', async () => {

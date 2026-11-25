@@ -6,6 +6,7 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } f
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { childEnvironment } from './child-environment.js'
 
 const entry = pathToFileURL(
   resolve(dirname(fileURLToPath(import.meta.url)), '../../dist/index.js')
@@ -16,18 +17,12 @@ const hash = (s: string): string => createHash('sha256').update(s).digest('hex')
 
 /** Run the built package in a separate process with the same guarded environment. */
 function child(script: string, dir: string, role: string): Promise<string> {
-  const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: join(dir, 'home') }
-  delete env['MACTS_API_KEY_SECRET']
+  const env: NodeJS.ProcessEnv = { ...childEnvironment(), MACTS_HOME: join(dir, 'home') }
   return new Promise((resolve, reject) => {
-    execFile(
-      process.execPath,
-      ['--no-warnings', script, dir, role],
-      { env, timeout: 30000 },
-      (error, stdout) => {
-        if (error instanceof Error) reject(error)
-        else resolve(stdout)
-      }
-    )
+    execFile(process.execPath, [script, dir, role], { env, timeout: 30000 }, (error, stdout) => {
+      if (error instanceof Error) reject(error)
+      else resolve(stdout)
+    })
   })
 }
 
