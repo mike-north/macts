@@ -22,9 +22,20 @@ import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { promisify } from 'node:util'
 
-const execFileAsync = promisify(execFile)
+/** Capture both streams even when execFile is wrapped by a process guard. */
+function execFileAsync(
+  file: string,
+  args: string[],
+  options: { env: NodeJS.ProcessEnv; cwd: string }
+): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    execFile(file, args, options, (error, stdout, stderr) => {
+      if (error instanceof Error) reject(error)
+      else resolve({ stdout, stderr })
+    })
+  })
+}
 
 const here = dirname(fileURLToPath(import.meta.url))
 // packages/runtime/src/keys → the package root is two levels up.
