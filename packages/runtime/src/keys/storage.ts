@@ -426,10 +426,16 @@ function secretCandidatePath(): string {
   return path.join(SECRETS_DIR, `.api-key-secret-${crypto.randomBytes(16).toString('hex')}`)
 }
 
+/** Report cleanup failures without replacing the result of publication. */
+function warnSecretCleanup(candidate: string, action: string, error: unknown): void {
+  process.emitWarning(`Could not ${action} signing secret candidate ${candidate}: ${String(error)}`)
+}
+
 /**
  * Synchronous counterpart for metadata operations that cannot await. A link
  * makes a complete candidate visible at the final name only if it is absent.
  * Competing creators read the published winner, and never cache their candidate.
+ * Cleanup is attempted without masking a prior failure; refused cleanup is reported.
  */
 function readOrCreateSecretSync(): string {
   try {
@@ -444,9 +450,15 @@ function readOrCreateSecretSync(): string {
     try {
       fsSync.writeFileSync(fd, generateSecret())
       fsSync.fsyncSync(fd)
-    } finally {
-      fsSync.closeSync(fd)
+    } catch (error) {
+      try {
+        fsSync.closeSync(fd)
+      } catch (closeError) {
+        warnSecretCleanup(candidate, 'close', closeError)
+      }
+      throw error
     }
+    fsSync.closeSync(fd)
     try {
       fsSync.linkSync(candidate, SECRET_FILE)
     } catch (error) {
@@ -454,14 +466,19 @@ function readOrCreateSecretSync(): string {
     }
     return requireStoredSecret(fsSync.readFileSync(SECRET_FILE, 'utf8'))
   } finally {
-    fsSync.unlinkSync(candidate)
+    try {
+      fsSync.unlinkSync(candidate)
+    } catch (error) {
+      warnSecretCleanup(candidate, 'remove', error)
+    }
   }
 }
 
 /**
  * Publish only a fully written candidate. Linking in the same directory is an
  * atomic no-overwrite operation, so readers see either no file or all of the
- * winning secret. The candidate is private and removed on every exit path.
+ * winning secret. Removal is attempted on every path; refused cleanup is
+ * reported without replacing an operation failure or a successful result.
  */
 async function readOrCreateSecret(): Promise<string> {
   try {
@@ -476,9 +493,15 @@ async function readOrCreateSecret(): Promise<string> {
     try {
       await handle.writeFile(generateSecret())
       await handle.sync()
-    } finally {
-      await handle.close()
+    } catch (error) {
+      try {
+        await handle.close()
+      } catch (closeError) {
+        warnSecretCleanup(candidate, 'close', closeError)
+      }
+      throw error
     }
+    await handle.close()
     try {
       await fs.link(candidate, SECRET_FILE)
     } catch (error) {
@@ -486,7 +509,11 @@ async function readOrCreateSecret(): Promise<string> {
     }
     return requireStoredSecret(await fs.readFile(SECRET_FILE, 'utf8'))
   } finally {
-    await fs.unlink(candidate)
+    try {
+      await fs.unlink(candidate)
+    } catch (error) {
+      warnSecretCleanup(candidate, 'remove', error)
+    }
   }
 }
 

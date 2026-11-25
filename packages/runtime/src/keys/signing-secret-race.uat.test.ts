@@ -7,6 +7,7 @@ import {
   mkdtempSync,
   readFileSync,
   readdirSync,
+  renameSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -44,7 +45,7 @@ describe('concurrent signing secret creation (issue #345)', () => {
       script,
       `
 import { createHash } from 'node:crypto'
-import { existsSync, writeFileSync, readFileSync } from 'node:fs'
+import { existsSync, writeFileSync, readFileSync, renameSync } from 'node:fs'
 import { createApiKey, getSigningSecret, validateApiKey, loadKeyMetadata, closeKeyStore } from ${JSON.stringify(entry)}
 const [dir, id] = process.argv.slice(2)
 writeFileSync(dir + '/ready-' + id, '')
@@ -52,7 +53,8 @@ while (!existsSync(dir + '/go')) await new Promise(r => setTimeout(r, 2))
 const secret = await getSigningSecret()
 const hash = createHash('sha256').update(secret).digest('hex')
 const { token } = await createApiKey({ name: id, permissions: ['calendar:events:list'] })
-writeFileSync(dir + '/key-' + id, token)
+writeFileSync(dir + '/pending-' + id, token)
+renameSync(dir + '/pending-' + id, dir + '/key-' + id)
 while (!existsSync(dir + '/verify')) await new Promise(r => setTimeout(r, 2))
 const tokens = JSON.parse(readFileSync(dir + '/verify', 'utf8'))
 const valid = await Promise.all(tokens.map(async token => (await validateApiKey(token)).valid))
@@ -88,7 +90,8 @@ process.stdout.write(JSON.stringify({ hash, valid, count }))
       const tokens = Array.from({ length: processes }, (_, i) =>
         readFileSync(join(dir, `key-${String(i)}`), 'utf8')
       )
-      writeFileSync(join(dir, 'verify'), JSON.stringify(tokens))
+      writeFileSync(join(dir, 'verify-pending'), JSON.stringify(tokens))
+      renameSync(join(dir, 'verify-pending'), join(dir, 'verify'))
       const results = await Promise.all(children)
       const reports = results.map(
         (stdout) => JSON.parse(stdout) as { hash: string; valid: boolean[]; count: number }
