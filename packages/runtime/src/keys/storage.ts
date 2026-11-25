@@ -218,20 +218,11 @@ function getEncryptionKey(): Buffer {
   }
 
   if (!cachedSigningSecret) {
-    // Try to load synchronously from env or file
     const envSecret = process.env[SECRET_ENV_VAR]
     if (envSecret) {
       cachedSigningSecret = envSecret
     } else {
-      try {
-        cachedSigningSecret = fsSync.readFileSync(SECRET_FILE, 'utf-8').trim()
-      } catch {
-        // Generate and store a new secret synchronously
-        ensureMactsDir()
-        fsSync.mkdirSync(SECRETS_DIR, { recursive: true, mode: 0o700 })
-        cachedSigningSecret = crypto.randomBytes(32).toString('base64')
-        fsSync.writeFileSync(SECRET_FILE, cachedSigningSecret, { mode: 0o600 })
-      }
+      cachedSigningSecret = readOrCreateSecretSync()
     }
   }
 
@@ -421,6 +412,111 @@ async function ensureSecretsDir(): Promise<void> {
   await fs.mkdir(SECRETS_DIR, { recursive: true, mode: 0o700 })
 }
 
+/** A stored secret must contain meaningful material; never replace a damaged file. */
+function requireStoredSecret(contents: string): string {
+  const secret = contents.trim()
+  if (!secret) {
+    throw new Error('The API key signing secret file is empty.')
+  }
+  return secret
+}
+
+/** A private candidate name in the same directory permits atomic hard-link publication. */
+function secretCandidatePath(): string {
+  return path.join(SECRETS_DIR, `.api-key-secret-${crypto.randomBytes(16).toString('hex')}`)
+}
+
+/** Report cleanup failures without replacing the result of publication. */
+function warnSecretCleanup(candidate: string, action: string, error: unknown): void {
+  process.emitWarning(`Could not ${action} signing secret candidate ${candidate}: ${String(error)}`)
+}
+
+/**
+ * Synchronous counterpart for metadata operations that cannot await. A link
+ * makes a complete candidate visible at the final name only if it is absent.
+ * Competing creators read the published winner, and never cache their candidate.
+ * Cleanup is attempted without masking a prior failure; refused cleanup is reported.
+ */
+function readOrCreateSecretSync(): string {
+  try {
+    return requireStoredSecret(fsSync.readFileSync(SECRET_FILE, 'utf8'))
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+  }
+  fsSync.mkdirSync(SECRETS_DIR, { recursive: true, mode: 0o700 })
+  const candidate = secretCandidatePath()
+  const fd = fsSync.openSync(candidate, 'wx', 0o600)
+  try {
+    try {
+      fsSync.writeFileSync(fd, generateSecret())
+      fsSync.fsyncSync(fd)
+    } catch (error) {
+      try {
+        fsSync.closeSync(fd)
+      } catch (closeError) {
+        warnSecretCleanup(candidate, 'close', closeError)
+      }
+      throw error
+    }
+    fsSync.closeSync(fd)
+    try {
+      fsSync.linkSync(candidate, SECRET_FILE)
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+    }
+    return requireStoredSecret(fsSync.readFileSync(SECRET_FILE, 'utf8'))
+  } finally {
+    try {
+      fsSync.unlinkSync(candidate)
+    } catch (error) {
+      warnSecretCleanup(candidate, 'remove', error)
+    }
+  }
+}
+
+/**
+ * Publish only a fully written candidate. Linking in the same directory is an
+ * atomic no-overwrite operation, so readers see either no file or all of the
+ * winning secret. Removal is attempted on every path; refused cleanup is
+ * reported without replacing an operation failure or a successful result.
+ */
+async function readOrCreateSecret(): Promise<string> {
+  try {
+    return requireStoredSecret(await fs.readFile(SECRET_FILE, 'utf8'))
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+  }
+  await ensureSecretsDir()
+  const candidate = secretCandidatePath()
+  const handle = await fs.open(candidate, 'wx', 0o600)
+  try {
+    try {
+      await handle.writeFile(generateSecret())
+      await handle.sync()
+    } catch (error) {
+      try {
+        await handle.close()
+      } catch (closeError) {
+        warnSecretCleanup(candidate, 'close', closeError)
+      }
+      throw error
+    }
+    await handle.close()
+    try {
+      await fs.link(candidate, SECRET_FILE)
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+    }
+    return requireStoredSecret(await fs.readFile(SECRET_FILE, 'utf8'))
+  } finally {
+    try {
+      await fs.unlink(candidate)
+    } catch (error) {
+      warnSecretCleanup(candidate, 'remove', error)
+    }
+  }
+}
+
 /**
  * Generate a new cryptographically secure signing secret.
  *
@@ -453,22 +549,7 @@ export async function getSigningSecret(): Promise<string> {
     return envSecret
   }
 
-  // Try to read from file
-  try {
-    const secret = await fs.readFile(SECRET_FILE, 'utf-8')
-    const trimmed = secret.trim()
-    cachedSigningSecret = trimmed
-    return trimmed
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
-      throw err
-    }
-  }
-
-  // Generate new secret
-  await ensureSecretsDir()
-  const secret = generateSecret()
-  await fs.writeFile(SECRET_FILE, secret, { mode: 0o600 })
+  const secret = await readOrCreateSecret()
   cachedSigningSecret = secret
   return secret
 }
