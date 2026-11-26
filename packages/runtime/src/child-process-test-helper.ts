@@ -45,12 +45,17 @@ export function runTestChild(
   } = {}
 ): Promise<ITestChildResult> {
   const started = performance.now()
+  const guard = childEnvironment()['NODE_OPTIONS']
+  const env = childEnvironment({ ...process.env, ...options.env })
+  // Caller additions cannot replace the guard selected from the test session.
+  if (guard === undefined) delete env['NODE_OPTIONS']
+  else env['NODE_OPTIONS'] = guard
   return new Promise((resolve, reject) => {
     execFile(
       process.execPath,
       [...args],
       {
-        env: { ...childEnvironment(), ...options.env },
+        env,
         cwd: options.cwd,
         timeout: options.timeoutMs ?? TEST_CHILD_TIMEOUT_MS,
         killSignal: 'SIGKILL',

@@ -103,6 +103,53 @@ it('does not run a session preload or inherit a secret override in a consumer', 
   }
 }, 40000)
 
+it.each(['copied session', 'replaced options'])(
+  'isolates a consumer when the caller supplies %s',
+  async (kind) => {
+    const work = mkdtempSync(join(tmpdir(), 'macts-child-override-'))
+    const marker = join(work, 'preload-ran')
+    const preload = join(work, 'preload.mjs')
+    writeFileSync(
+      preload,
+      `import { writeFileSync } from 'node:fs'; writeFileSync(${JSON.stringify(marker)}, '')`
+    )
+    const previousOptions = process.env['NODE_OPTIONS']
+    const previousSecret = process.env['MACTS_API_KEY_SECRET']
+    const previousWarnings = process.env['NODE_NO_WARNINGS']
+    const hadGuard = previousOptions?.includes('macts-nonnative-process-guard.mjs') ?? false
+    process.env['NODE_OPTIONS'] =
+      `${previousOptions ?? ''} --import ${JSON.stringify(preload)} --conditions=probe`
+    process.env['MACTS_API_KEY_SECRET'] = 'test-only-override'
+    process.env['NODE_NO_WARNINGS'] = '1'
+    const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: 'test-home' }
+    if (kind === 'replaced options') env['NODE_OPTIONS'] = '--conditions=probe'
+    try {
+      const result = await runTestChild(
+        'forwarded environment',
+        [
+          '-e',
+          "process.stdout.write(JSON.stringify({ secret: Boolean(process.env.MACTS_API_KEY_SECRET), guard: (process.env.NODE_OPTIONS ?? '').includes('macts-nonnative-process-guard.mjs'), extra: (process.env.NODE_OPTIONS ?? '').includes('--conditions=probe'), warnings: Boolean(process.env.NODE_NO_WARNINGS), home: process.env.MACTS_HOME }))",
+        ],
+        { env }
+      )
+      const parsed: unknown = JSON.parse(result.stdout)
+      expect({ child: parsed, preloadRan: existsSync(marker) }).toEqual({
+        child: { secret: false, guard: hadGuard, extra: false, warnings: false, home: 'test-home' },
+        preloadRan: false,
+      })
+    } finally {
+      if (previousOptions === undefined) delete process.env['NODE_OPTIONS']
+      else process.env['NODE_OPTIONS'] = previousOptions
+      if (previousSecret === undefined) delete process.env['MACTS_API_KEY_SECRET']
+      else process.env['MACTS_API_KEY_SECRET'] = previousSecret
+      if (previousWarnings === undefined) delete process.env['NODE_NO_WARNINGS']
+      else process.env['NODE_NO_WARNINGS'] = previousWarnings
+      rmSync(work, { recursive: true, force: true })
+    }
+  },
+  40000
+)
+
 it('surfaces a child failure while a synchronization point is still pending', async () => {
   const failure = new Error('child failed')
   const child = Promise.reject(failure)
