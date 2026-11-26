@@ -65,11 +65,22 @@ const SECRET_ENV_VAR = 'MACTS_API_KEY_SECRET'
 /** Singleton database instance */
 let db: SqliteDatabase | null = null
 
-/** Cached signing secret (indefinite per-process cache) */
+/** Secret last selected from the environment or the shared file. */
 let cachedSigningSecret: string | null = null
 
 /** Cached encryption key derived from signing secret */
 let cachedEncryptionKey: Buffer | null = null
+
+/** Once a file has been used, its disappearance must not create a new identity. */
+let hasSeenSecretFile = false
+
+/** Observation can change during asynchronous file operations. */
+function hasUsedSecretFile(): boolean {
+  return hasSeenSecretFile
+}
+
+/** Concurrent asynchronous initializers share the same candidate publication. */
+let pendingSecretCreation: Promise<string> | null = null
 
 /** Current schema version (bump when adding migrations) */
 const SCHEMA_VERSION = 1
@@ -206,27 +217,15 @@ function migrateSchema(database: SqliteDatabase): void {
 }
 
 /**
- * Get the encryption key, deriving it from the cached signing secret.
- *
- * The signing secret must already be cached (via getSigningSecret)
- * before calling any storage functions that need encryption.
- * Falls back to reading from file synchronously if not cached.
+ * Get the metadata key after checking the same secret used for signing.
  */
 function getEncryptionKey(): Buffer {
-  if (cachedEncryptionKey) {
-    return cachedEncryptionKey
+  if (!process.env[SECRET_ENV_VAR] && !hasSeenSecretFile) {
+    readOrCreateSecretSync()
+    hasSeenSecretFile = true
   }
-
-  if (!cachedSigningSecret) {
-    const envSecret = process.env[SECRET_ENV_VAR]
-    if (envSecret) {
-      cachedSigningSecret = envSecret
-    } else {
-      cachedSigningSecret = readOrCreateSecretSync()
-    }
-  }
-
-  cachedEncryptionKey = deriveEncryptionKey(cachedSigningSecret)
+  const secret = refreshSigningSecret()
+  cachedEncryptionKey ??= deriveEncryptionKey(secret)
   return cachedEncryptionKey
 }
 
@@ -421,6 +420,36 @@ function requireStoredSecret(contents: string): string {
   return secret
 }
 
+/**
+ * Select the current secret for both signing and metadata. Reading through one
+ * descriptor on each access observes complete atomic replacements and detects
+ * changes that file metadata cannot distinguish. A missing or
+ * blank file after first use fails closed rather than creating a new secret.
+ * The environment override does not consult the file.
+ *
+ * Rotation takes effect on the next key operation in each process. Tokens and
+ * encrypted metadata created with the old secret cannot be verified or
+ * decrypted with the new secret.
+ */
+function refreshSigningSecret(): string {
+  const envSecret = process.env[SECRET_ENV_VAR]
+  if (envSecret) {
+    if (cachedSigningSecret !== envSecret) cachedEncryptionKey = null
+    cachedSigningSecret = envSecret
+    return envSecret
+  }
+  const fd = fsSync.openSync(SECRET_FILE, 'r')
+  try {
+    const secret = requireStoredSecret(fsSync.readFileSync(fd, 'utf8'))
+    if (cachedSigningSecret !== secret) cachedEncryptionKey = null
+    cachedSigningSecret = secret
+    hasSeenSecretFile = true
+    return secret
+  } finally {
+    fsSync.closeSync(fd)
+  }
+}
+
 /** A private candidate name in the same directory permits atomic hard-link publication. */
 function secretCandidatePath(): string {
   return path.join(SECRETS_DIR, `.api-key-secret-${crypto.randomBytes(16).toString('hex')}`)
@@ -443,6 +472,7 @@ function readOrCreateSecretSync(): string {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
   }
+  if (hasSeenSecretFile) return refreshSigningSecret()
   fsSync.mkdirSync(SECRETS_DIR, { recursive: true, mode: 0o700 })
   const candidate = secretCandidatePath()
   const fd = fsSync.openSync(candidate, 'wx', 0o600)
@@ -486,12 +516,28 @@ async function readOrCreateSecret(): Promise<string> {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
   }
+  pendingSecretCreation ??= createSecret().finally(() => {
+    pendingSecretCreation = null
+  })
+  return pendingSecretCreation
+}
+
+/**
+ * A process that has used a file secret may adopt an existing secret but must
+ * not publish a new one. Async callers share creation; checks before candidate
+ * creation and immediately before synchronous linking prevent publication
+ * after use. Refreshing after cleanup adopts the current winner or fails if
+ * it is missing or blank, including when another path won the race.
+ */
+async function createSecret(): Promise<string> {
   await ensureSecretsDir()
+  if (hasSeenSecretFile) return refreshSigningSecret()
   const candidate = secretCandidatePath()
   const handle = await fs.open(candidate, 'wx', 0o600)
+  const generated = generateSecret()
   try {
     try {
-      await handle.writeFile(generateSecret())
+      await handle.writeFile(generated)
       await handle.sync()
     } catch (error) {
       try {
@@ -502,12 +548,13 @@ async function readOrCreateSecret(): Promise<string> {
       throw error
     }
     await handle.close()
-    try {
-      await fs.link(candidate, SECRET_FILE)
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+    if (!hasUsedSecretFile()) {
+      try {
+        fsSync.linkSync(candidate, SECRET_FILE)
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+      }
     }
-    return requireStoredSecret(await fs.readFile(SECRET_FILE, 'utf8'))
   } finally {
     try {
       await fs.unlink(candidate)
@@ -515,6 +562,7 @@ async function readOrCreateSecret(): Promise<string> {
       warnSecretCleanup(candidate, 'remove', error)
     }
   }
+  return refreshSigningSecret()
 }
 
 /**
@@ -537,21 +585,11 @@ export function generateSecret(): string {
  * @returns The signing secret
  */
 export async function getSigningSecret(): Promise<string> {
-  // Return cached secret if available
-  if (cachedSigningSecret) {
-    return cachedSigningSecret
+  if (!process.env[SECRET_ENV_VAR] && !hasSeenSecretFile) {
+    await readOrCreateSecret()
+    hasSeenSecretFile = true
   }
-
-  // Check environment variable first
-  const envSecret = process.env[SECRET_ENV_VAR]
-  if (envSecret) {
-    cachedSigningSecret = envSecret
-    return envSecret
-  }
-
-  const secret = await readOrCreateSecret()
-  cachedSigningSecret = secret
-  return secret
+  return refreshSigningSecret()
 }
 
 /**
@@ -560,10 +598,36 @@ export async function getSigningSecret(): Promise<string> {
  * @param secret - The secret to store
  */
 export async function setSigningSecret(secret: string): Promise<void> {
+  requireStoredSecret(secret)
   await ensureSecretsDir()
-  await fs.writeFile(SECRET_FILE, secret, { mode: 0o600 })
-  cachedSigningSecret = secret
-  cachedEncryptionKey = null // Invalidate derived key
+  const candidate = secretCandidatePath()
+  const handle = await fs.open(candidate, 'wx', 0o600)
+  let published = false
+  try {
+    try {
+      await handle.writeFile(secret)
+      await handle.sync()
+    } catch (error) {
+      try {
+        await handle.close()
+      } catch (closeError) {
+        warnSecretCleanup(candidate, 'close', closeError)
+      }
+      throw error
+    }
+    await handle.close()
+    await fs.rename(candidate, SECRET_FILE)
+    published = true
+    hasSeenSecretFile = true
+  } finally {
+    if (!published) {
+      try {
+        await fs.unlink(candidate)
+      } catch (error) {
+        warnSecretCleanup(candidate, 'remove', error)
+      }
+    }
+  }
 }
 
 // =============================================================================

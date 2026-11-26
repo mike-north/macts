@@ -18,25 +18,11 @@
  */
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { execFile } from 'node:child_process'
 import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-
-/** Capture both streams even when execFile is wrapped by a process guard. */
-function execFileAsync(
-  file: string,
-  args: string[],
-  options: { env: NodeJS.ProcessEnv; cwd: string }
-): Promise<{ stdout: string; stderr: string }> {
-  return new Promise((resolve, reject) => {
-    execFile(file, args, options, (error, stdout, stderr) => {
-      if (error instanceof Error) reject(error)
-      else resolve({ stdout, stderr })
-    })
-  })
-}
+import { PROCESS_UAT_TIMEOUT_MS, runTestChild } from '../child-process-test-helper.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 // packages/runtime/src/keys → the package root is two levels up.
@@ -45,18 +31,6 @@ const builtEntry = resolve(here, '../../dist/index.js')
 interface ProcessResult {
   stdout: string
   stderr: string
-}
-
-/**
- * Environment for the child process: the parent's, minus anything that would
- * silence warnings globally and so make the test pass vacuously.
- */
-function childEnv(mactsHome: string): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = { ...process.env, MACTS_HOME: mactsHome }
-  delete env['NODE_OPTIONS']
-  delete env['NODE_NO_WARNINGS']
-  delete env['MACTS_API_KEY_SECRET']
-  return env
 }
 
 describe('opening the key store (UAT)', () => {
@@ -92,27 +66,42 @@ describe('opening the key store (UAT)', () => {
         `console.log(JSON.stringify({ keyCount: keys.length }))`,
       ].join('\n')
     )
-    return execFileAsync(process.execPath, [script], { env: childEnv(mactsHome), cwd: workDir })
+    return runTestChild('sqlite-warning consumer', [script], {
+      env: { MACTS_HOME: mactsHome },
+      cwd: workDir,
+    })
   }
 
-  it('creates the store and reads it', async () => {
-    const { stdout } = await runConsumer()
+  it(
+    'creates the store and reads it',
+    async () => {
+      const { stdout } = await runConsumer()
 
-    expect(JSON.parse(stdout)).toEqual({ keyCount: 0 })
-    expect(existsSync(join(workDir, 'home', 'api-keys.db'))).toBe(true)
-  })
+      expect(JSON.parse(stdout)).toEqual({ keyCount: 0 })
+      expect(existsSync(join(workDir, 'home', 'api-keys.db'))).toBe(true)
+    },
+    PROCESS_UAT_TIMEOUT_MS
+  )
 
-  it('prints no SQLite ExperimentalWarning', async () => {
-    const { stderr } = await runConsumer()
+  it(
+    'prints no SQLite ExperimentalWarning',
+    async () => {
+      const { stderr } = await runConsumer()
 
-    expect(stderr).not.toMatch(/ExperimentalWarning[^\n]*SQLite/)
-    expect(stderr).not.toContain('SQLite is an experimental feature')
-  })
+      expect(stderr).not.toMatch(/ExperimentalWarning[^\n]*SQLite/)
+      expect(stderr).not.toContain('SQLite is an experimental feature')
+    },
+    PROCESS_UAT_TIMEOUT_MS
+  )
 
-  it("still prints the consumer's own warning", async () => {
-    const { stderr } = await runConsumer()
+  it(
+    "still prints the consumer's own warning",
+    async () => {
+      const { stderr } = await runConsumer()
 
-    // Node's default warning printer: "(node:<pid>) <name>: <message>".
-    expect(stderr).toMatch(/\(node:\d+\) CustomWarning: probe/)
-  })
+      // Node's default warning printer: "(node:<pid>) <name>: <message>".
+      expect(stderr).toMatch(/\(node:\d+\) CustomWarning: probe/)
+    },
+    PROCESS_UAT_TIMEOUT_MS
+  )
 })
