@@ -20,7 +20,11 @@ import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { PROCESS_UAT_TIMEOUT_MS, runTestChild } from '../child-process-test-helper.js'
+import {
+  PROCESS_UAT_TIMEOUT_MS,
+  runTestChild,
+  runTestChildGroup,
+} from '../child-process-test-helper.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 // packages/runtime/src/transfers → the package root is two levels up.
@@ -68,11 +72,9 @@ describe('opening one fresh home from several processes at once (UAT)', () => {
         ].join('\n')
       )
 
-      const results = await Promise.all(
+      const results = await runTestChildGroup(
         Array.from({ length: PROCESSES }, (_, index) =>
-          runTestChild(`transfer open-store ${String(index)}`, ['--no-warnings', script], {
-            env: { ...process.env },
-          })
+          runTestChild(`transfer open-store ${String(index)}`, ['--no-warnings', script])
         )
       )
       const tokens = results.map((result) => result.stdout)

@@ -1,11 +1,15 @@
 /** First-use callers adopt the complete secret published by any winner. */
 import { afterEach, beforeEach, expect, it } from 'vitest'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { PROCESS_UAT_TIMEOUT_MS, runTestChild } from '../child-process-test-helper.js'
-import { childEnvironment } from './child-environment.js'
+import {
+  PROCESS_UAT_TIMEOUT_MS,
+  rejectOnTestChildFailure,
+  runTestChild,
+  runTestChildGroup,
+} from '../child-process-test-helper.js'
 
 const entry = pathToFileURL(
   resolve(dirname(fileURLToPath(import.meta.url)), '../../dist/index.js')
@@ -17,6 +21,15 @@ beforeEach(() => {
 afterEach(() => {
   rmSync(work, { recursive: true, force: true })
 })
+
+/** Wait for a consumer to request its competing publisher. */
+async function waitFor(file: string): Promise<void> {
+  for (let i = 0; i < 3000; i++) {
+    if (existsSync(file)) return
+    await new Promise((resolve) => setTimeout(resolve, 10))
+  }
+  throw new Error('Timed out waiting for the competing publisher')
+}
 
 it.each(['sync-wins', 'external-wins', 'own-wins', 'eight-callers'])(
   'adopts the current secret when %s',
@@ -32,9 +45,8 @@ it.each(['sync-wins', 'external-wins', 'own-wins', 'eight-callers'])(
       `
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
-import { execFile } from 'node:child_process'
 import { syncBuiltinESMExports } from 'node:module'
-const [mode, winner] = process.argv.slice(2)
+const [mode, dir] = process.argv.slice(2)
 const file = process.env.MACTS_HOME + '/secrets/api-key-secret'
 function barrier() {
   let reached, release
@@ -64,13 +76,10 @@ try {
     const pending = m.getSigningSecret().then(value => ({ ok: true, value }), () => ({ ok: false }))
     await writeGate.ready
     if (mode === 'sync-wins') m.setKeyPolicy('probe', policy)
-    if (mode === 'external-wins') await new Promise((resolve, reject) => {
-      const started = Date.now()
-      execFile(process.execPath, [winner], { env: process.env, timeout: 20000, killSignal: 'SIGKILL' }, (error, _stdout, stderr) => {
-        if (error) reject(new Error('external winner ' + (error.killed ? 'timed out' : 'failed') + ' after ' + (Date.now() - started) + ' ms; stderr:\\n' + stderr))
-        else resolve()
-      })
-    })
+    if (mode === 'external-wins') {
+      fs.writeFileSync(dir + '/winner-request', '')
+      while (!fs.existsSync(dir + '/winner-done')) await new Promise(r => setTimeout(r, 10))
+    }
     writeGate.release()
     if (mode !== 'sync-wins') { await unlinkGate.ready; m.setKeyPolicy('probe', policy) }
     const disk = fs.readFileSync(file, 'utf8').trim(), identity = fs.statSync(file).ino
@@ -81,8 +90,34 @@ try {
 } finally { writeGate.release(); unlinkGate.release(); m.closeKeyStore() }
 `
     )
-    const env = { ...childEnvironment(), MACTS_HOME: join(work, 'home') }
-    const { stdout } = await runTestChild(`first-use ${mode}`, [script, mode, winner], { env })
+    const env = { MACTS_HOME: join(work, 'home') }
+    const consumer = runTestChild(`first-use ${mode}`, [script, mode, work], { env })
+    let publisher: ReturnType<typeof runTestChild> | undefined
+    let failure: unknown
+    try {
+      if (mode === 'external-wins') {
+        await Promise.race([
+          waitFor(join(work, 'winner-request')),
+          rejectOnTestChildFailure([consumer]),
+        ])
+        publisher = runTestChild('external winner', [winner], { env })
+        await Promise.race([publisher, rejectOnTestChildFailure([consumer, publisher])])
+        writeFileSync(join(work, 'winner-done'), '')
+      }
+      await consumer
+    } catch (error) {
+      failure = error
+    } finally {
+      if (mode === 'external-wins') writeFileSync(join(work, 'winner-done'), '')
+      try {
+        await runTestChildGroup(publisher ? [consumer, publisher] : [consumer])
+      } catch (error) {
+        if (failure === undefined) failure = error
+      }
+    }
+    if (failure instanceof Error) throw failure
+    if (failure !== undefined) throw new Error('Child operation failed', { cause: failure })
+    const { stdout } = await consumer
     expect(JSON.parse(stdout)).toEqual(
       mode === 'eight-callers'
         ? { matches: true, clean: true }

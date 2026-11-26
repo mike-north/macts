@@ -9,8 +9,8 @@ import {
   PROCESS_UAT_TIMEOUT_MS,
   rejectOnTestChildFailure,
   runTestChild,
+  runTestChildGroup,
 } from '../child-process-test-helper.js'
-import { childEnvironment } from './child-environment.js'
 
 const entry = pathToFileURL(
   resolve(dirname(fileURLToPath(import.meta.url)), '../../dist/index.js')
@@ -21,10 +21,9 @@ const hash = (s: string): string => createHash('sha256').update(s).digest('hex')
 
 /** Run the built package in a separate process with the same guarded environment. */
 function child(script: string, dir: string, role: string): Promise<string> {
-  const env: NodeJS.ProcessEnv = { ...childEnvironment(), MACTS_HOME: join(dir, 'home') }
-  return runTestChild(`replacement ${role}`, [script, dir, role], { env }).then(
-    (result) => result.stdout
-  )
+  return runTestChild(`replacement ${role}`, [script, dir, role], {
+    env: { MACTS_HOME: join(dir, 'home') },
+  }).then((result) => result.stdout)
 }
 
 /** Wait for a child to reach a named synchronization point. */
@@ -86,18 +85,29 @@ else if (role === 'sync' || role === 'sync-new') {
       )
       const replacing = child(script, work, 'replace')
       const replacementFailure = rejectOnTestChildFailure([replacing])
+      let readers: Promise<string>[] = []
+      let failure: unknown
       try {
         await Promise.race([waitFor(join(work, 'paused')), replacementFailure])
-        const results = await Promise.all([
-          child(script, work, 'async'),
-          child(script, work, 'sync'),
+        readers = [child(script, work, 'async'), child(script, work, 'sync')]
+        const results = await Promise.race([
+          runTestChildGroup(readers),
+          rejectOnTestChildFailure([replacing, ...readers]),
         ])
         expect(results).toEqual([hash(oldSecret), 'true'])
+      } catch (error) {
+        failure = error
       } finally {
         writeFileSync(join(work, 'go'), '')
-        await replacing
+        try {
+          await runTestChildGroup([replacing, ...readers])
+        } catch (error) {
+          if (failure === undefined) failure = error
+        }
       }
-      const results = await Promise.all([
+      if (failure instanceof Error) throw failure
+      if (failure !== undefined) throw new Error('Child operation failed', { cause: failure })
+      const results = await runTestChildGroup([
         child(script, work, 'async'),
         child(script, work, 'sync-new'),
       ])
@@ -145,15 +155,24 @@ else {
       )
       const reader = child(script, work, kind)
       const readerFailure = rejectOnTestChildFailure([reader])
-      let replaced = false
+      let replacing: Promise<string> | undefined
+      let failure: unknown
       try {
         await Promise.race([waitFor(join(work, 'ready')), readerFailure])
-        await child(script, work, 'replace')
-        replaced = true
+        replacing = child(script, work, 'replace')
+        await Promise.race([replacing, rejectOnTestChildFailure([reader, replacing])])
+      } catch (error) {
+        failure = error
       } finally {
         writeFileSync(join(work, 'go'), '')
-        if (!replaced) await Promise.allSettled([reader])
+        try {
+          await runTestChildGroup(replacing ? [reader, replacing] : [reader])
+        } catch (error) {
+          if (failure === undefined) failure = error
+        }
       }
+      if (failure instanceof Error) throw failure
+      if (failure !== undefined) throw new Error('Child operation failed', { cause: failure })
       expect(await reader).toBe(kind === 'async' ? hash(newSecret) : 'true')
     },
     PROCESS_UAT_TIMEOUT_MS

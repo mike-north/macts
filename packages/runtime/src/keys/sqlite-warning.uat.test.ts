@@ -23,7 +23,6 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { PROCESS_UAT_TIMEOUT_MS, runTestChild } from '../child-process-test-helper.js'
-import { childEnvironment } from './child-environment.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 // packages/runtime/src/keys → the package root is two levels up.
@@ -32,14 +31,6 @@ const builtEntry = resolve(here, '../../dist/index.js')
 interface ProcessResult {
   stdout: string
   stderr: string
-}
-
-/**
- * Environment for the child process: the parent's, minus anything that would
- * silence warnings globally and so make the test pass vacuously.
- */
-function childEnv(mactsHome: string): NodeJS.ProcessEnv {
-  return { ...childEnvironment(), MACTS_HOME: mactsHome }
 }
 
 describe('opening the key store (UAT)', () => {
@@ -76,7 +67,7 @@ describe('opening the key store (UAT)', () => {
       ].join('\n')
     )
     return runTestChild('sqlite-warning consumer', [script], {
-      env: childEnv(mactsHome),
+      env: { MACTS_HOME: mactsHome },
       cwd: workDir,
     })
   }

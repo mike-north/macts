@@ -21,8 +21,11 @@ import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { PROCESS_UAT_TIMEOUT_MS, runTestChild } from '../child-process-test-helper.js'
-import { childEnvironment } from './child-environment.js'
+import {
+  PROCESS_UAT_TIMEOUT_MS,
+  runTestChild,
+  runTestChildGroup,
+} from '../child-process-test-helper.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 // packages/runtime/src/keys → the package root is two levels up.
@@ -53,11 +56,6 @@ describe('opening one fresh key store from several processes at once (UAT)', () 
     rmSync(workDir, { recursive: true, force: true })
   })
 
-  /** Environment for a child process: the parent's, with a throwaway home and no inherited secret. */
-  function childEnv(home: string): NodeJS.ProcessEnv {
-    return { ...childEnvironment(), MACTS_HOME: home }
-  }
-
   it(
     'succeeds in every process, and the store they share then works',
     async () => {
@@ -74,10 +72,10 @@ describe('opening one fresh key store from several processes at once (UAT)', () 
         ].join('\n')
       )
 
-      const results = await Promise.all(
+      const results = await runTestChildGroup(
         Array.from({ length: PROCESSES }, (_, index) =>
           runTestChild(`open-store ${String(index)}`, ['--no-warnings', open], {
-            env: childEnv(home),
+            env: { MACTS_HOME: home },
             cwd: workDir,
           })
         )
@@ -95,7 +93,7 @@ describe('opening one fresh key store from several processes at once (UAT)', () 
         ].join('\n')
       )
       const { stdout } = await runTestChild('use-store', ['--no-warnings', use], {
-        env: childEnv(home),
+        env: { MACTS_HOME: home },
         cwd: workDir,
       })
       const used = JSON.parse(stdout) as { keyId: string; listed: string[] }

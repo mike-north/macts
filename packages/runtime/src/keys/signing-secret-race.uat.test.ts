@@ -18,8 +18,8 @@ import {
   PROCESS_UAT_TIMEOUT_MS,
   rejectOnTestChildFailure,
   runTestChild,
+  runTestChildGroup,
 } from '../child-process-test-helper.js'
-import { childEnvironment } from './child-environment.js'
 
 const exec = (script: string, dir: string, id: string, env: NodeJS.ProcessEnv): Promise<string> =>
   runTestChild(`secret race round ${dir} child ${id}`, [script, dir, id], { env }).then(
@@ -69,7 +69,7 @@ process.stdout.write(JSON.stringify({ hash, valid, count }))
         const dir = join(work, String(round))
         const { mkdirSync } = await import('node:fs')
         mkdirSync(dir)
-        const env: NodeJS.ProcessEnv = { ...childEnvironment(), MACTS_HOME: join(dir, 'home') }
+        const env: NodeJS.ProcessEnv = { MACTS_HOME: join(dir, 'home') }
         const children = Array.from({ length: processes }, (_, i) =>
           exec(script, dir, String(i), env)
         )
@@ -92,7 +92,7 @@ process.stdout.write(JSON.stringify({ hash, valid, count }))
           )
           writeFileSync(join(dir, 'verify-pending'), JSON.stringify(tokens))
           renameSync(join(dir, 'verify-pending'), join(dir, 'verify'))
-          const results = await Promise.all(children)
+          const results = await runTestChildGroup(children)
           completed = true
           const reports = results.map(
             (stdout) => JSON.parse(stdout) as { hash: string; valid: boolean[]; count: number }
