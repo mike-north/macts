@@ -1,5 +1,22 @@
 # @macts/mail
 
+## 0.6.0
+
+### Minor Changes
+
+- e7a407f: A command's `unsupported` marker now also accepts dictionary handler evidence: the app's dictionary documents the command as a handler the app sends to a user's script, not a command it carries out. Such a command has no route, operation, tool, capability or derived permission, and the SDKs and the CLI omit it. The new `DictionaryHandlerEvidenceSchema` and `CommandUnsupportedEvidenceSchema` describe the evidence.
+
+  Mail's `performMailActionWithMessages`, a handler Mail sends to scripts when a rule or menu item runs one, is marked this way and is no longer offered.
+
+### Patch Changes
+
+- b658122: Manifest validation now rejects a manifest whose text names the automation mechanism: any description, name, key or author-written evidence note, apart from the dictionary's own words quoted in evidence (`term`, `statement`) and the `extraction` notes. Every surface derives its text from the manifest, so capabilities, contracts, the CLI, clients and MCP tools no longer carry these terms. `MECHANISM_TERMS` is the one definition of the terms, and `findMechanismTermIssues` reports where a manifest names one.
+
+  The Music and TV `count` and `make` inputs, Script Editor's document `language`, Mail's rule `runScript`, OmniGraffle's attached `script`, and the OmniFocus and OmniPlan suite descriptions now say what each is without naming the mechanism.
+
+- fe454b9: Make exported declaration paths available in built packages.
+  - @macts/contracts@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @macts/system-settings-server
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [fe454b9]
+  - @macts/system-settings@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

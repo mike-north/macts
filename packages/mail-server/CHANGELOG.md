@@ -1,5 +1,14 @@
 # @macts/mail-server
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [e7a407f]
+- Updated dependencies [b658122]
+- Updated dependencies [fe454b9]
+  - @macts/mail@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

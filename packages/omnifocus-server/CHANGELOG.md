@@ -1,5 +1,13 @@
 # @macts/omnifocus-server
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [b658122]
+- Updated dependencies [fe454b9]
+  - @macts/omnifocus@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

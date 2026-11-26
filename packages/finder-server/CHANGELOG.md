@@ -1,5 +1,12 @@
 # @macts/finder-server
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [fe454b9]
+  - @macts/finder@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

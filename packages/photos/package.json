@@ -1,6 +1,6 @@
 {
   "name": "@macts/photos",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "SDK and CLI for macOS photos automation",
   "license": "MIT",
   "repository": {

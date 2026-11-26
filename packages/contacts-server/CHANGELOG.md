@@ -1,5 +1,13 @@
 # @macts/contacts-server
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [76f5399]
+- Updated dependencies [fe454b9]
+  - @macts/contacts@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

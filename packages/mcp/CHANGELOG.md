@@ -1,5 +1,32 @@
 # @macts/mcp
 
+## 0.6.0
+
+### Patch Changes
+
+- 298b040: Capability CLI snippets and the generated CLI now come from one command tree, so a snippet always names a command the app's CLI registers. A capability whose operation has no CLI command (a resource update or delete, a create where the hierarchy entry is read-only, or a resource with no hierarchy entry) now has no `cliSnippet` instead of one naming a command that does not exist; `Capability.cliSnippet` is `string | undefined`. Affected today: Calendar event update and delete, Microsoft Edge tab and window create, Notes attachment list and get, Reminders delete, System Events action perform and UI element click and select, and Terminal tab list and get.
+
+  `macts capabilities inspect` and `search`, and the MCP discovery tool, report `call: null` for such a capability; the human-readable output names its MCP tool instead.
+
+  CLI generation now refuses a manifest in which two commands are placed at the same CLI path, naming the path and each command.
+
+- Updated dependencies [e7a407f]
+- Updated dependencies [298b040]
+- Updated dependencies [a295def]
+- Updated dependencies [d57951d]
+- Updated dependencies [0999cfd]
+- Updated dependencies [b658122]
+- Updated dependencies [7330158]
+- Updated dependencies [241be94]
+- Updated dependencies [c8d6ba1]
+- Updated dependencies [fe454b9]
+- Updated dependencies [4627f9a]
+- Updated dependencies [bf1ea58]
+- Updated dependencies [2341796]
+  - @macts/core@0.6.0
+  - @macts/runtime@0.6.0
+  - @macts/contracts@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes
