@@ -1,5 +1,36 @@
 # @macts/core
 
+## 0.6.0
+
+### Minor Changes
+
+- e7a407f: A command's `unsupported` marker now also accepts dictionary handler evidence: the app's dictionary documents the command as a handler the app sends to a user's script, not a command it carries out. Such a command has no route, operation, tool, capability or derived permission, and the SDKs and the CLI omit it. The new `DictionaryHandlerEvidenceSchema` and `CommandUnsupportedEvidenceSchema` describe the evidence.
+
+  Mail's `performMailActionWithMessages`, a handler Mail sends to scripts when a rule or menu item runs one, is marked this way and is no longer offered.
+
+- 298b040: Capability CLI snippets and the generated CLI now come from one command tree, so a snippet always names a command the app's CLI registers. A capability whose operation has no CLI command (a resource update or delete, a create where the hierarchy entry is read-only, or a resource with no hierarchy entry) now has no `cliSnippet` instead of one naming a command that does not exist; `Capability.cliSnippet` is `string | undefined`. Affected today: Calendar event update and delete, Microsoft Edge tab and window create, Notes attachment list and get, Reminders delete, System Events action perform and UI element click and select, and Terminal tab list and get.
+
+  `macts capabilities inspect` and `search`, and the MCP discovery tool, report `call: null` for such a capability; the human-readable output names its MCP tool instead.
+
+  CLI generation now refuses a manifest in which two commands are placed at the same CLI path, naming the path and each command.
+
+- d57951d: Write text into an iTerm session, optionally followed by a newline. The session is addressed by its Window-scoped identity, and writing requires its own `iterm:sessions:writeText` permission, separate from every session read. Resource commands that act on one item can now find it through a declared identity traversal.
+- b658122: Manifest validation now rejects a manifest whose text names the automation mechanism: any description, name, key or author-written evidence note, apart from the dictionary's own words quoted in evidence (`term`, `statement`) and the `extraction` notes. Every surface derives its text from the manifest, so capabilities, contracts, the CLI, clients and MCP tools no longer carry these terms. `MECHANISM_TERMS` is the one definition of the terms, and `findMechanismTermIssues` reports where a manifest names one.
+
+  The Music and TV `count` and `make` inputs, Script Editor's document `language`, Mail's rule `runScript`, OmniGraffle's attached `script`, and the OmniFocus and OmniPlan suite descriptions now say what each is without naming the mechanism.
+
+- c8d6ba1: The manifest command schema now rejects fields it does not know. A command, a command parameter or a permission-history entry with an unrecognised key fails to load, where the key was previously dropped silently. A future field that withholds or restricts a command therefore fails closed on a runtime that predates it, instead of being stripped and the command offered.
+- 2341796: A generated CLI command now sits under the collections its address selects. In format 1.1, a command that declares its ancestors is placed under those ancestors' collections followed by its target's collection, leaving out any collection its identity traversal searches; capability CLI snippets name the same path.
+
+  The iTerm Session resolve and Session write, which take a Window and search every Tab of it, move from `macts iterm windows tabs sessions resolve` and `macts iterm windows tabs sessions write` to `macts iterm windows sessions resolve` and `macts iterm windows sessions write`. The old paths are removed. Their routes, permissions, MCP tools and SDK methods are unchanged.
+
+### Patch Changes
+
+- a295def: Generated app packages now document their `./contract` and `./cli` entry points in the API reference. The generator writes a doc model for each subpath entry point beside the root entry's, and a new `api-extractor.cli.json` reports and documents the `./cli` entry.
+- 241be94: A Session read by identity never returns another Session's data. When a property read reports the object missing, the read now confirms that the object still exists with the sought identity before treating the property as omitted or empty, so a Session that is gone, moved or replaced at that point fails as a missing target or a retryable `CollectionChangedError` instead of returning a record with fields missing. A Session that leaves and returns within a single property read can still produce an incomplete record of its own data, which the output check reports as `UnexpectedValueError`. This applies to the Tab-scoped get, the Window-scoped resolve and reads of a decoded Session reference; format 1.0 reads are unchanged.
+- fe454b9: Make exported declaration paths available in built packages.
+  - @macts/contracts@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes

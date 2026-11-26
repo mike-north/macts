@@ -1,5 +1,12 @@
 # @macts-e2e/round-trip
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [fe454b9]
+  - @macts/calendar@0.6.0
+
 ## 0.0.5
 
 ### Patch Changes

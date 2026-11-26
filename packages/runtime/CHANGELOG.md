@@ -1,5 +1,25 @@
 # @macts/runtime
 
+## 0.6.0
+
+### Patch Changes
+
+- 0999cfd: Opening the API-key store on a fresh macts home no longer fails with `database is locked` when several processes open it at once. The store sets its busy timeout before its first statement and retries the switch to WAL while SQLite reports busy, for at most the busy timeout.
+- 7330158: Publish signing secret replacements atomically and refresh running processes on their next key operation.
+- 4627f9a: Ensure concurrent key store initialization shares a complete signing secret.
+- bf1ea58: The transfer store's sweep now also removes files in its uploads and copies directories that no record names, once they are older than the longest transfer lifetime. Only regular files with a name the store mints are removed; links, directories and any other name are left alone. A temporary copy whose deletion is refused and whose state cannot then be read (an I/O error rather than the file being absent) now keeps its record and reports the failure, instead of being treated as refused and forgotten.
+- Updated dependencies [e7a407f]
+- Updated dependencies [298b040]
+- Updated dependencies [a295def]
+- Updated dependencies [d57951d]
+- Updated dependencies [b658122]
+- Updated dependencies [241be94]
+- Updated dependencies [c8d6ba1]
+- Updated dependencies [fe454b9]
+- Updated dependencies [2341796]
+  - @macts/core@0.6.0
+  - @macts/contracts@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes

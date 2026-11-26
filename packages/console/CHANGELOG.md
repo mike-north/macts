@@ -1,5 +1,12 @@
 # @macts/console
 
+## 0.6.0
+
+### Patch Changes
+
+- fe454b9: Make exported declaration paths available in built packages.
+  - @macts/contracts@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

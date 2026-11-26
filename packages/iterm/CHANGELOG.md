@@ -1,5 +1,20 @@
 # @macts/iterm
 
+## 0.6.0
+
+### Minor Changes
+
+- d57951d: Write text into an iTerm session, optionally followed by a newline. The session is addressed by its Window-scoped identity, and writing requires its own `iterm:sessions:writeText` permission, separate from every session read. Resource commands that act on one item can now find it through a declared identity traversal.
+- d57951d: Remove the application-level `write` command (`iterm.app.write`, permission `iterm:app:write`, `macts iterm write`, `client.write`, and the `macts__iterm__app_write` MCP tool). It typed text into iTerm with no session address. Use the session write (`iterm.sessions.writeText`, permission `iterm:sessions:writeText`) instead, which names the window and session it types into.
+- 2341796: A generated CLI command now sits under the collections its address selects. In format 1.1, a command that declares its ancestors is placed under those ancestors' collections followed by its target's collection, leaving out any collection its identity traversal searches; capability CLI snippets name the same path.
+
+  The iTerm Session resolve and Session write, which take a Window and search every Tab of it, move from `macts iterm windows tabs sessions resolve` and `macts iterm windows tabs sessions write` to `macts iterm windows sessions resolve` and `macts iterm windows sessions write`. The old paths are removed. Their routes, permissions, MCP tools and SDK methods are unchanged.
+
+### Patch Changes
+
+- fe454b9: Make exported declaration paths available in built packages.
+  - @macts/contracts@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes

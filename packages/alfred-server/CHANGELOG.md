@@ -1,5 +1,12 @@
 # @macts/alfred-server
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [fe454b9]
+  - @macts/alfred@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes

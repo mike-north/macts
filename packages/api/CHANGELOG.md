@@ -1,5 +1,26 @@
 # @macts/api
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [e7a407f]
+- Updated dependencies [298b040]
+- Updated dependencies [a295def]
+- Updated dependencies [d57951d]
+- Updated dependencies [0999cfd]
+- Updated dependencies [b658122]
+- Updated dependencies [7330158]
+- Updated dependencies [241be94]
+- Updated dependencies [c8d6ba1]
+- Updated dependencies [fe454b9]
+- Updated dependencies [4627f9a]
+- Updated dependencies [bf1ea58]
+- Updated dependencies [2341796]
+  - @macts/core@0.6.0
+  - @macts/runtime@0.6.0
+  - @macts/contracts@0.6.0
+
 ## 0.5.0
 
 ### Patch Changes
