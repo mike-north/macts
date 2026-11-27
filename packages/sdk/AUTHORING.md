@@ -45,11 +45,19 @@ const reminders = createClient(remindersContract, options)
 
 const calendars = await calendar.calendars.list()
 const lists = await reminders.lists.list()
+const list = lists.items[0]
+if (!list) {
+  throw new Error('No reminder list found; create one in Reminders first')
+}
 await reminders.reminders.create({
-  name: `Review: ${calendars[0]?.name ?? 'calendar'}`,
-  listId: lists[0]?.id ?? '',
+  name: `Review: ${calendars.items[0]?.name ?? 'calendar'}`,
+  listId: list.id,
 })
 ```
+
+List operations return one page, not a whole collection: read the page's
+`items`, and when it carries a `nextCursor`, call the same operation again with
+`{ cursor }` to read the next page.
 
 `resolveClientOptions()` reads `MACTS_API_KEY` (required) and `MACTS_API_URL`
 (optional, default `http://localhost:8372`) and returns `{ token, url }`.
@@ -154,17 +162,28 @@ async function main() {
 
   // Capability: calendar.calendars.list (permission: calendar:calendars:list)
   const calendars = await calendar.calendars.list()
-  console.log(`Found ${String(calendars.length)} calendar(s)`)
+  console.log(`Found ${String(calendars.items.length)} calendar(s)`)
 
-  // Capability: reminders.lists.list (permission: reminders:lists:list)
-  const lists = await reminders.lists.list()
-  const inbox = lists.find((list) => list.name === 'Reminders') ?? lists[0]
-  if (!inbox) throw new Error('No reminder lists found')
+  // Capability: reminders.lists.list (permission: reminders:lists:list).
+  // The listing is paged: follow nextCursor until the list named "Reminders"
+  // appears, and keep the first list as a fallback.
+  let page = await reminders.lists.list()
+  let fallback = page.items[0]
+  let inbox = page.items.find((list) => list.name === 'Reminders')
+  while (!inbox && page.nextCursor) {
+    page = await reminders.lists.list({ cursor: page.nextCursor })
+    fallback ??= page.items[0]
+    inbox = page.items.find((list) => list.name === 'Reminders')
+  }
+  const list = inbox ?? fallback
+  if (!list) {
+    throw new Error('No reminder lists found; create one in Reminders first')
+  }
 
   // Capability: reminders.reminders.create (permission: reminders:reminders:create)
   const reminder = await reminders.reminders.create({
-    name: `Review calendar: ${calendars[0]?.name ?? 'unknown'}`,
-    listId: inbox.id,
+    name: `Review calendar: ${calendars.items[0]?.name ?? 'unknown'}`,
+    listId: list.id,
   })
   console.log(`Created reminder: ${reminder.name}`)
 }
